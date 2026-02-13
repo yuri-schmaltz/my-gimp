@@ -33,6 +33,7 @@
 #include "core/gimppickable.h"
 
 #include "gimpclipboard.h"
+#include "gimpclipboardcompat.h"
 #include "gimppixbuf.h"
 #include "gimpselectiondata.h"
 
@@ -125,20 +126,17 @@ gimp_clipboard_exit (Gimp *gimp)
 
   g_return_if_fail (GIMP_IS_GIMP (gimp));
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
-  if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) == G_OBJECT (gimp))
+  if (gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
-      gtk_clipboard_store (clipboard);
+      gimp_clipboard_compat_store (clipboard);
     }
 
-  if (clipboard)
-    /* If we don't clear the clipboard, it keeps a reference on the object
-     * owner (i.e. Gimp object probably) which fails to finalize.
-     */
-    gtk_clipboard_clear (clipboard);
+  /* If we don't clear the clipboard, it keeps a reference on the object
+   * owner (i.e. Gimp object probably) which fails to finalize.
+   */
+  gimp_clipboard_compat_clear (clipboard);
 
   g_object_set_data (G_OBJECT (gimp), GIMP_CLIPBOARD_KEY, NULL);
 }
@@ -160,11 +158,10 @@ gimp_clipboard_has_image (Gimp *gimp)
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), FALSE);
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) != G_OBJECT (gimp))
+      ! gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
       if (gimp_clipboard_wait_for_image (gimp) != GDK_NONE)
         {
@@ -199,11 +196,10 @@ gimp_clipboard_has_buffer (Gimp *gimp)
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), FALSE);
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) != G_OBJECT (gimp))
+      ! gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
       if (gimp_clipboard_wait_for_buffer (gimp) != GDK_NONE)
         {
@@ -236,11 +232,10 @@ gimp_clipboard_has_svg (Gimp *gimp)
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), FALSE);
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) != G_OBJECT (gimp))
+      ! gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
       if (gimp_clipboard_wait_for_svg (gimp) != GDK_NONE)
         {
@@ -273,11 +268,10 @@ gimp_clipboard_has_curve (Gimp *gimp)
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), FALSE);
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) != G_OBJECT (gimp))
+      ! gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
       if (gimp_clipboard_wait_for_curve (gimp) != GDK_NONE)
         {
@@ -341,11 +335,10 @@ gimp_clipboard_get_image (Gimp *gimp)
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), NULL);
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) != G_OBJECT (gimp))
+      ! gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
       GdkAtom atom = gimp_clipboard_wait_for_image (gimp);
 
@@ -355,7 +348,7 @@ gimp_clipboard_get_image (Gimp *gimp)
 
           gimp_set_busy (gimp);
 
-          data = gtk_clipboard_wait_for_contents (clipboard, atom);
+          data = gimp_clipboard_compat_wait_for_contents (clipboard, atom);
 
           if (data)
             {
@@ -400,11 +393,10 @@ gimp_clipboard_get_buffer (Gimp *gimp)
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), NULL);
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) != G_OBJECT (gimp))
+      ! gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
       GdkAtom atom = gimp_clipboard_wait_for_buffer (gimp);
 
@@ -414,7 +406,7 @@ gimp_clipboard_get_buffer (Gimp *gimp)
 
           gimp_set_busy (gimp);
 
-          data = gtk_clipboard_wait_for_contents (clipboard, atom);
+          data = gimp_clipboard_compat_wait_for_contents (clipboard, atom);
 
           if (data)
             {
@@ -470,11 +462,10 @@ gimp_clipboard_get_svg (Gimp  *gimp,
 
   *svg_length = 0;
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) != G_OBJECT (gimp))
+      ! gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
       GdkAtom atom = gimp_clipboard_wait_for_svg (gimp);
 
@@ -484,7 +475,7 @@ gimp_clipboard_get_svg (Gimp  *gimp,
 
           gimp_set_busy (gimp);
 
-          data = gtk_clipboard_wait_for_contents (clipboard, atom);
+          data = gimp_clipboard_compat_wait_for_contents (clipboard, atom);
 
           if (data)
             {
@@ -536,11 +527,10 @@ gimp_clipboard_get_curve (Gimp *gimp)
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), NULL);
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard &&
-      gtk_clipboard_get_owner (clipboard) != G_OBJECT (gimp))
+      ! gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
       GdkAtom atom = gimp_clipboard_wait_for_curve (gimp);
 
@@ -550,7 +540,7 @@ gimp_clipboard_get_curve (Gimp *gimp)
 
           gimp_set_busy (gimp);
 
-          data = gtk_clipboard_wait_for_contents (clipboard, atom);
+          data = gimp_clipboard_compat_wait_for_contents (clipboard, atom);
 
           if (data)
             {
@@ -590,8 +580,7 @@ gimp_clipboard_set_image (Gimp      *gimp,
   g_return_if_fail (GIMP_IS_GIMP (gimp));
   g_return_if_fail (image == NULL || GIMP_IS_IMAGE (image));
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
   if (! clipboard)
     return;
 
@@ -603,23 +592,22 @@ gimp_clipboard_set_image (Gimp      *gimp,
     {
       gimp_clip->image = g_object_ref (image);
 
-      gtk_clipboard_set_with_owner (clipboard,
-                                    gimp_clip->image_target_entries,
-                                    gimp_clip->n_image_target_entries,
-                                    (GtkClipboardGetFunc) gimp_clipboard_send_image,
-                                    (GtkClipboardClearFunc) NULL,
-                                    G_OBJECT (gimp));
+      gimp_clipboard_compat_set_with_owner (clipboard,
+                                            gimp_clip->image_target_entries,
+                                            gimp_clip->n_image_target_entries,
+                                            (GtkClipboardGetFunc) gimp_clipboard_send_image,
+                                            G_OBJECT (gimp));
 
       /*  mark the first two entries (image/x-xcf and image/png) as
        *  suitable for storing
        */
-      gtk_clipboard_set_can_store (clipboard,
-                                   gimp_clip->image_target_entries,
-                                   MIN (2, gimp_clip->n_image_target_entries));
+      gimp_clipboard_compat_set_can_store (clipboard,
+                                           gimp_clip->image_target_entries,
+                                           MIN (2, gimp_clip->n_image_target_entries));
     }
-  else if (gtk_clipboard_get_owner (clipboard) == G_OBJECT (gimp))
+  else if (gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
-      gtk_clipboard_clear (clipboard);
+      gimp_clipboard_compat_clear (clipboard);
     }
 }
 
@@ -640,8 +628,7 @@ gimp_clipboard_set_buffer (Gimp       *gimp,
   g_return_if_fail (GIMP_IS_GIMP (gimp));
   g_return_if_fail (buffer == NULL || GIMP_IS_BUFFER (buffer));
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
   if (! clipboard)
     return;
 
@@ -653,21 +640,20 @@ gimp_clipboard_set_buffer (Gimp       *gimp,
     {
       gimp_clip->buffer = g_object_ref (buffer);
 
-      gtk_clipboard_set_with_owner (clipboard,
-                                    gimp_clip->buffer_target_entries,
-                                    gimp_clip->n_buffer_target_entries,
-                                    (GtkClipboardGetFunc) gimp_clipboard_send_buffer,
-                                    (GtkClipboardClearFunc) NULL,
-                                    G_OBJECT (gimp));
+      gimp_clipboard_compat_set_with_owner (clipboard,
+                                            gimp_clip->buffer_target_entries,
+                                            gimp_clip->n_buffer_target_entries,
+                                            (GtkClipboardGetFunc) gimp_clipboard_send_buffer,
+                                            G_OBJECT (gimp));
 
       /*  mark the first entry (image/png) as suitable for storing  */
       if (gimp_clip->n_buffer_target_entries > 0)
-        gtk_clipboard_set_can_store (clipboard,
-                                     gimp_clip->buffer_target_entries, 1);
+        gimp_clipboard_compat_set_can_store (clipboard,
+                                             gimp_clip->buffer_target_entries, 1);
     }
-  else if (gtk_clipboard_get_owner (clipboard) == G_OBJECT (gimp))
+  else if (gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
-      gtk_clipboard_clear (clipboard);
+      gimp_clipboard_compat_clear (clipboard);
     }
 }
 
@@ -687,8 +673,7 @@ gimp_clipboard_set_svg (Gimp        *gimp,
 
   g_return_if_fail (GIMP_IS_GIMP (gimp));
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
   if (! clipboard)
     return;
 
@@ -700,20 +685,19 @@ gimp_clipboard_set_svg (Gimp        *gimp,
     {
       gimp_clip->svg = g_strdup (svg);
 
-      gtk_clipboard_set_with_owner (clipboard,
-                                    gimp_clip->svg_target_entries,
-                                    gimp_clip->n_svg_target_entries,
-                                    (GtkClipboardGetFunc) gimp_clipboard_send_svg,
-                                    (GtkClipboardClearFunc) NULL,
-                                    G_OBJECT (gimp));
+      gimp_clipboard_compat_set_with_owner (clipboard,
+                                            gimp_clip->svg_target_entries,
+                                            gimp_clip->n_svg_target_entries,
+                                            (GtkClipboardGetFunc) gimp_clipboard_send_svg,
+                                            G_OBJECT (gimp));
 
       /*  mark the first entry (image/svg) as suitable for storing  */
-      gtk_clipboard_set_can_store (clipboard,
-                                   gimp_clip->svg_target_entries, 1);
+      gimp_clipboard_compat_set_can_store (clipboard,
+                                           gimp_clip->svg_target_entries, 1);
     }
-  else if (gtk_clipboard_get_owner (clipboard) == G_OBJECT (gimp))
+  else if (gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
-      gtk_clipboard_clear (clipboard);
+      gimp_clipboard_compat_clear (clipboard);
     }
 }
 
@@ -735,15 +719,11 @@ gimp_clipboard_set_text (Gimp        *gimp,
 
   gimp_clipboard_clear (gimp_clipboard_get (gimp));
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
-  if (clipboard)
-    gtk_clipboard_set_text (clipboard, text, -1);
+  clipboard = gimp_clipboard_compat_get_default ();
+  gimp_clipboard_compat_set_text (clipboard, text);
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_PRIMARY);
-  if (clipboard)
-    gtk_clipboard_set_text (clipboard, text, -1);
+  clipboard = gimp_clipboard_compat_get_primary ();
+  gimp_clipboard_compat_set_text (clipboard, text);
 }
 
 /**
@@ -763,8 +743,7 @@ gimp_clipboard_set_curve (Gimp      *gimp,
   g_return_if_fail (GIMP_IS_GIMP (gimp));
   g_return_if_fail (curve == NULL || GIMP_IS_CURVE (curve));
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
   if (! clipboard)
     return;
 
@@ -776,19 +755,18 @@ gimp_clipboard_set_curve (Gimp      *gimp,
     {
       gimp_clip->curve = g_object_ref (curve);
 
-      gtk_clipboard_set_with_owner (clipboard,
-                                    gimp_clip->curve_target_entries,
-                                    gimp_clip->n_curve_target_entries,
-                                    (GtkClipboardGetFunc) gimp_clipboard_send_curve,
-                                    (GtkClipboardClearFunc) NULL,
-                                    G_OBJECT (gimp));
+      gimp_clipboard_compat_set_with_owner (clipboard,
+                                            gimp_clip->curve_target_entries,
+                                            gimp_clip->n_curve_target_entries,
+                                            (GtkClipboardGetFunc) gimp_clipboard_send_curve,
+                                            G_OBJECT (gimp));
 
-      gtk_clipboard_set_can_store (clipboard,
-                                   gimp_clip->curve_target_entries, 1);
+      gimp_clipboard_compat_set_can_store (clipboard,
+                                           gimp_clip->curve_target_entries, 1);
     }
-  else if (gtk_clipboard_get_owner (clipboard) == G_OBJECT (gimp))
+  else if (gimp_clipboard_compat_owner_is (clipboard, gimp))
     {
-      gtk_clipboard_clear (clipboard);
+      gimp_clipboard_compat_clear (clipboard);
     }
 }
 
@@ -951,15 +929,14 @@ gimp_clipboard_wait_for_targets (Gimp *gimp,
 {
   GtkClipboard *clipboard;
 
-  clipboard = gtk_clipboard_get_for_display (gdk_display_get_default (),
-                                             GDK_SELECTION_CLIPBOARD);
+  clipboard = gimp_clipboard_compat_get_default ();
 
   if (clipboard)
     {
       GtkSelectionData *data;
       GdkAtom           atom = gdk_atom_intern_static_string ("TARGETS");
 
-      data = gtk_clipboard_wait_for_contents (clipboard, atom);
+      data = gimp_clipboard_compat_wait_for_contents (clipboard, atom);
 
       if (data)
         {

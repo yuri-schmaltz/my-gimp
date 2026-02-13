@@ -48,6 +48,7 @@
 #include "widgets/gimphelp-ids.h"
 #include "widgets/gimpprefsbox.h"
 #include "widgets/gimprow.h"
+#include "widgets/gimpshortcutbridge.h"
 #include "widgets/gimpuimanager.h"
 #include "widgets/gimpwidgets-utils.h"
 
@@ -197,11 +198,6 @@ welcome_dialog_new (Gimp       *gimp,
 
   gchar          *title;
 
-  GtkAccelGroup  *accel_group;
-  guint           accel_key;
-  GdkModifierType accel_mods;
-  gchar         **accels;
-
   /* Translators: the %s string will be the version, e.g. "3.0". */
   title = g_strdup_printf (_("Welcome to GIMP %s"), GIMP_VERSION);
   windows = gimp_get_image_windows (gimp);
@@ -323,53 +319,28 @@ welcome_dialog_new (Gimp       *gimp,
   /*************/
   /* Shortcuts */
   /*************/
-  /* XXX: GtkAccelGroup will be deprecated in GTK4
-   * See: https://docs.gtk.org/gtk4/migrating-3to4.html#use-the-new-apis-for-keyboard-shortcuts
-   * This GtkAccelGroup must be converted to a GtkShortcutController
-   */
-  accel_group = gtk_accel_group_new ();
-  gtk_window_add_accel_group (GTK_WINDOW (dialog), accel_group);
+  gimp_shortcut_bridge_add_action_accel (GTK_WINDOW (dialog),
+                                         GTK_APPLICATION (gimp->app),
+                                         "app.image-new",
+                                         G_CALLBACK (welcome_dialog_new_image_accelerator),
+                                         dialog);
 
-  accels = gtk_application_get_accels_for_action (GTK_APPLICATION (gimp->app),
-                                                  "app.image-new");
-  if (accels && accels[0])
-    {
-      gtk_accelerator_parse (accels[0], &accel_key, &accel_mods);
-      gtk_accel_group_connect (accel_group,
-                              accel_key, accel_mods, 0,
-                              g_cclosure_new (G_CALLBACK (welcome_dialog_new_image_accelerator),
-                                              dialog, NULL));
-      g_strfreev (accels);
-    }
-
-  accels = gtk_application_get_accels_for_action (GTK_APPLICATION (gimp->app),
-                                                  "app.file-open");
-  if (accels && accels[0])
-    {
-      gtk_accelerator_parse (accels[0], &accel_key, &accel_mods);
-      gtk_accel_group_connect (accel_group,
-                              accel_key, accel_mods, 0,
-                              g_cclosure_new (G_CALLBACK (welcome_dialog_open_image_dialog_accelerator),
-                                              dialog, NULL));
-      g_strfreev (accels);
-    }
+  gimp_shortcut_bridge_add_action_accel (GTK_WINDOW (dialog),
+                                         GTK_APPLICATION (gimp->app),
+                                         "app.file-open",
+                                         G_CALLBACK (welcome_dialog_open_image_dialog_accelerator),
+                                         dialog);
 
   for (guint i = 0; i < 10; i++)
     {
       gchar accel_str[24];
 
       g_snprintf (accel_str, sizeof (accel_str), "app.file-open-recent-%02u", i + 1);
-      accels = gtk_application_get_accels_for_action (GTK_APPLICATION (gimp->app),
-                                                      accel_str);
-      if (accels && accels[0])
-        {
-          gtk_accelerator_parse (accels[0], &accel_key, &accel_mods);
-          gtk_accel_group_connect (accel_group,
-                                  accel_key, accel_mods, 0,
-                                  g_cclosure_new (G_CALLBACK (welcome_dialog_open_image_accelerator),
-                                                  GUINT_TO_POINTER (i), NULL));
-          g_strfreev (accels);
-        }
+      gimp_shortcut_bridge_add_action_accel (GTK_WINDOW (dialog),
+                                             GTK_APPLICATION (gimp->app),
+                                             accel_str,
+                                             G_CALLBACK (welcome_dialog_open_image_accelerator),
+                                             GUINT_TO_POINTER (i));
     }
 
   return dialog;

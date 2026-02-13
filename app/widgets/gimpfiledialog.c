@@ -39,6 +39,7 @@
 #include "plug-in/gimppluginprocedure.h"
 
 #include "gimpfiledialog.h"
+#include "gimpfiledialog-backend.h"
 #include "gimpfileprocview.h"
 #include "gimpprogressbox.h"
 #include "gimpthumbbox.h"
@@ -333,10 +334,8 @@ gimp_file_dialog_constructed (GObject *object)
 
   G_OBJECT_CLASS (parent_class)->constructed (object);
 
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-                          _("_Cancel"),            GTK_RESPONSE_CANCEL,
-                          dialog->ok_button_label, GTK_RESPONSE_OK,
-                          NULL);
+  gimp_file_dialog_backend_add_default_buttons (GTK_DIALOG (dialog),
+                                                dialog->ok_button_label);
 
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
   gimp_dialog_set_alternative_button_order (GTK_DIALOG (dialog),
@@ -344,9 +343,9 @@ gimp_file_dialog_constructed (GObject *object)
                                            GTK_RESPONSE_CANCEL,
                                            -1);
 
-  gtk_file_chooser_set_local_only (GTK_FILE_CHOOSER (object), FALSE);
-  gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (object),
-                                                  TRUE);
+  gimp_file_dialog_backend_configure_chooser (GTK_FILE_CHOOSER (object),
+                                              FALSE,
+                                              TRUE);
 
   if (dialog->help_id)
     {
@@ -369,15 +368,15 @@ gimp_file_dialog_constructed (GObject *object)
   gimp_file_dialog_add_preview (dialog);
 
   dialog->extra_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 4);
-  gtk_file_chooser_set_extra_widget (GTK_FILE_CHOOSER (dialog),
-                                     dialog->extra_vbox);
+  gimp_file_dialog_backend_set_extra_widget (GTK_FILE_CHOOSER (dialog),
+                                             dialog->extra_vbox);
   gtk_widget_show (dialog->extra_vbox);
 
   gimp_file_dialog_add_proc_selection (dialog);
 
   dialog->progress = gimp_progress_box_new ();
-  gtk_box_pack_end (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))),
-                    dialog->progress, FALSE, FALSE, 0);
+  gimp_file_dialog_backend_pack_progress (GTK_DIALOG (dialog),
+                                          dialog->progress);
 
   gimp_widget_set_native_handle (GTK_WIDGET (dialog), &dialog->window_handle);
 }
@@ -711,8 +710,8 @@ gimp_file_dialog_add_user_dir (GimpFileDialog *dialog,
   const gchar *user_dir = g_get_user_special_dir (directory);
 
   if (user_dir)
-    gtk_file_chooser_add_shortcut_folder (GTK_FILE_CHOOSER (dialog),
-                                          user_dir, NULL);
+    gimp_file_dialog_backend_add_shortcut_folder (GTK_FILE_CHOOSER (dialog),
+                                                  user_dir);
 }
 
 static void
