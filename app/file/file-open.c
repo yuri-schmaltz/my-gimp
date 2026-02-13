@@ -30,6 +30,7 @@
 #include "gegl/gimp-babl.h"
 
 #include "core/gimp.h"
+#include "core/gimp-data-factories.h"
 #include "core/gimpcontext.h"
 #include "core/gimpdocumentlist.h"
 #include "core/gimpimage.h"
@@ -47,6 +48,9 @@
 #include "plug-in/gimppluginmanager-file.h"
 #include "plug-in/gimppluginprocedure.h"
 
+#include "xcf/xcf-private.h"
+#include "xcf/xcf-load.h"
+
 #include "file-import.h"
 #include "file-open.h"
 #include "file-remote.h"
@@ -55,32 +59,41 @@
 #include "gimp-intl.h"
 
 
-static GimpImage * file_open_link_image           (Gimp                *gimp,
-                                                   GimpContext         *context,
-                                                   GimpProgress        *progress,
-                                                   GFile               *file,
-                                                   gint                 vector_width,
-                                                   gint                 vector_height,
-                                                   gboolean             vector_keep_ratio,
-                                                   gboolean             as_new,
-                                                   GimpPlugInProcedure *file_proc,
-                                                   GimpRunMode          run_mode,
-                                                   gboolean            *file_proc_handles_vector,
-                                                   GimpPDBStatusType   *status,
-                                                   const gchar        **mime_type,
-                                                   GError             **error);
+static GimpImage * file_open_link_image           (Gimp                 *gimp,
+                                                   GimpContext          *context,
+                                                   GimpImage            *dest_image,
+                                                   GimpProgress         *progress,
+                                                   GFile                *file,
+                                                   gint                  vector_width,
+                                                   gint                  vector_height,
+                                                   gboolean              vector_keep_ratio,
+                                                   gboolean              as_new,
+                                                   GimpPlugInProcedure  *file_proc,
+                                                   GimpRunMode           run_mode,
+                                                   gboolean             *file_proc_handles_vector,
+                                                   GimpPDBStatusType    *status,
+                                                   const gchar         **mime_type,
+                                                   GError              **error);
 
-static void        file_open_sanitize_image       (GimpImage           *image,
-                                                   gboolean             as_new);
-static void        file_open_convert_items        (GimpImage           *dest_image,
-                                                   const gchar         *basename,
-                                                   GList               *items);
-static GList     * file_open_get_layers           (GimpImage           *image,
-                                                   gboolean             merge_visible,
-                                                   gint                *n_visible);
-static gboolean    file_open_file_proc_is_import  (GimpPlugInProcedure *file_proc);
-static gboolean    file_open_valid_permissions    (GFile               *file,
-                                                   GError             **error);
+static void        file_open_sanitize_image       (GimpImage            *image,
+                                                   gboolean              as_new);
+static void        file_open_convert_items        (GimpImage            *dest_image,
+                                                   const gchar          *basename,
+                                                   GList                *items);
+static GList     * file_open_get_layers           (GimpImage            *image,
+                                                   gboolean              merge_visible,
+                                                   gint                 *n_visible);
+static gboolean    file_open_valid_permissions    (GFile                *file,
+                                                   GError              **error);
+static gboolean    file_open_pre_check            (Gimp                 *gimp,
+                                                   GFile                *file,
+                                                   GimpImage            *dest_image,
+                                                   gboolean              as_link,
+                                                   GimpProgress         *progress,
+                                                   GimpPlugInProcedure **file_proc,
+                                                   GFile               **local_file,
+                                                   GimpPDBStatusType    *status,
+                                                   GError              **error);
 
 
 /*  public functions  */
@@ -105,8 +118,6 @@ file_open_image (Gimp                *gimp,
   GFile          *orig_file;
   GimpImage      *image       = NULL;
   GFile          *local_file  = NULL;
-  gboolean        mounted     = TRUE;
-  GError         *my_error    = NULL;
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), NULL);
   g_return_val_if_fail (GIMP_IS_CONTEXT (context), NULL);
@@ -115,83 +126,16 @@ file_open_image (Gimp                *gimp,
   g_return_val_if_fail (status != NULL, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
+  if (! file_open_pre_check (gimp, file, NULL, FALSE, progress,
+                             &file_proc, &local_file, status, error))
+    return NULL;
+
   *status = GIMP_PDB_EXECUTION_ERROR;
 
   orig_file = file;
 
-  if (! g_file_is_native (file) &&
-      ! file_remote_mount_file (gimp, file, progress, &my_error))
-    {
-      if (my_error)
-        {
-          g_printerr ("%s: mounting remote volume failed, trying to download "
-                      "the file: %s\n",
-                      G_STRFUNC, my_error->message);
-          g_clear_error (&my_error);
-
-          mounted = FALSE;
-        }
-      else
-        {
-          *status = GIMP_PDB_CANCEL;
-
-          return NULL;
-        }
-    }
-
-  if (g_file_is_native (file) && ! file_open_valid_permissions (file, error))
-    return NULL;
-
-  if (! file_proc)
-    file_proc = gimp_plug_in_manager_file_procedure_find (gimp->plug_in_manager,
-                                                          GIMP_FILE_PROCEDURE_GROUP_OPEN,
-                                                          file, error);
-
-  if (! file_proc || ! file_proc->handles_remote || ! mounted)
-    {
-      gchar *my_path = g_file_get_path (file);
-
-      if (! my_path)
-        {
-          g_clear_error (error);
-
-          local_file = file_remote_download_image (gimp, file, progress,
-                                                   &my_error);
-
-          if (! local_file)
-            {
-              if (my_error)
-                g_propagate_error (error, my_error);
-              else
-                *status = GIMP_PDB_CANCEL;
-
-              return NULL;
-            }
-
-          /*  if we don't have a file proc yet, try again on the local
-           *  file
-           */
-          if (! file_proc)
-            file_proc = gimp_plug_in_manager_file_procedure_find (gimp->plug_in_manager,
-                                                                  GIMP_FILE_PROCEDURE_GROUP_OPEN,
-                                                                  local_file, error);
-
-          file = local_file;
-        }
-
-      g_free (my_path);
-    }
-
-  if (! file_proc)
-    {
-      if (local_file)
-        {
-          g_file_delete (local_file, NULL, NULL);
-          g_object_unref (local_file);
-        }
-
-      return NULL;
-    }
+  if (local_file)
+    file = local_file;
 
   if (file_proc_handles_vector)
     *file_proc_handles_vector = file_proc->handles_vector;
@@ -290,7 +234,7 @@ file_open_image (Gimp                *gimp,
     {
       gimp_image_undo_disable (image);
 
-      if (file_open_file_proc_is_import (file_proc))
+      if (! gimp_plug_in_procedure_is_xcf_load (file_proc))
         {
           file_import_image (image, context, orig_file,
                              run_mode == GIMP_RUN_INTERACTIVE,
@@ -524,7 +468,7 @@ file_open_with_proc_and_display (Gimp                *gimp,
     run_mode = GIMP_RUN_NONINTERACTIVE;
 
   if (as_link)
-    image = file_open_link_image (gimp, context, progress,
+    image = file_open_link_image (gimp, context, NULL, progress,
                                   file, 0, 0, TRUE,
                                   as_new,
                                   file_proc,
@@ -557,7 +501,7 @@ file_open_with_proc_and_display (Gimp                *gimp,
       if (! file_proc)
         file_proc = gimp_image_get_load_proc (image);
 
-      if (file_open_file_proc_is_import (file_proc) &&
+      if (! gimp_plug_in_procedure_is_xcf_load (file_proc) &&
           gimp_image_get_n_layers (image) == 1)
         {
           GimpObject *layer = gimp_image_get_layer_iter (image)->data;
@@ -642,7 +586,7 @@ file_open_layers (Gimp                *gimp,
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (as_link)
-    new_image = file_open_link_image (gimp, context, progress,
+    new_image = file_open_link_image (gimp, context, dest_image, progress,
                                       file,
                                       gimp_image_get_width (dest_image),
                                       gimp_image_get_height (dest_image),
@@ -770,6 +714,7 @@ file_open_from_command_line (Gimp     *gimp,
 static GimpImage *
 file_open_link_image (Gimp                *gimp,
                       GimpContext         *context,
+                      GimpImage           *dest_image,
                       GimpProgress        *progress,
                       GFile               *file,
                       gint                 vector_width,
@@ -784,70 +729,53 @@ file_open_link_image (Gimp                *gimp,
                       GError             **error)
 {
   GimpImage *image = NULL;
+  GimpLink  *link;
 
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), NULL);
   g_return_val_if_fail (GIMP_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (progress == NULL || GIMP_IS_PROGRESS (progress), NULL);
-  g_return_val_if_fail (G_IS_FILE (file), NULL);
+  g_return_val_if_fail (G_IS_FILE (file) && g_file_is_native (file), NULL);
   g_return_val_if_fail (status != NULL, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  if (! file_proc)
-    file_proc = gimp_plug_in_manager_file_procedure_find (gimp->plug_in_manager,
-                                                          GIMP_FILE_PROCEDURE_GROUP_OPEN,
-                                                          file, error);
-
-  if (g_file_is_native (file) && ! file_open_valid_permissions (file, error))
+  if (! file_open_pre_check (gimp, file, dest_image, TRUE, progress,
+                             &file_proc, NULL, status, error))
     return NULL;
 
-  if (g_file_is_native (file) && file_proc != NULL)
+  link = gimp_link_new (gimp, file,
+                        vector_width, vector_height, vector_keep_ratio,
+                        progress, error);
+
+  if (gimp_link_is_broken (link))
     {
-      GimpLink *link = gimp_link_new (gimp, file,
-                                      vector_width, vector_height, vector_keep_ratio,
-                                      progress, error);
-
-      if (gimp_link_is_broken (link))
-        {
-          *status = GIMP_PDB_EXECUTION_ERROR;
-        }
-      else
-        {
-          GimpLayer *layer;
-          gint       width;
-          gint       height;
-
-          gimp_link_get_size (link, &width, &height);
-          image = gimp_image_new (gimp, width, height,
-                                  gimp_link_get_base_type (link),
-                                  gimp_link_get_precision (link));
-          layer = gimp_link_layer_new (image, link);
-          gimp_image_add_layer (image, layer, NULL, 0, FALSE);
-
-          if (! gimp_image_get_load_proc (image))
-            gimp_image_set_load_proc (image, gimp_link_get_load_proc (link));
-
-          file_proc = gimp_image_get_load_proc (image);
-          if (mime_type)
-            *mime_type = g_slist_nth_data (file_proc->mime_types_list, 0);
-          if (file_proc_handles_vector)
-            *file_proc_handles_vector = file_proc->handles_vector;
-
-          *status = GIMP_PDB_SUCCESS;
-        }
-
-      g_clear_object (&link);
+      *status = GIMP_PDB_EXECUTION_ERROR;
     }
-  else if (! g_file_is_native (file))
+  else
     {
-      gchar *uri = g_file_get_uri (file);
+      GimpLayer *layer;
+      gint       width;
+      gint       height;
 
-      if (error && ! *error)
-        g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
-                     _("Only platform-native file paths are supported: '%s' cannot be opened as link."),
-                     uri);
+      gimp_link_get_size (link, &width, &height);
+      image = gimp_image_new (gimp, width, height,
+                              gimp_link_get_base_type (link),
+                              gimp_link_get_precision (link));
+      layer = gimp_link_layer_new (image, link);
+      gimp_image_add_layer (image, layer, NULL, 0, FALSE);
 
-      g_free (uri);
+      if (! gimp_image_get_load_proc (image))
+        gimp_image_set_load_proc (image, gimp_link_get_load_proc (link));
+
+      file_proc = gimp_image_get_load_proc (image);
+      if (mime_type)
+        *mime_type = g_slist_nth_data (file_proc->mime_types_list, 0);
+      if (file_proc_handles_vector)
+        *file_proc_handles_vector = file_proc->handles_vector;
+
+      *status = GIMP_PDB_SUCCESS;
     }
+
+  g_clear_object (&link);
 
   return image;
 }
@@ -947,22 +875,6 @@ file_open_get_layers (GimpImage *image,
 }
 
 static gboolean
-file_open_file_proc_is_import (GimpPlugInProcedure *file_proc)
-{
-  const gchar *proc_name;
-
-  g_return_val_if_fail (file_proc != NULL, TRUE);
-
-  proc_name = gimp_object_get_name (file_proc);
-
-  /* Even when loading through an intermediate container format plug-in
-   * (e.g. file-compressor), the stored procedure shall be the inner
-   * format.
-   */
-  return (g_strcmp0 (proc_name, "gimp-xcf-load") != 0);
-}
-
-static gboolean
 file_open_valid_permissions (GFile   *file,
                              GError **error)
 {
@@ -1010,4 +922,169 @@ file_open_valid_permissions (GFile   *file,
     }
 
   return FALSE;
+}
+
+static gboolean
+file_open_pre_check (Gimp                 *gimp,
+                     GFile                *file,
+                     GimpImage            *dest_image,
+                     gboolean              as_link,
+                     GimpProgress         *progress,
+                     GimpPlugInProcedure **file_proc,
+                     GFile               **local_file,
+                     GimpPDBStatusType    *status,
+                     GError              **error)
+{
+  gboolean  mounted  = TRUE;
+  GError   *my_error = NULL;
+
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+  g_return_val_if_fail (file_proc != NULL, FALSE);
+  g_return_val_if_fail ((as_link && local_file == NULL) ||
+                        (! as_link && local_file != NULL && *local_file == NULL),
+                        FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  *status = GIMP_PDB_EXECUTION_ERROR;
+
+  if (g_file_is_native (file) && ! file_open_valid_permissions (file, error))
+    return FALSE;
+
+  if (! *file_proc)
+    *file_proc = gimp_plug_in_manager_file_procedure_find (gimp->plug_in_manager,
+                                                           GIMP_FILE_PROCEDURE_GROUP_OPEN,
+                                                           file, error);
+
+  if (as_link)
+    {
+      GFile *dest_file  = dest_image ? gimp_image_get_file (dest_image) : NULL;
+
+      if (! g_file_is_native (file))
+        {
+          gchar *uri = g_file_get_uri (file);
+
+          g_clear_error (error);
+
+          if (error && ! *error)
+            g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
+                         _("Only platform-native file paths are supported: '%s' cannot be opened as link."),
+                         uri);
+
+          g_free (uri);
+
+          return FALSE;
+        }
+
+      if (dest_file && gimp_plug_in_procedure_is_xcf_load (*file_proc))
+        {
+          gboolean loop_found = xcf_load_file_equal (dest_file, file);
+
+          if (! loop_found)
+            {
+              GInputStream  *input;
+              GList         *parent_files;
+              GList         *loop_files = NULL;
+              XcfInfo        info       = { 0, };
+              gint           width;
+              gint           height;
+              gint           type;
+              GimpPrecision  precision;
+
+              parent_files = g_list_prepend (NULL, dest_file);
+
+              input = G_INPUT_STREAM (g_file_read (file, NULL, NULL));
+              if (input && xcf_load_magic_version (gimp, input, file, NULL, &info))
+                xcf_load_image_header (gimp, &info, &width, &height, &type, &precision,
+                                       parent_files, &loop_files, &loop_found, NULL);
+
+              g_clear_object (&input);
+              g_list_free (parent_files);
+              g_list_free_full (loop_files, g_object_unref);
+            }
+
+          if (loop_found)
+            {
+              g_clear_error (error);
+              if (error && ! *error)
+                g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
+                             /* TODO: localize after string freeze ends. */
+                             "Cycling link detected with %s.",
+                             g_file_peek_path (file));
+
+              return FALSE;
+            }
+        }
+
+      return (*file_proc != NULL);
+    }
+
+  /* Below are checks relevant only for non-link file opening. */
+
+  if (! g_file_is_native (file) &&
+      ! file_remote_mount_file (gimp, file, progress, &my_error))
+    {
+      if (my_error)
+        {
+          g_printerr ("%s: mounting remote volume failed, trying to download "
+                      "the file: %s\n",
+                      G_STRFUNC, my_error->message);
+          g_clear_error (&my_error);
+
+          mounted = FALSE;
+        }
+      else
+        {
+          *status = GIMP_PDB_CANCEL;
+          g_clear_error (error);
+
+          return FALSE;
+        }
+    }
+
+  if (! *file_proc || ! (*file_proc)->handles_remote || ! mounted)
+    {
+      gchar *my_path = g_file_get_path (file);
+
+      if (! my_path)
+        {
+          g_clear_error (error);
+
+          *local_file = file_remote_download_image (gimp, file, progress,
+                                                    &my_error);
+
+          if (! *local_file)
+            {
+              if (my_error)
+                g_propagate_error (error, my_error);
+              else
+                *status = GIMP_PDB_CANCEL;
+
+              return FALSE;
+            }
+
+          /*  if we don't have a file proc yet, try again on the local
+           *  file
+           */
+          if (! *file_proc)
+            *file_proc = gimp_plug_in_manager_file_procedure_find (gimp->plug_in_manager,
+                                                                   GIMP_FILE_PROCEDURE_GROUP_OPEN,
+                                                                   *local_file, error);
+
+          if (! *file_proc)
+            {
+              g_file_delete (*local_file, NULL, NULL);
+              g_clear_object (local_file);
+
+              return FALSE;
+            }
+        }
+
+      g_free (my_path);
+    }
+
+  if (*file_proc != NULL &&
+      gimp_plug_in_procedure_is_xcf_load (*file_proc))
+    return gimp_data_factories_wait (gimp);
+
+  return (*file_proc != NULL);
 }

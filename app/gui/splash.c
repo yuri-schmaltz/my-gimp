@@ -101,6 +101,10 @@ static gboolean    splash_key_event            (GtkWidget      *window,
                                                 GimpSplash     *splash);
 static gboolean    splash_unset_alt            (GimpSplash     *splash);
 
+static gboolean    splash_window_focus         (GtkWidget        *window,
+                                                GtkDirectionType  direction,
+                                                Gimp             *gimp);
+
 static void        splash_rectangle_union      (GdkRectangle   *dest,
                                                 PangoRectangle *pango_rect,
                                                 gint            offset_x,
@@ -144,12 +148,12 @@ splash_create (Gimp         *gimp,
   GdkRectangle        workarea;
   gint                max_width;
   gint                max_height;
+  gboolean            release_splash;
 #ifdef G_OS_WIN32
   STARTUPINFO         StartupInfo;
 
   GetStartupInfo (&StartupInfo);
 #endif
-  gboolean            release_splash;
 
   g_return_if_fail (splash == NULL);
   g_return_if_fail (GDK_IS_MONITOR (monitor));
@@ -292,6 +296,10 @@ splash_create (Gimp         *gimp,
   splash->progress = gtk_progress_bar_new ();
   gtk_box_pack_end (GTK_BOX (vbox), splash->progress, FALSE, FALSE, 0);
   gtk_widget_show (splash->progress);
+
+  g_signal_connect (splash->window, "focus",
+                    G_CALLBACK (splash_window_focus),
+                    gimp);
 
   gtk_widget_show (splash->window);
 
@@ -483,6 +491,19 @@ splash_unset_alt (GimpSplash *splash)
   gtk_widget_queue_draw (splash->window);
 
   return G_SOURCE_REMOVE;
+}
+
+static gboolean
+splash_window_focus (GtkWidget        *window,
+                     GtkDirectionType  direction,
+                     Gimp             *gimp)
+{
+  g_signal_handlers_disconnect_by_func (splash->window,
+                                        G_CALLBACK (splash_window_focus),
+                                        gimp);
+  gimp_set_focused_once (gimp);
+
+  return FALSE;
 }
 
 /* area returns the union of the previous and new ink rectangles */

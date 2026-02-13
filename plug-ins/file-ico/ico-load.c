@@ -69,7 +69,9 @@ ico_read_int32 (FILE    *fp,
   total = count;
   if (count > 0)
     {
-      ico_read_int8 (fp, (guint8 *) data, count * 4);
+      if (ico_read_int8 (fp, (guint8 *) data, count * 4) != (count * 4))
+        return FALSE;
+
       for (i = 0; i < count; i++)
         data[i] = GUINT32_FROM_LE (data[i]);
     }
@@ -88,7 +90,9 @@ ico_read_int16 (FILE    *fp,
   total = count;
   if (count > 0)
     {
-      ico_read_int8 (fp, (guint8 *) data, count * 2);
+      if (ico_read_int8 (fp, (guint8 *) data, count * 2) != (count * 2))
+        return FALSE;
+
       for (i = 0; i < count; i++)
         data[i] = GUINT16_FROM_LE (data[i]);
     }
@@ -109,8 +113,8 @@ ico_read_int8 (FILE   *fp,
   while (count > 0)
     {
       bytes = fread ((gchar *) data, sizeof (gchar), count, fp);
-      if (bytes <= 0) /* something bad happened */
-        break;
+      if (bytes != count) /* something bad happened */
+        return -1;
 
       count -= bytes;
       data += bytes;
@@ -426,6 +430,7 @@ ico_read_icon (FILE    *fp,
                gint    *height)
 {
   IcoFileDataHeader   data;
+  gsize               data_size;
   gint                length;
   gint                x, y, w, h;
   guchar             *xor_map, *and_map;
@@ -437,16 +442,20 @@ ico_read_icon (FILE    *fp,
   palette = NULL;
 
   data.header_size = header_size;
-  ico_read_int32 (fp, &data.width, 1);
-  ico_read_int32 (fp, &data.height, 1);
-  ico_read_int16 (fp, &data.planes, 1);
-  ico_read_int16 (fp, &data.bpp, 1);
-  ico_read_int32 (fp, &data.compression, 1);
-  ico_read_int32 (fp, &data.image_size, 1);
-  ico_read_int32 (fp, &data.x_res, 1);
-  ico_read_int32 (fp, &data.y_res, 1);
-  ico_read_int32 (fp, &data.used_clrs, 1);
-  ico_read_int32 (fp, &data.important_clrs, 1);
+  if (ico_read_int32 (fp, &data.width, 1)   != 4     ||
+      ico_read_int32 (fp, &data.height, 1)  != 4     ||
+      ico_read_int16 (fp, &data.planes, 1)  != 2     ||
+      ico_read_int16 (fp, &data.bpp, 1) != 2         ||
+      ico_read_int32 (fp, &data.compression, 1) != 4 ||
+      ico_read_int32 (fp, &data.image_size, 1) != 4  ||
+      ico_read_int32 (fp, &data.x_res, 1) != 4       ||
+      ico_read_int32 (fp, &data.y_res, 1) != 4       ||
+      ico_read_int32 (fp, &data.used_clrs, 1) != 4   ||
+      ico_read_int32 (fp, &data.important_clrs, 1) != 4)
+    {
+      D(("skipping image: invalid header\n"));
+      return FALSE;
+    }
 
   D(("  header size %i, "
      "w %i, h %i, planes %i, size %i, bpp %i, used %i, imp %i.\n",
@@ -471,7 +480,9 @@ ico_read_icon (FILE    *fp,
       return FALSE;
     }
 
-  if (data.width * data.height * 2 > maxsize)
+  if (! g_size_checked_mul (&data_size, data.width, data.height) ||
+      ! g_size_checked_mul (&data_size, data_size, 2)            ||
+      data_size > maxsize)
     {
       D(("skipping image: too large\n"));
       return FALSE;
@@ -489,16 +500,31 @@ ico_read_icon (FILE    *fp,
          data.used_clrs, data.bpp));
 
       palette = g_new0 (guint32, data.used_clrs);
-      ico_read_int8 (fp, (guint8 *) palette, data.used_clrs * 4);
+      if (ico_read_int8 (fp,
+                         (guint8 *) palette,
+                         data.used_clrs * 4) != (data.used_clrs * 4))
+        {
+          D(("skipping image: too large\n"));
+          return FALSE;
+        }
+
     }
 
   xor_map = ico_alloc_map (w, h, data.bpp, &length);
-  ico_read_int8 (fp, xor_map, length);
+  if (ico_read_int8 (fp, xor_map, length) != length)
+    {
+      D(("skipping image: too large\n"));
+      return FALSE;
+    }
   D(("  length of xor_map: %i\n", length));
 
   /* Read in and_map. It's padded out to 32 bits per line: */
   and_map = ico_alloc_map (w, h, 1, &length);
-  ico_read_int8 (fp, and_map, length);
+  if (ico_read_int8 (fp, and_map, length) != length)
+    {
+      D(("skipping image: too large\n"));
+      return FALSE;
+    }
   D(("  length of and_map: %i\n", length));
 
   dest_vec = (guint32 *) buf;
@@ -726,7 +752,14 @@ ico_load_image (GFile        *file,
   image = gimp_image_new (max_width, max_height, GIMP_RGB);
 
   maxsize = max_width * max_height * 4;
-  buf = g_new (guchar, max_width * max_height * 4);
+  buf     = g_try_new (guchar, maxsize);
+  if (! buf)
+    {
+      g_free (info);
+      fclose (fp);
+      return NULL;
+    }
+
   for (i = 0; i < icon_count; i++)
     {
       GimpLayer *layer;

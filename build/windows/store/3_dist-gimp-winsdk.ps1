@@ -54,18 +54,18 @@ if ("$CI_COMMIT_TAG" -eq (git describe --all | Foreach-Object {$_ -replace 'tags
   {
     #.NET runtime required by msstore-cli (and its PowerShell counterpart)
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $msstore_tag = (Invoke-WebRequest https://api.github.com/repos/microsoft/msstore-cli/releases/latest | ConvertFrom-Json).tag_name
-    $dotnet_msstore = ([xml](Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/msstore-cli/refs/heads/rel/$msstore_tag/MSStore.API/MSStore.API.csproj").Content).Project.PropertyGroup.TargetFramework
-    $powershell_tag = (Invoke-WebRequest https://api.github.com/repos/PowerShell/PowerShell/releases/latest | ConvertFrom-Json).tag_name
-    $dotnet_powershell = ([xml](Invoke-WebRequest "https://raw.githubusercontent.com/PowerShell/PowerShell/refs/tags/$powershell_tag/PowerShell.Common.props").Content).Project.PropertyGroup.TargetFramework
+    $msstore_tag = (Invoke-RestMethod 'https://api.github.com/repos/microsoft/msstore-cli/releases/latest').tag_name
+    $dotnet_msstore = (Invoke-RestMethod "https://raw.githubusercontent.com/microsoft/msstore-cli/refs/heads/rel/$msstore_tag/MSStore.API/MSStore.API.csproj").Project.PropertyGroup.TargetFramework
+    $powershell_tag = (Invoke-RestMethod 'https://api.github.com/repos/PowerShell/PowerShell/releases/latest').tag_name
+    $dotnet_powershell = (Invoke-RestMethod "https://raw.githubusercontent.com/PowerShell/PowerShell/refs/tags/$powershell_tag/PowerShell.Common.props").Project.PropertyGroup.TargetFramework
     foreach ($dotnet in $dotnet_msstore, $dotnet_powershell)
       {
         $dotnet_major = ($dotnet | Out-String) -replace "`r`n",'' -replace 'net',''
-        $dotnet_tag = ((Invoke-WebRequest https://api.github.com/repos/dotnet/runtime/releases | ConvertFrom-Json).tag_name | Select-String "$dotnet_major" | Select-Object -First 1).ToString() -replace 'v',''
+        $dotnet_tag = ((Invoke-RestMethod "https://api.github.com/repos/dotnet/runtime/releases").tag_name | Select-String "$dotnet_major" | Select-Object -First 1).ToString() -replace 'v',''
         if (-not (Test-Path "$Env:ProgramFiles\dotnet\shared\Microsoft.NETCore.App\$dotnet_major*\") -and -not (Test-Path "${PARENT_DIR}dotnet-runtime-${dotnet_major}"))
           {
             Write-Output "(INFO): downloading .NET v$dotnet_tag"
-            Invoke-WebRequest https://aka.ms/dotnet/$dotnet_major/dotnet-runtime-win-$cpu_arch.zip -OutFile ${PARENT_DIR}dotnet-runtime-${dotnet_major}.zip
+            Invoke-WebRequest "https://aka.ms/dotnet/$dotnet_major/dotnet-runtime-win-$cpu_arch.zip" -UseBasicParsing -OutFile ${PARENT_DIR}dotnet-runtime-${dotnet_major}.zip
             Expand-Archive ${PARENT_DIR}dotnet-runtime-${dotnet_major}.zip ${PARENT_DIR}dotnet-runtime-${dotnet_major} -Force
             $env:PATH = "$(Resolve-Path $PWD\${PARENT_DIR}dotnet-runtime-${dotnet_major});" + $env:PATH
             $env:DOTNET_ROOT = "$(Resolve-Path $PWD\${PARENT_DIR}dotnet-runtime-${dotnet_major})"
@@ -76,7 +76,7 @@ if ("$CI_COMMIT_TAG" -eq (git describe --all | Foreach-Object {$_ -replace 'tags
     if (-not (Test-Path Registry::'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\App Paths\pwsh.exe') -and $PSVersionTable.PSVersion.Major -lt 6)
       {
         Write-Output "(INFO): downloading PowerShell $powershell_tag"
-        Invoke-WebRequest https://github.com/PowerShell/PowerShell/releases/download/$powershell_tag/PowerShell-$($powershell_tag -replace 'v','')-win-$cpu_arch.zip -OutFile ${PARENT_DIR}PowerShell.zip
+        Invoke-WebRequest "https://github.com/PowerShell/PowerShell/releases/download/$powershell_tag/PowerShell-$($powershell_tag -replace 'v','')-win-$cpu_arch.zip" -UseBasicParsing -OutFile ${PARENT_DIR}PowerShell.zip
         Expand-Archive ${PARENT_DIR}PowerShell.zip ${PARENT_DIR}PowerShell -Force
         $env:PATH = "$(Resolve-Path $PWD\${PARENT_DIR}PowerShell);" + $env:PATH
       }
@@ -85,7 +85,7 @@ if ("$CI_COMMIT_TAG" -eq (git describe --all | Foreach-Object {$_ -replace 'tags
     if (-not (Test-Path Registry::'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\App Paths\MSStore.exe'))
       {
         Write-Output "(INFO): downloading MSStoreCLI $msstore_tag"
-        Invoke-WebRequest https://github.com/microsoft/msstore-cli/releases/download/$msstore_tag/MSStoreCLI-win-$cpu_arch.zip -OutFile ${PARENT_DIR}MSStoreCLI.zip
+        Invoke-WebRequest "https://github.com/microsoft/msstore-cli/releases/download/$msstore_tag/MSStoreCLI-win-$cpu_arch.zip" -UseBasicParsing -OutFile ${PARENT_DIR}MSStoreCLI.zip
         Expand-Archive ${PARENT_DIR}MSStoreCLI.zip ${PARENT_DIR}MSStoreCLI -Force
         $env:PATH = "$(Resolve-Path $PWD\${PARENT_DIR}MSStoreCLI);" + $env:PATH
       }
@@ -215,7 +215,7 @@ foreach ($bundle in $supported_archs)
 
     # 3. PREPARE MSIX "SOURCE"
     Write-Output "$([char]27)[0Ksection_start:$(Get-Date -UFormat %s -Millisecond 0):${msix_arch}_source[collapsed=true]$([char]13)$([char]27)[0KMaking assets for $msix_arch MSIX"
-    # (We test the existence of the icons here (and not on 3.2.) to avoid creating AppxManifest.xml for nothing)
+    # (We test the existence of the icons here (and not on section 3.2.) to avoid creating AppxManifest.xml for nothing)
     $icons_path = "$build_dir\build\windows\store\Assets"
     if (-not (Test-Path "$icons_path"))
       {
@@ -251,8 +251,6 @@ foreach ($bundle in $supported_archs)
     conf_manifest '@DISPLAY_NAME@' "$display_name"
     ### Set custom GIMP version (major.minor.micro+revision.0)
     conf_manifest '@CUSTOM_GIMP_VERSION@' "$CUSTOM_GIMP_VERSION"
-    ### Set some things based on GIMP mutex version (major.minor or major)
-    conf_manifest '@GIMP_MUTEX_VERSION@' "$GIMP_MUTEX_VERSION"
     #### Needed to differentiate on PowerShell etc
     if ($GIMP_RELEASE -and -not $GIMP_IS_RC_GIT)
       {
@@ -501,15 +499,17 @@ if ("$CI_COMMIT_TAG" -eq (git describe --all | Foreach-Object {$_ -replace 'tags
     msstore publish $OUTPUT_DIR\$MSIX_ARTIFACT -id $env:PRODUCT_ID -nc; if ("$LASTEXITCODE" -gt '0') { exit 1 }
 
     ## Update submission info (if PS6 or up. Check the section 1 of this script)
+    $env:GIMP_VERSION="$GIMP_VERSION"
     pwsh -Command `
       {
         $jsonObject = msstore submission get $env:PRODUCT_ID | ConvertFrom-Json -AsHashtable; if ("$LASTEXITCODE" -gt '0') { exit 1 }
         ###Get changelog from Linux appdata
         $xmlObject = New-Object XML
         $xmlObject.Load("$PWD\desktop\org.gimp.GIMP.appdata.xml.in.in")
-        if ($xmlObject.component.releases.release[0].version -ne ("$GIMP_VERSION".ToLower() -replace '-','~'))
+        if ($xmlObject.component.releases.release[0].version -ne ("$env:GIMP_VERSION".ToLower() -replace '-','~'))
           {
-            Write-Host "(ERROR): appdata does not match main meson file. Submission can't be done." -ForegroundColor red
+            #This check is needed to ensure the right release notes etc when the submission is (rarely) done manually/locally
+            Write-Host "(WARNING): appdata does not match main meson file. Submission info can't be updated." -ForegroundColor yellow
             exit 1
           }
         $jsonObject."Listings"."en-us"."BaseListing".'ShortDescription' = ($xmlObject.component.summary).Trim()

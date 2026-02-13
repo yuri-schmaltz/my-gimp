@@ -74,6 +74,7 @@
 #include "gimppattern.h"
 #include "gimptemplate.h"
 #include "gimptoolinfo.h"
+#include "gimptoolpreset.h"
 #include "gimptreeproxy.h"
 
 #include "text/gimpfont.h"
@@ -97,6 +98,7 @@ enum
   CLIPBOARD_CHANGED,
   FILTER_HISTORY_CHANGED,
   IMAGE_OPENED,
+  FOCUSED_ONCE,
   LAST_SIGNAL
 };
 
@@ -205,6 +207,13 @@ gimp_class_init (GimpClass *klass)
                   NULL, NULL, NULL,
                   G_TYPE_NONE, 1, G_TYPE_FILE);
 
+  gimp_signals[FOCUSED_ONCE] =
+    g_signal_new ("focused-once",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST, 0,
+                  NULL, NULL, NULL,
+                  G_TYPE_NONE, 0);
+
   object_class->constructed      = gimp_constructed;
   object_class->set_property     = gimp_set_property;
   object_class->get_property     = gimp_get_property;
@@ -293,6 +302,8 @@ gimp_init (Gimp *gimp)
 
   gimp->templates = gimp_list_new (GIMP_TYPE_TEMPLATE, TRUE);
   gimp_object_set_static_name (GIMP_OBJECT (gimp->templates), "templates");
+
+  gimp->focused_once = FALSE;
 }
 
 static void
@@ -881,7 +892,7 @@ gimp_is_restored (Gimp *gimp)
 {
   g_return_val_if_fail (GIMP_IS_GIMP (gimp), FALSE);
 
-  return gimp->initialized && gimp->restored;
+  return gimp->initialized && gimp->restored && gimp_data_factories_wait (gimp);
 }
 
 /**
@@ -915,6 +926,26 @@ gimp_exit (Gimp     *gimp,
   g_idle_add_full (G_PRIORITY_LOW,
                    (GSourceFunc) gimp_exit_idle_cleanup_stray_images,
                    gimp, NULL);
+}
+
+void
+gimp_set_focused_once (Gimp *gimp)
+{
+  g_return_if_fail (GIMP_IS_GIMP (gimp));
+
+  if (! gimp->focused_once)
+    {
+      gimp->focused_once = TRUE;
+      g_signal_emit (gimp, gimp_signals[FOCUSED_ONCE], 0);
+    }
+}
+
+gboolean
+gimp_has_focused_once (Gimp *gimp)
+{
+  g_return_val_if_fail (GIMP_IS_GIMP (gimp), FALSE);
+
+  return gimp->focused_once;
 }
 
 GList *
@@ -1295,6 +1326,8 @@ gimp_get_data_factory (Gimp  *gimp,
     return gimp->dynamics_factory;
   else if (g_type_is_a (data_type, GIMP_TYPE_MYBRUSH))
     return gimp->mybrush_factory;
+  else if (g_type_is_a (data_type, GIMP_TYPE_TOOL_PRESET))
+    return gimp->tool_preset_factory;
 
   /* If we reach this, it means we forgot a data factory in our list! */
   g_return_val_if_reached (NULL);

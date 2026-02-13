@@ -5,6 +5,7 @@ option('enable-multiproc',  type: 'boolean', value: true,   description: 'Suppor
 option('profiling',         type: 'boolean', value: false,  description: 'Enable profiling')
 option('windows-installer', type: 'boolean', value: false,  description: 'Generate files needed for the Inno Windows installer')
 option('ms-store',          type: 'boolean', value: false,  description: 'Generate files needed for the Microsoft Store .msixupload and/or .msixbundle')
+option('dmg',               type: 'boolean', value: false,  description: 'Generate files needed for the macOS .dmg')
 
 option('relocatable-bundle', type: 'combo', value: 'platform-default',
                              description: 'build with resources considered bundled under the same prefix',
@@ -33,6 +34,7 @@ option('win-debugging',     type: 'combo',   value: 'native', description: 'Buil
 # Features
 
 option('enable-default-bin',type: 'feature', value: 'auto', description: 'Install unversioned symlinks pointing to versioned executables (on UNIX) or unversioned duplicates (on Windows)')
+option('bash-completion',   type: 'feature', value: 'auto', description: 'Install a bash completion script')
 option('aa',                type: 'feature', value: 'auto', description: 'AA plugin')
 option('alsa',              type: 'feature', value: 'auto', description: 'Alsa support in midi input controller')
 option('appdata-test',      type: 'feature', value: 'auto', description: 'Validate the appdata file')

@@ -309,61 +309,85 @@ gimp_config_serialize_property (GimpConfig       *config,
 
           if (color)
             {
-              const gchar   *encoding;
-              const Babl    *format = gegl_color_get_format (color);
-              const Babl    *space;
-              GBytes        *bytes;
-              gconstpointer  data;
-              gsize          data_length;
-              int            profile_length = 0;
+              guint xcf_version = gimp_config_get_xcf_version (config);
 
-              gimp_config_writer_open (writer, "color");
-
-              if (babl_format_is_palette (format))
+              /* If XCF version is before GIMP 3.0, then colors should be saved
+               * in legacy GimpRGB format for backwards compatibility */
+              if (xcf_version >= 14)
                 {
-                  guint8 pixel[40];
+                  const gchar   *encoding;
+                  const Babl    *format = gegl_color_get_format (color);
+                  const Babl    *space;
+                  GBytes        *bytes;
+                  gconstpointer  data;
+                  gsize          data_length;
+                  int            profile_length = 0;
 
-                  /* As a special case, we don't want to serialize
-                   * palette colors, because they are just too much
-                   * dependent on external data and cannot be
-                   * deserialized back safely. So we convert them first.
-                   */
-                   free_color = TRUE;
-                   color = gegl_color_duplicate (color);
+                  gimp_config_writer_open (writer, "color");
 
-                   format = babl_format_with_space ("R'G'B'A u8", format);
-                   gegl_color_get_pixel (color, format, pixel);
-                   gegl_color_set_pixel (color, format, pixel);
-                }
+                  if (babl_format_is_palette (format))
+                    {
+                      guint8 pixel[40];
 
-              encoding = babl_format_get_encoding (format);
-              gimp_config_writer_string (writer, encoding);
+                      /* As a special case, we don't want to serialize
+                       * palette colors, because they are just too much
+                       * dependent on external data and cannot be
+                       * deserialized back safely. So we convert them first.
+                       */
+                       free_color = TRUE;
+                       color = gegl_color_duplicate (color);
 
-              bytes = gegl_color_get_bytes (color, format);
-              data  = g_bytes_get_data (bytes, &data_length);
+                       format = babl_format_with_space ("R'G'B'A u8", format);
+                       gegl_color_get_pixel (color, format, pixel);
+                       gegl_color_set_pixel (color, format, pixel);
+                    }
 
-              gimp_config_writer_printf (writer, "%" G_GSIZE_FORMAT, data_length);
-              gimp_config_writer_data (writer, data_length, data);
+                  encoding = babl_format_get_encoding (format);
+                  gimp_config_writer_string (writer, encoding);
 
-              space = babl_format_get_space (format);
-              if (space != babl_space ("sRGB"))
-                {
-                  guint8 *profile_data;
+                  bytes = gegl_color_get_bytes (color, format);
+                  data  = g_bytes_get_data (bytes, &data_length);
 
-                  profile_data = (guint8 *) babl_space_get_icc (babl_format_get_space (format),
-                                                                &profile_length);
-                  gimp_config_writer_printf (writer, "%u", profile_length);
-                  if (profile_data)
-                    gimp_config_writer_data (writer, profile_length, profile_data);
+                  gimp_config_writer_printf (writer, "%" G_GSIZE_FORMAT,
+                                             data_length);
+                  gimp_config_writer_data (writer, data_length, data);
+
+                  space = babl_format_get_space (format);
+                  if (space != babl_space ("sRGB"))
+                    {
+                      guint8 *profile_data;
+
+                      profile_data =
+                        (guint8 *) babl_space_get_icc (babl_format_get_space (format),
+                                                        &profile_length);
+                      gimp_config_writer_printf (writer, "%u", profile_length);
+                      if (profile_data)
+                        gimp_config_writer_data (writer, profile_length,
+                                                 profile_data);
+                    }
+                  else
+                    {
+                      gimp_config_writer_printf (writer, "%u", profile_length);
+                    }
+
+                  g_bytes_unref (bytes);
+                  gimp_config_writer_close (writer);
                 }
               else
                 {
-                  gimp_config_writer_printf (writer, "%u", profile_length);
+                  gchar   buf[4][G_ASCII_DTOSTR_BUF_SIZE];
+                  gdouble rgba[4];
+
+                  gegl_color_get_pixel (color, babl_format ("R'G'B'A double"),
+                                        rgba);
+
+                  for (gint i = 0; i < 4; i++)
+                    g_ascii_dtostr (buf[i], G_ASCII_DTOSTR_BUF_SIZE, rgba[i]);
+
+                  gimp_config_writer_printf (writer,
+                                             "(color-rgba %s %s %s %s)",
+                                             buf[0], buf[1], buf[2], buf[3]);
                 }
-
-              g_bytes_unref (bytes);
-
-              gimp_config_writer_close (writer);
             }
           else
             {
@@ -642,7 +666,7 @@ gimp_config_serialize_value (const GValue *value,
 
       if (file)
         {
-          gchar *path     = g_file_get_uri (file);
+          gchar *path     = g_file_get_path (file);
           gchar *unexpand = NULL;
 
           if (path)
@@ -653,16 +677,37 @@ gimp_config_serialize_value (const GValue *value,
 
           if (unexpand)
             {
-              if (escaped)
-                gimp_config_string_append_escaped (str, unexpand);
-              else
-                g_string_append (str, unexpand);
+              gchar *full_uri;
+              gchar *scheme = g_file_get_uri_scheme (file);
 
+              full_uri = g_strconcat (scheme, ":///", unexpand, NULL);
+              g_free (scheme);
               g_free (unexpand);
+
+              if (escaped)
+                gimp_config_string_append_escaped (str, full_uri);
+              else
+                g_string_append (str, full_uri);
+
+              g_free (full_uri);
             }
           else
             {
-              g_string_append (str, "NULL");
+              gchar *uri = g_file_get_uri (file);
+
+              if (uri)
+                {
+                  if (escaped)
+                    gimp_config_string_append_escaped (str, uri);
+                  else
+                    g_string_append (str, uri);
+
+                  g_free (uri);
+                }
+              else
+                {
+                  g_string_append (str, "NULL");
+                }
             }
         }
       else

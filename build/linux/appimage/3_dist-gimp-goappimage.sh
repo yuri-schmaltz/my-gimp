@@ -46,10 +46,8 @@ if [ ! "$(find $GIMP_DIR -maxdepth 1 -iname "AppDir*")" ] || [ "$MODE" = '--bund
     apt-get install -y --no-install-recommends file patchelf >/dev/null 2>&1
   fi
   bundler="$PWD/go-appimagetool.AppImage"
-  rm -f "$bundler" >/dev/null
-  wget -c https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep "appimagetool-.*-${HOST_ARCH}.AppImage" | head -n 1 | cut -d '"' -f 2) >/dev/null 2>&1
+  wget -c -O $bundler "https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep "appimagetool-.*-${HOST_ARCH}.AppImage" | head -n 1 | cut -d '"' -f 2)" >/dev/null 2>&1
   bundler_text="go-appimagetool build: $(echo appimagetool-*.AppImage | sed -e 's/appimagetool-//' -e "s/-${HOST_ARCH}.AppImage//")"
-  mv appimagetool-*.AppImage $bundler
   chmod +x "$bundler"
 fi
 
@@ -154,7 +152,10 @@ USR_DIR="$APP_DIR/usr"
 
 prep_pkg ()
 {
-  if [ "$GITLAB_CI" ]; then
+  if [ -z "$GITLAB_CI" ] && ! dpkg -s "$1" >/dev/null 2>&1; then
+    printf "\033[31m(ERROR)\033[0m: $1 package is not installed. Please, install it then call this script again.\n"
+    exit 1
+  elif [ "$GITLAB_CI" ]; then
     apt-get install -y --no-install-recommends $1 >/dev/null 2>&1
   fi
 }
@@ -205,7 +206,7 @@ bund_usr ()
         printf "(INFO): bundling $target_path to $output_dest_path\n"
         mkdir -p $dest_path
         cp -ru $target_path $dest_path >/dev/null 2>&1 || continue
-        
+
         #Process .typelib dependencies
         if echo "$target_path" | grep -q '\.typelib$'; then
           process_typelib()
@@ -256,11 +257,11 @@ conf_app ()
 {
   #Prefix from which to expand the var
   prefix=$UNIX_PREFIX
-  case $1 in
-    #actually, using conf_app to set babl, gegl or gimp vars is not needed when built relocatable
-    *BABL*|*GEGL*|*GIMP*)
-      prefix=$GIMP_PREFIX
-  esac
+  #actually, using conf_app to set babl, gegl or gimp vars is not needed when built relocatable
+  #case $1 in
+    #*BABL*|*GEGL*|*GIMP*)
+      #prefix=$GIMP_PREFIX
+  #esac
 
   #Get expanded var
   if [ "$3" != '--no-expand' ]; then
@@ -284,7 +285,14 @@ conf_app ()
 
 wipe_usr ()
 {
-  find $USR_DIR -iname ${1##*/} -execdir rm -r -f "{}" \;
+  unset first_found
+  for target_path in $(find $USR_DIR -iname ${1##*/} 2>/dev/null); do
+    if [ -z "$first_found" ]; then
+      printf "(INFO): cleaning $USR_DIR/$1\n"
+      first_found=true
+    fi
+    rm -fr $target_path
+  done
 }
 
 ## Prepare AppDir
@@ -343,7 +351,7 @@ for lang in $lang_list; do
     bund_usr "$UNIX_PREFIX" share/locale/$lang/LC_MESSAGES/gtk3*.mo
   fi
   # For language list in text tool options
-  if ! echo "$(echo $UNIX_PREFIX/share/locale/$lang/LC_MESSAGES/iso_639*3.mo)" | grep -q '\*'; then 
+  if ! echo "$(echo $UNIX_PREFIX/share/locale/$lang/LC_MESSAGES/iso_639*3.mo)" | grep -q '\*'; then
     bund_usr "$UNIX_PREFIX" share/locale/$lang/LC_MESSAGES/iso_639*3.mo
   fi
 done
@@ -371,20 +379,15 @@ conf_app GS_LIB "share/ghostscript/10*/Resource/Init"
 ### file-wmf support
 bund_usr "$UNIX_PREFIX" "share/fonts/type1/urw-base35/Nimbus*" --dest "share/libwmf/fonts"
 bund_usr "$UNIX_PREFIX" "share/fonts/type1/urw-base35/StandardSymbols*" --dest "share/libwmf/fonts"
-# Note: we want the same test as around the global variable
-# show_debug_menu in app/main.c
-if [ "$GIMP_UNSTABLE" ] || [ -z "$GIMP_RELEASE" ]; then
-  ### Image graph support
-  bund_usr "$UNIX_PREFIX" "bin/libgvc*" --rename "bin/dot"
-  bund_usr "$UNIX_PREFIX" "lib/graphviz/config*"
-  bund_usr "$UNIX_PREFIX" "lib/graphviz/libgvplugin_dot*"
-  bund_usr "$UNIX_PREFIX" "lib/graphviz/libgvplugin_pango*"
-  ### Needed for GTK inspector
-  bund_usr "$UNIX_PREFIX" "lib/libEGL*"
-  bund_usr "$UNIX_PREFIX" "lib/libGL*"
-fi
-### Debug dialog
-bund_usr "$GIMP_PREFIX" "bin/gimp-debug-tool*" --dest "libexec"
+### Debug menu: if show_debug_menu is true in app/main.c or --show-debug-menu CLI option is set
+#### Image graph support
+bund_usr "$UNIX_PREFIX" "bin/libgvc*" --rename "bin/dot"
+bund_usr "$UNIX_PREFIX" "lib/graphviz/config*"
+bund_usr "$UNIX_PREFIX" "lib/graphviz/libgvplugin_dot*"
+bund_usr "$UNIX_PREFIX" "lib/graphviz/libgvplugin_pango*"
+#### Needed for GTK inspector
+bund_usr "$UNIX_PREFIX" "lib/libEGL*"
+bund_usr "$UNIX_PREFIX" "lib/libGL*"
 ### Introspected plug-ins
 bund_usr "$GIMP_PREFIX" "lib/girepository-*/*.typelib"
 conf_app GI_TYPELIB_PATH "${LIB_DIR}/${LIB_SUBDIR}girepository-*"
@@ -407,20 +410,21 @@ bund_usr "$UNIX_PREFIX" "lib/girepository-*/GioUnix*.typelib"
 
 ## Other binaries and deps (bundle them and do fine-tuning with bundling tool)
 bund_usr "$GIMP_PREFIX" 'bin/gimp*'
+bund_usr "$GIMP_PREFIX" "bin/gimp-debug-tool*" --dest "libexec"
 bund_usr "$GIMP_PREFIX" "bin/gegl"
 bund_usr "$GIMP_PREFIX" "share/applications/*.desktop"
-### go-appimagetool have too polluted output so we save as log. See: https://github.com/probonopd/go-appimage/issues/314
+### FIXME: go-appimagetool have too polluted output so we save as log. See: https://github.com/probonopd/go-appimage/issues/314
 "$bundler" -s deploy $(echo "$USR_DIR/share/applications/*.desktop") > appimagetool.log 2>&1 || { cat appimagetool.log; exit 1; }
-### Undo the mess which breaks babl and GEGL. See: https://github.com/probonopd/go-appimage/issues/315
+### FIXME: Undo the mess which breaks babl and GEGL etc. See: https://github.com/probonopd/go-appimage/issues/315
 cp -r $APP_DIR/lib/* $USR_DIR/${LIB_DIR}
 rm -r $APP_DIR/lib
-### Fix not fully bundled GTK canberra module. See: https://github.com/probonopd/go-appimage/issues/332
-find "$USR_DIR/${LIB_DIR}/${LIB_SUBDIR}gtk-3.0/modules" -iname *canberra*.so -execdir ln -sf "{}" libcanberra-gtk-module.so \;
-### Ensure that LD is in right dir. See: https://github.com/probonopd/go-appimage/issues/49
 if [ "$HOST_ARCH" = 'x86_64' ]; then
   cp -r $APP_DIR/lib64 $USR_DIR
   rm -r $APP_DIR/lib64
 fi
+### FIXME: Fix not fully bundled GTK canberra module. See: https://github.com/probonopd/go-appimage/issues/332
+find "$USR_DIR/${LIB_DIR}/${LIB_SUBDIR}gtk-3.0/modules" -iname *canberra*.so -execdir ln -sf "{}" libcanberra-gtk-module.so \;
+### FIXME: Ensure that LD is configured. See: https://github.com/probonopd/go-appimage/issues/49
 chmod +x "$APP_DIR/$LD_LINUX"
 exec_list=$(find "$USR_DIR/bin" "$USR_DIR/$LIB_DIR" ! -iname "*.so*" -type f -exec head -c 4 {} \; -exec echo " {}" \;  | grep ^.ELF)
 for exec in $exec_list; do
@@ -428,6 +432,19 @@ for exec in $exec_list; do
     patchelf --set-interpreter "./$LD_LINUX" "$exec" >/dev/null 2>&1 || continue
   fi
 done
+### FIXME: resource:// protocol seems broken on Debian 13. Remove this when update to Debian 14(?). See: #15552
+for LIB_PATH in $(find "$USR_DIR" \( -name "libgtk-3.so*" -o -name "libgjs*.so*" \) 2>/dev/null); do
+  if gresource list "$LIB_PATH" >/dev/null 2>&1; then
+    gresource list "$LIB_PATH" | while read -r resource_path; do
+      extract_dir="$USR_DIR/share"
+      local_resource_path="${resource_path#/}"
+      mkdir -p "$extract_dir/$(dirname "$local_resource_path")"
+      gresource extract "$LIB_PATH" "$resource_path" > "$extract_dir/$local_resource_path"
+    done
+  fi
+done
+conf_app G_RESOURCE_OVERLAYS "/org/gtk/libgtk=\${APPDIR}/usr/share/org/gtk/libgtk:/org/gnome/gjs=\${APPDIR}/usr/share/org/gnome/gjs" --no-expand
+conf_app GJS_PATH "\${APPDIR}/usr/share/org/gnome/gjs/modules/scripts:\${APPDIR}/usr/share/org/gnome/gjs/modules/core" --no-expand
 ### We can't set LD_LIBRARY_PATH partly to not break patchelf trick so we need 'ln' for Lua
 #cd $APP_DIR
 #lua_cpath_tweaked="$(echo $LUA_CPATH | sed -e 's|$HERE/||' -e 's|/?.so||')/lgi"
@@ -516,6 +533,8 @@ printf "\e[0Ksection_end:`date +%s`:${ARCH}_source\r\e[0K\n"
 APPIMAGETOOL_APP_NAME="GIMP-${CUSTOM_GIMP_VERSION}-${ARCH}.AppImage"
 printf "\e[0Ksection_start:`date +%s`:${ARCH}_making[collapsed=true]\r\e[0KSquashing $APPIMAGETOOL_APP_NAME\n"
 if [ "$GIMP_RELEASE" ] && [ -z "$GIMP_IS_RC_GIT" ]; then
+  #this allows users to optionally delta update with e.g. AppImageUpdate tool so without needing a browser
+  #see: https://github.com/AppImage/AppImageSpec/blob/6932f737883e5b57693398355587d6dc4666b729/draft.md?plain=1#L177
   update_info="--updateinformation zsync|https://download.gimp.org/gimp/GIMP-${CHANNEL}-${ARCH}.AppImage.zsync --file-url v$GIMP_APP_VERSION/linux/$APPIMAGETOOL_APP_NAME"
 fi
 "$standard_appimagetool" $APP_DIR $APPIMAGETOOL_APP_NAME --exclude-file appimageignore-$ARCH \

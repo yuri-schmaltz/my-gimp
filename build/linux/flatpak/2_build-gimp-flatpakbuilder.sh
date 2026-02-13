@@ -23,7 +23,10 @@ eval "$(sed -n '/Install part/,/End of check/p' build/linux/flatpak/1_build-deps
 
 if [ "$GITLAB_CI" ]; then
   # Extract deps from previous job
-  tar xf _build-$RUNNER.tar.zst
+  for archive in _build-$RUNNER/*; do
+    #see the rationale in 1_build-deps-flatpakbuilder.sh
+    tar --zstd -xf "$archive"
+  done
 fi
 
 
@@ -38,19 +41,19 @@ printf "\e[0Ksection_start:`date +%s`:gimp_build[collapsed=true]\r\e[0KBuilding 
 eval $FLATPAK_BUILDER --force-clean --disable-rofiles-fuse --keep-build-dirs --build-only --disable-download \
                       "$GIMP_PREFIX" build/linux/flatpak/org.gimp.GIMP-nightly.json > gimp-flatpak-builder.log 2>&1 || { cat gimp-flatpak-builder.log; exit 1; }
 if [ "$GITLAB_CI" ]; then
-  tar cf gimp-meson-log.tar .flatpak-builder/build/gimp-1/_flatpak_build/meson-logs/meson-log.txt
+  cp .flatpak-builder/build/gimp-1/_flatpak_build/meson-logs/meson-log.txt gimp-meson-log.txt
 fi
 printf "\e[0Ksection_end:`date +%s`:gimp_build\r\e[0K\n"
 
 
 # Cleanup GIMP_PREFIX (not working) and export it to OSTree repo
-# https://github.com/flatpak/flatpak-builder/issues/14
+# FIXME: https://github.com/flatpak/flatpak-builder/issues/14
 printf "\e[0Ksection_start:`date +%s`:gimp_bundle[collapsed=true]\r\e[0KCreating OSTree repo\n"
 eval $FLATPAK_BUILDER --disable-rofiles-fuse --finish-only --repo=repo \
                       "$GIMP_PREFIX" build/linux/flatpak/org.gimp.GIMP-nightly.json
 if [ "$GITLAB_CI" ]; then
   tar cf repo-$(uname -m).tar repo/
-  
+
   ## On CI, make the .flatpak prematurely on each runner since build-bundle is not arch neutral
   eval "$(sed -n -e '/APP_ID=/,/BRANCH=/ { s/  //; p }' build/linux/flatpak/3_dist-gimp-flatpakbuilder.sh)"
   eval "$(grep 'build-bundle repo' build/linux/flatpak/3_dist-gimp-flatpakbuilder.sh | sed 's/  //')"

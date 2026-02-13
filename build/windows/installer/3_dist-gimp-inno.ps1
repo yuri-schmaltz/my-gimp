@@ -26,7 +26,7 @@ Write-Output "$([char]27)[0Ksection_start:$(Get-Date -UFormat %s -Millisecond 0)
 ## Install or Update Inno (if needed)
 ## (We need to ensure that TLS 1.2 is enabled because of some runners)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest https://jrsoftware.org/download.php/is.exe -OutFile ..\is.exe
+Invoke-WebRequest "https://jrsoftware.org/download.php/is.exe" -UseBasicParsing -OutFile ..\is.exe
 $inno_version_downloaded = (Get-Item ..\is.exe).VersionInfo.ProductVersion -replace ' ',''
 $broken_inno = Get-ChildItem $env:TMP -Filter *.isl.bak -ErrorAction SilentlyContinue
 $inno_version = Get-ItemProperty Registry::'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup*' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty DisplayVersion
@@ -128,7 +128,7 @@ Write-Output "$([char]27)[0Ksection_end:$(Get-Date -UFormat %s -Millisecond 0):i
 # 3. PREPARE INSTALLER "SOURCE"
 Write-Output "$([char]27)[0Ksection_start:$(Get-Date -UFormat %s -Millisecond 0):installer_source[collapsed=true]$([char]13)$([char]27)[0KMaking installer assets"
 ## Custom installer strings translations and other assets
-## (They are loaded with '-DBUILD_DIR')
+## (They are loaded with 'iscc -DBUILD_DIR' on section 5.)
 if (-not (Test-Path "$BUILD_DIR\build\windows\installer"))
   {
     Write-Host "(ERROR): Installer assets not found. You can tweak 'build\windows\2_build-gimp-msys2.ps1' or configure GIMP with '-Dwindows-installer=true' to build them." -ForegroundColor red
@@ -195,7 +195,7 @@ if (Test-Path "$X86_BUNDLE")
     Write-Output "$([char]27)[0Ksection_start:$(Get-Date -UFormat %s -Millisecond 0):installer_files[collapsed=true]$([char]13)$([char]27)[0KGenerating 32-bit TWAIN dependencies list"
     $twain_list_file = 'build\windows\installer\base_twain32on64.list'
     Copy-Item $twain_list_file "$twain_list_file.bak"
-    $twain_list = (python build\windows\2_bundle-gimp-uni_dep.py --debug debug-only $(Resolve-Path $X86_BUNDLE/lib/gimp/*/plug-ins/twain/twain.exe) $env:MSYS_ROOT/mingw32/ $X86_BUNDLE/ 32 |
+    $twain_list = (python tools\lib_bundle.py --debug debug-only $(Resolve-Path $X86_BUNDLE/lib/gimp/*/plug-ins/twain/twain.exe) $env:MSYS_ROOT/mingw32/ $X86_BUNDLE/ 32 |
                   Select-String 'Installed' -CaseSensitive -Context 0,1000) -replace "  `t- ",'bin\'
     (Get-Content $twain_list_file) | Foreach-Object {$_ -replace "@DEPS_GENLIST@","$twain_list"} | Set-Content $twain_list_file
     (Get-Content $twain_list_file) | Select-string 'Installed' -notmatch | Set-Content $twain_list_file

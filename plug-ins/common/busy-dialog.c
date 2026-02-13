@@ -147,26 +147,29 @@ busy_dialog_create_procedure (GimpPlugIn  *plug_in,
                                        "The read file descriptor",
                                        "The read file descriptor",
                                        G_MININT, G_MAXINT, 0,
-                                       G_PARAM_READWRITE);
+                                       G_PARAM_READWRITE |
+                                       GIMP_PARAM_DONT_SERIALIZE);
 
       gimp_procedure_add_int_argument (procedure, "write-fd",
                                        "The write file descriptor",
                                        "The write file descriptor",
                                        G_MININT, G_MAXINT, 0,
-                                       G_PARAM_READWRITE);
-
+                                       G_PARAM_READWRITE |
+                                       GIMP_PARAM_DONT_SERIALIZE);
 
       gimp_procedure_add_string_argument (procedure, "message",
                                           "The message",
                                           "The message",
                                           NULL,
-                                          G_PARAM_READWRITE);
+                                          G_PARAM_READWRITE |
+                                          GIMP_PARAM_DONT_SERIALIZE);
 
       gimp_procedure_add_boolean_argument (procedure, "cancelable",
                                            "Whether the dialog is cancelable",
                                            "Whether the dialog is cancelable",
                                            FALSE,
-                                           G_PARAM_READWRITE);
+                                           G_PARAM_READWRITE |
+                                           GIMP_PARAM_DONT_SERIALIZE);
     }
 
   return procedure;
@@ -310,6 +313,7 @@ busy_dialog (gint         read_fd,
   gtk_box_pack_start (GTK_BOX (vbox), box, TRUE, TRUE, 0);
   gtk_widget_show (box);
 
+  gimp_window_set_transient (GTK_WINDOW (window));
   gtk_window_present (GTK_WINDOW (window));
 
   gtk_main ();

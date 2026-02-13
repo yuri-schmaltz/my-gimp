@@ -22,7 +22,7 @@
         "--share=network",
         "--socket=fallback-x11",
         "--socket=wayland",
-        "--device=dri",
+        "--device=all",
         "--filesystem=host",
         "--filesystem=xdg-config/GIMP:create",
         "--filesystem=xdg-config/gtk-3.0",
@@ -212,8 +212,8 @@
                     "sources": [
                         {
                             "type": "archive",
-                            "url": "https://github.com/aous72/OpenJPH/archive/refs/tags/0.25.3.tar.gz",
-                            "sha256": "815b0d345daf3bbad72f3930d4f6c831643dcb2b734d8bb44d871d68db12f4d2",
+                            "url": "https://github.com/aous72/OpenJPH/archive/refs/tags/0.26.0.tar.gz",
+                            "sha256": "359fa26e5c6becc64f7f9fa339600e00ca3164af7d988aa1fbf16d527347baf4",
                             "x-checker-data": {
                                 "type": "anitya",
                                 "project-id": 375199,
@@ -240,8 +240,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://poppler.freedesktop.org/poppler-25.12.0.tar.xz",
-                    "sha256": "c18b40eb36b1a0c5b86e29ca054bf0770304583da4f2cdd42fe86eca6a20de48",
+                    "url": "https://poppler.freedesktop.org/poppler-26.02.0.tar.xz",
+                    "sha256": "dded8621f7b2f695c91063aab1558691c8418374cd583501e89ed39487e7ab77",
                     "x-checker-data": {
                         "type": "anitya",
                         "project-id": 3686,
@@ -550,8 +550,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://xorg.freedesktop.org/releases/individual/lib/libXmu-1.2.1.tar.xz",
-                    "sha256": "fcb27793248a39e5fcc5b9c4aec40cc0734b3ca76aac3d7d1c264e7f7e14e8b2",
+                    "url": "https://xorg.freedesktop.org/releases/individual/lib/libXmu-1.3.1.tar.xz",
+                    "sha256": "81a99e94c4501e81c427cbaa4a11748b584933e94b7a156830c3621256857bc4",
                     "x-checker-data": {
                         "type": "anitya",
                         "project-id": 1785,
@@ -588,8 +588,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://github.com/HEASARC/cfitsio/archive/refs/tags/cfitsio-4.6.2.tar.gz",
-                    "sha256": "83f710f9441e7c703eeb485c9a475f50801ae7fad32ac7e356a406d318b4c02f",
+                    "url": "https://github.com/HEASARC/cfitsio/archive/refs/tags/cfitsio-4.6.3.tar.gz",
+                    "sha256": "e9f1017e942f4a90d2db8984a7677e9d01a5da877a43ed905b9b5108451a68a0",
                     "x-checker-data": {
                         "type": "anitya",
                         "project-id": 270,
@@ -615,8 +615,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v7.12.1.tar.gz",
-                    "sha256": "794ae22f7e38e2ac9f5cbb673be9dd80cdaff2cdf858f5104e082694f743b0ba",
+                    "url": "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v7.12.2.tar.gz",
+                    "sha256": "679412daa5f69af96d6976595c1ac64f252287a56e98cc4a8155d09cc7fd69e8",
                     "x-checker-data": {
                         "type": "anitya",
                         "project-id": 4908,
@@ -648,16 +648,12 @@
                     "sources": [
                         {
                             "type": "archive",
-                            "url": "https://github.com/xianyi/OpenBLAS/archive/v0.3.29.tar.gz",
-                            "sha256": "38240eee1b29e2bde47ebb5d61160207dc68668a54cac62c076bb5032013b1eb",
+                            "url": "https://github.com/xianyi/OpenBLAS/archive/v0.3.31.tar.gz",
+                            "sha256": "6dd2a63ac9d32643b7cc636eab57bf4e57d0ed1fff926dfbc5d3d97f2d2be3a6",
                             "x-checker-data": {
                                 "type": "anitya",
                                 "project-id": 2540,
                                 "stable-only": true,
-                                "//": "https://github.com/OpenMathLib/OpenBLAS/issues/5324",
-                                "versions": {
-                                    "<": "0.3.30"
-                                },
                                 "url-template": "https://github.com/xianyi/OpenBLAS/archive/v$version.tar.gz"
                             }
                         }
@@ -700,8 +696,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://gitlab.com/graphviz/graphviz/-/archive/14.1.0/graphviz-14.1.0.tar.gz",
-                    "sha256": "71fc8b295d51847e66844ab41825cfb653ef8b5671b5cd2ab36cd14d28a03cfb",
+                    "url": "https://gitlab.com/graphviz/graphviz/-/archive/14.1.2/graphviz-14.1.2.tar.gz",
+                    "sha256": "44fb98203b4545421a2c2cbeb917a8443388838e22460e164526dda3aa28d892",
                     "x-checker-data": {
                         "type": "anitya",
                         "project-id": 1249,
@@ -746,8 +742,8 @@
             ],
             "buildsystem": "meson",
             "config-opts": [
-                "-Dwith-docs=false",
-                "-Dgi-docgen=disabled"
+                "-Dgi-docgen=disabled",
+                "-Dwith-docs=false"
             ],
             "cleanup": [
                 "/bin"
@@ -764,8 +760,8 @@
             ],
             "buildsystem": "meson",
             "config-opts": [
-                "-Ddocs=false",
                 "-Dgi-docgen=disabled",
+                "-Ddocs=false",
                 "-Dworkshop=true"
             ],
             "cleanup": [
@@ -784,20 +780,17 @@
                     "type": "shell",
                     "commands": [
                         "sed -i \"/<release[^>]*date=\\\"TODO\\\"[^>]*>/,/<\\/release>/d\" desktop/org.gimp.GIMP.appdata.xml.in.in",
-                        "v=$(awk -F\"'\" '/version:/ {print $2; exit}' meson.build | sed 's/-/~/g' | tr '[:upper:]' '[:lower:]'); grep -q \"version=\\\"$v\\\"\" desktop/org.gimp.GIMP.appdata.xml.in.in || sed -i \"/<releases>/a <release version=\\\"$v\\\" date=\\\"$(date --iso-8601)\\\" type=\\\"snapshot\\\"></release>\" desktop/org.gimp.GIMP.appdata.xml.in.in"
+                        "appdata='desktop/org.gimp.GIMP.appdata.xml.in.in'; v=$(awk -F\"'\" '/version:/ {print $2; exit}' meson.build | sed 's/-/~/g' | tr '[:upper:]' '[:lower:]'); grep -q \"version=\\\"$v\\\"\" $appdata || grep -q \"date=\\\"$(date --iso-8601)\\\"\" $appdata || sed -i \"/<releases>/a <release version=\\\"$v\\\" date=\\\"$(date --iso-8601)\\\" type=\\\"snapshot\\\"></release>\" $appdata"
                     ]
                 }
             ],
             "buildsystem": "meson",
             "config-opts": [
-                "-Dgi-docgen=disabled",
                 "-Dicc-directory=/run/host/usr/share/color/icc/",
+                "-Dgi-docgen=disabled",
                 "-Dcheck-update=no",
                 "-Denable-default-bin=enabled",
                 "-Dbuild-id=org.gimp.GIMP.flatpak.nightly"
-            ],
-            "cleanup": [
-                "/bin/gimp-console*"
             ]
         }
     ]

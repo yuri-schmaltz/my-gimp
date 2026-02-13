@@ -550,6 +550,10 @@ CODE
     my $procdesc = '';
 
     if ($proc->{deprecated}) {
+        if (! $proc->{deprecated_since}) {
+          die "ERROR: missing 'deprecated_since' variable on $name.\n";
+        }
+        $deprecated_since = $proc->{deprecated_since};
         if ($proc->{deprecated} eq 'NONE') {
             if ($proc->{blurb}) {
                 $procdesc = &desc_wrap($proc->{blurb}) . "\n *\n";
@@ -557,12 +561,25 @@ CODE
             if ($proc->{help}) {
                 $procdesc .= &desc_wrap($proc->{help}) . "\n *\n";
             }
-            $procdesc .= &desc_wrap("Deprecated: There is no replacement " .
+            $procdesc .= &desc_wrap("Deprecated: $deprecated_since: There is no replacement " .
                                     "for this procedure.");
         }
         else {
-            my $underscores = $proc->{deprecated};
-            $underscores =~ s/-/_/g;
+            my $replacement = $proc->{deprecated};
+            chomp $replacement;
+            if ($replacement =~ / /) {
+              # Use the deprecated string as-is.
+              #$replacement =~ s/"/\\"/g;
+            }
+            elsif ($replacement =~ /:/) {
+              # Replacement is a GEGL operation.
+              $replacement = "filter \"$replacement\"";
+            }
+            else {
+              # Replacement is another function.
+              $replacement =~ s/-/_/g;
+              $replacement .= '()';
+            }
 
             if ($proc->{blurb}) {
                 $procdesc = &desc_wrap($proc->{blurb}) . "\n *\n";
@@ -570,8 +587,8 @@ CODE
             if ($proc->{help}) {
                 $procdesc .= &desc_wrap($proc->{help}) . "\n *\n";
             }
-            $procdesc .= &desc_wrap("Deprecated: " .
-                                    "Use $underscores() instead.");
+            $procdesc .= &desc_wrap("Deprecated: $deprecated_since: " .
+                                    "Use $replacement instead.");
         }
     }
     else {

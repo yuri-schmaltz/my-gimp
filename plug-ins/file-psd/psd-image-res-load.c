@@ -198,6 +198,12 @@ static gint     load_resource_1033     (const PSDimageres     *res_a,
                                         GInputStream          *input,
                                         GError               **error);
 
+static gint     load_resource_1037     (const PSDimageres     *res_a,
+                                        PSDimage              *img_a,
+                                        GimpImage             *image,
+                                        GInputStream          *input,
+                                        GError               **error);
+
 static gint     load_resource_1039     (const PSDimageres     *res_a,
                                         PSDimage              *img_a,
                                         GimpImage             *image,
@@ -381,7 +387,11 @@ load_image_resource (PSDimageres  *res_a,
               load_resource_1032 (res_a, image, input, error);
             break;
 
-          case PSD_ICC_PROFILE:
+          case PSD_GLOBAL_ANGLE:
+            load_resource_1037 (res_a, img_a, image, input, error);
+            break;
+
+            case PSD_ICC_PROFILE:
             if (! load_resource_1039 (res_a, img_a, image, input, error))
               *profile_loaded = TRUE;
             break;
@@ -650,8 +660,6 @@ load_resource_1006 (const PSDimageres  *res_a,
       return 0;
     }
 
-  img_a->alpha_names = g_ptr_array_new ();
-
   block_rem = res_a->data_len;
   while (block_rem > 1)
     {
@@ -661,6 +669,8 @@ load_resource_1006 (const PSDimageres  *res_a,
       IFDBG(3) g_debug ("String: %s, %d, %d", str, read_len, write_len);
       if (write_len >= 0)
         {
+          if (! img_a->alpha_names)
+            img_a->alpha_names = g_ptr_array_new ();
           g_ptr_array_add (img_a->alpha_names, (gpointer) str);
         }
       block_rem -= read_len;
@@ -1157,6 +1167,34 @@ load_resource_1033 (const PSDimageres  *res_a,
   return 0;
 }
 
+/* (Photoshop 5.0) Global Angle. 4 bytes that contain an integer between 0 and 359,
+ * which is the global lighting angle for effects layer. If not present, assumed to be 30.
+ * The above official text seems to be incorrect. I have seen a negative value,
+ * which isn't a surprise since layer effect angles can be negative.
+ */
+static gint
+load_resource_1037 (const PSDimageres  *res_a,
+                    PSDimage           *img_a,
+                    GimpImage          *image,
+                    GInputStream       *input,
+                    GError            **error)
+{
+  gint32 global_angle = 30;
+
+  IFDBG(2) g_debug ("Process image resource block: 1037: Global Lighting Angle");
+
+  if (psd_read (input, &global_angle, 4, error) < 4)
+    {
+      psd_set_error (error);
+      return -1;
+    }
+  img_a->global_light_angle = GINT32_FROM_BE (global_angle);
+
+  IFDBG(3) g_debug ("Global angle: %d", img_a->global_light_angle);
+
+  return 0;
+}
+
 static gint
 load_resource_1039 (const PSDimageres  *res_a,
                     PSDimage           *img_a,
@@ -1533,9 +1571,9 @@ load_resource_2000 (const PSDimageres  *res_a,
   gdouble   *controlpoints;
   gint32     x[3];
   gint32     y[3];
-  GimpPath  *path = NULL;
-  gint16     type = 0;
-  gint16     init_fill;
+  GimpPath  *path      = NULL;
+  gint16     type      = 0;
+  gint16     init_fill = 0;
   gint16     num_rec;
   gint16     path_rec;
   gint16     cntr;

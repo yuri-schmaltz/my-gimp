@@ -1121,7 +1121,17 @@ read_creator_block (FILE      *f,
         }
       keyword = GUINT16_FROM_LE (keyword);
       length = GUINT32_FROM_LE (length);
-      switch (keyword)
+
+      if ((goffset) ftell (f) + length > (goffset) data_start + total_len)
+        {
+          /* FIXME: After string freeze is over, we should consider changing
+           * this error message to be a bit more descriptive. */
+          g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
+                       _("Error reading creator keyword data"));
+          return -1;
+        }
+
+        switch (keyword)
         {
         case PSP_CRTR_FLD_TITLE:
         case PSP_CRTR_FLD_ARTIST:
@@ -1613,9 +1623,14 @@ read_channel_data (FILE        *f,
                 {
                   guchar *p, *q;
 
-                  fread (buf, width, 1, f);
+                  if (fread (buf, 1, width, f) != width)
+                    {
+                      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
+                                   _("Error reading data. Most likely unexpected end of file."));
+                      return -1;
+                    }
                   /* Contrary to what the PSP specification seems to suggest
-                    scanlines are not stored on a 4-byte boundary. */
+                     scanlines are not stored on a 4-byte boundary. */
                   p = buf;
                   q = pixels[y] + offset;
                   for (i = 0; i < width; i++)
@@ -1631,9 +1646,14 @@ read_channel_data (FILE        *f,
                 {
                   guint16 *p, *q;
 
-                  fread (buf, width * ia->bytes_per_sample, 1, f);
+                  if (fread (buf, ia->bytes_per_sample, width, f) != width)
+                    {
+                      g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
+                                   _("Error reading data. Most likely unexpected end of file."));
+                      return -1;
+                    }
                   /* Contrary to what the PSP specification seems to suggest
-                    scanlines are not stored on a 4-byte boundary. */
+                     scanlines are not stored on a 4-byte boundary. */
                   p = (guint16 *) buf;
                   q = (guint16 *) (pixels[y] + offset);
                   for (i = 0; i < width; i++)
@@ -2151,7 +2171,7 @@ read_layer_block (FILE      *f,
                   || fread (&channel_type, 2, 1, f) < 1)
                 {
                   g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
-                              _("Error reading channel information chunk"));
+                               _("Error reading channel information chunk"));
                   return NULL;
                 }
 
@@ -2171,11 +2191,12 @@ read_layer_block (FILE      *f,
                 }
               else
                 {
-                  if (channel_type > PSP_CHANNEL_BLUE)
+                  if ((ia->base_type == GIMP_RGB && channel_type > PSP_CHANNEL_BLUE) ||
+                      (ia->base_type != GIMP_RGB && channel_type >= PSP_CHANNEL_RED))
                     {
                       g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
-                                  _("Invalid channel type %d in channel information chunk"),
-                                  channel_type);
+                                   _("Invalid channel type %d in channel information chunk"),
+                                   channel_type);
                       return NULL;
                     }
 
@@ -2484,7 +2505,7 @@ read_extended_block (FILE      *f,
                 fread (&unit, 2, 1, f) < 1)
               {
                 g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
-                           _("Error reading extended chunk grid data"));
+                             _("Error reading extended chunk grid data"));
                 return -1;
               }
 
@@ -2512,7 +2533,7 @@ read_extended_block (FILE      *f,
                 fread (&orientation, 2, 1, f) < 1)
               {
                 g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED,
-                           _("Error reading extended chunk guide data"));
+                             _("Error reading extended chunk guide data"));
                 return -1;
               }
 

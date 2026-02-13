@@ -57,21 +57,20 @@ if [ "$CI_PIPELINE_SOURCE" = 'schedule' ]; then
     printf "\033[31m(ERROR)\033[0m: Some dependencies sources are outdated. Please, update them on the manifest.\n"
     exit 1
   else
-    printf "(INFO): All dependencies sources are up to date. Building them...\n" 
+    printf "(INFO): All dependencies sources are up to date. Building them...\n"
   fi
 fi
 if [ "$GITLAB_CI" ]; then
   built_deps_image="quay.io/gnome_infrastructure/gnome-nightly-cache:$(uname -m)-$(echo "org.gimp.GIMP.Nightly" | tr 'A-Z' 'a-z')-master"
   oras pull $built_deps_image && oras logout quay.io || true
-  tar --zstd --xattrs -xf _build-$RUNNER.tar.zst || true
+  tar --zstd --xattrs -xf _build-cached-$RUNNER.tar.zst || true
 fi
-eval $FLATPAK_BUILDER --force-clean --disable-rofiles-fuse --keep-build-dirs --build-only --stop-at=babl \
-                      "$GIMP_PREFIX" build/linux/flatpak/org.gimp.GIMP-nightly.json
+eval $FLATPAK_BUILDER --force-clean --disable-rofiles-fuse --build-only --stop-at=babl \
+                      "$GIMP_PREFIX" build/linux/flatpak/org.gimp.GIMP-nightly.json > flatpak-builder.log 2>&1
 if [ "$GITLAB_CI" ] && [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
-  tar --zstd --xattrs --exclude=.flatpak-builder/build/babl-1 --exclude=.flatpak-builder/build/gegl-1 -cf _build-$RUNNER.tar.zst .flatpak-builder/
+  tar --zstd --xattrs --exclude=.flatpak-builder/build/ -cf _build-cached-$RUNNER.tar.zst .flatpak-builder/
   cat $NIGHTLY_CACHE_ORAS_TOKEN_FILE | oras login -u "${NIGHTLY_CACHE_ORAS_USER}" --password-stdin quay.io || true
-  oras push $built_deps_image _build-$RUNNER.tar.zst && oras logout quay.io || true
-  rm _build-$RUNNER.tar.zst
+  oras push $built_deps_image _build-cached-$RUNNER.tar.zst && oras logout quay.io || true
 fi
 printf "\e[0Ksection_end:`date +%s`:deps_build\r\e[0K\n"
 
@@ -79,7 +78,7 @@ printf "\e[0Ksection_start:`date +%s`:babl_build[collapsed=true]\r\e[0KBuilding 
 eval $FLATPAK_BUILDER --force-clean --disable-rofiles-fuse --keep-build-dirs --build-only --stop-at=gegl \
                       "$GIMP_PREFIX" build/linux/flatpak/org.gimp.GIMP-nightly.json
 if [ "$GITLAB_CI" ]; then
-  tar cf babl-meson-log.tar .flatpak-builder/build/babl-1/_flatpak_build/meson-logs/meson-log.txt
+  cp .flatpak-builder/build/babl-1/_flatpak_build/meson-logs/meson-log.txt babl-meson-log.txt
 fi
 printf "\e[0Ksection_end:`date +%s`:babl_build\r\e[0K\n"
 
@@ -87,9 +86,25 @@ printf "\e[0Ksection_start:`date +%s`:gegl_build[collapsed=true]\r\e[0KBuilding 
 eval $FLATPAK_BUILDER --force-clean --disable-rofiles-fuse --keep-build-dirs --build-only --stop-at=gimp \
                       "$GIMP_PREFIX" build/linux/flatpak/org.gimp.GIMP-nightly.json
 if [ "$GITLAB_CI" ]; then
-  tar cf gegl-meson-log.tar .flatpak-builder/build/gegl-1/_flatpak_build/meson-logs/meson-log.txt
+  cp .flatpak-builder/build/gegl-1/_flatpak_build/meson-logs/meson-log.txt gegl-meson-log.txt
   printf "\e[0Ksection_end:`date +%s`:gegl_build\r\e[0K\n"
 
-  ## Save built deps for 'gimp-flatpak' job
-  tar --zstd --xattrs -cf _build-$RUNNER.tar.zst .flatpak-builder/
+  ## Save built deps for 'gimp-flatpak' job ##
+  #
+  # Just passing .flatpak-builder/ as artifacts work, but the files all
+  # end up root, which flatpak-builder chokes on with "permission
+  # denied" in the next job.
+  # On the other hand, if I try to compress the whole thing (because tar
+  # is able to preserve permissions!), it's Gitlab CI which chokes on it
+  # with "Request Entity Too Large".
+  # So I do an in-between, and rename the folder itself in the end (so
+  # that .flatpak-builder/ itself doesn't end up belonging to root in
+  # the next job, by letting tar rebuild it).
+  for dir in .flatpak-builder/*; do
+    if [ "$dir" != ".flatpak-builder/build" ]; then
+      tar --zstd --xattrs -cf "$dir.tar.zst" "$dir"
+    fi
+    rm -fr "$dir"
+  done
+  mv .flatpak-builder _build-$RUNNER
 fi

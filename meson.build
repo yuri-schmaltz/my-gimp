@@ -1,6 +1,6 @@
 project('gimp',
   'c', 'cpp',
-  version: '3.2.0-RC1+git',
+  version: '3.2.0-RC2+git',
   meson_version: '>=0.61.0',
   default_options: [
     'cpp_std=c++14',
@@ -130,7 +130,7 @@ versionconfig.set('GIMP_API_VERSION',   gimp_api_version)
 pkgconfig = import('pkgconfig')
 i18n      = import('i18n')
 gnome     = import('gnome')
-pythonmod = import('python')
+python    = import('python').find_installation()
 simd      = import('unstable-simd')
 fs        = import('fs')
 
@@ -203,7 +203,7 @@ if platform_windows
 
   if cc.get_argument_syntax() == 'msvc'
     # MSVC's rc.exe style: /DKey=Value'
-    rc_define_flag = [] 
+    rc_define_flag = []
     rc_define_fmt  = '/D@0@=@1@'
   else
     # GNU's windres.exe style: --define Key="Value"
@@ -434,7 +434,7 @@ mscms             = platform_windows ? cc.find_library('mscms') : no_dep
 
 atk_minver        = '2.4.0'
 atk               = dependency('atk',                version: '>='+atk_minver)
-babl_minver       = '0.1.116'
+babl_minver       = '0.1.118'
 babl              = dependency('babl-0.1',           version: '>='+babl_minver)
 # TODO: we want to bump to Cairo 1.17.2 when possible in order to use
 # CAIRO_FORMAT_RGBA128F unconditionally. At time of writing, it's not possible
@@ -448,8 +448,16 @@ fontconfig_minver = '2.12.4'
 fontconfig        = dependency(fontconfig_name,      version: '>='+fontconfig_minver)
 freetype2_minver  = '2.1.7'
 freetype2         = dependency('freetype2',          version: '>='+freetype2_minver)
+
 gdk_pixbuf_minver = '2.30.8'
 gdk_pixbuf        = dependency('gdk-pixbuf-2.0',     version: '>='+gdk_pixbuf_minver)
+gdk_pixbuf_version_split = gdk_pixbuf_minver.split('.')
+gdk_pixbuf_major = gdk_pixbuf_version_split[0].to_int()
+gdk_pixbuf_minor = gdk_pixbuf_version_split[1].to_int()
+gdk_pixbuf_min_macro = 'GDK_PIXBUF_VERSION_@0@_@1@'.format(gdk_pixbuf_major, gdk_pixbuf_minor)
+add_project_arguments('-DGDK_PIXBUF_VERSION_MIN_REQUIRED=' + gdk_pixbuf_min_macro, language: 'c')
+add_project_arguments('-DGDK_PIXBUF_VERSION_MAX_ALLOWED=' + gdk_pixbuf_min_macro, language: 'c')
+
 gegl_minver       = '0.4.66'
 gegl              = dependency('gegl-0.4',           version: '>='+gegl_minver)
 exiv2_minver      = '0.27.4'
@@ -483,6 +491,8 @@ gmodule           = dependency('gmodule-no-export-2.0')
 
 gtk3_minver       = '3.24.0'
 gtk3              = dependency('gtk+-3.0',           version: '>='+gtk3_minver)
+gdk_specific_name = platform_osx ? 'gdk-quartz-3.0' : 'gdk-3.0'
+gdk_specific      = dependency(gdk_specific_name)
 gtk_version_split = gtk3_minver.split('.')
 gtk_major = gtk_version_split[0].to_int()
 gtk_minor = gtk_version_split[1].to_int()
@@ -492,6 +502,30 @@ add_project_arguments('-DGDK_VERSION_MAX_ALLOWED=' + gtk_min_macro, language: 'c
 
 harfbuzz_minver   = '2.8.2'
 harfbuzz          = dependency('harfbuzz',           version: '>='+harfbuzz_minver)
+
+if platform_osx and \
+   cc.run('''
+          #include <string.h>
+          #include <hb.h>
+
+          int
+          main (int argc, char **argv)
+          {
+            const char **shapers = hb_shape_list_shapers ();
+
+            for (int i = 0; shapers[i] != NULL; i++)
+              if (strcmp (shapers[i], "graphite2") == 0)
+                return 0;
+
+            return 1;
+          }
+          ''',
+          name: 'harfbuzz is built with graphite2 shaper',
+          dependencies: harfbuzz).returncode() != 0
+  error('harfbuzz must be built with graphite2 shaper on macOS.')
+endif
+
+
 json_glib_minver  = '1.2.6'
 json_glib         = dependency('json-glib-1.0',      version: '>='+json_glib_minver)
 lcms_minver       = '2.8'
@@ -535,6 +569,38 @@ if not pango.found()
   pango        = dependency('pango',       version: '>='+pango_minver)
   pangocairo   = dependency('pangocairo',  version: '>='+pango_minver)
   pangoft2     = dependency('pangoft2',    version: '>='+pango_minver)
+endif
+
+if cc.run('''
+  #include <pango/pango.h>
+  #include <string.h>
+  #include <stdlib.h>
+
+  int main () {
+    const char *text = "ภาษาไทย";
+    int char_count = 7;
+    int byte_len = strlen(text);
+    int breaks_found = 0;
+
+    PangoLogAttr *attrs = (PangoLogAttr *) calloc(char_count + 1, sizeof(PangoLogAttr));
+
+    pango_get_log_attrs (text, byte_len, -1, pango_language_from_string("th"), attrs, char_count + 1);
+    for (int i = 1; i < char_count; i++) {
+      if (attrs[i].is_line_break)
+        breaks_found++;
+    }
+
+    if (breaks_found > 0)
+      return 0;
+    else
+      return 1;
+  }
+  ''',
+  name: 'pango is built with libthai support',
+  dependencies: [pango]).returncode() != 0
+  thai_warning = 'Pango was not built with libthai support. Line breaking on Text tool may be incorrect on Thai language.'
+  warning(thai_warning)
+  warnings += thai_warning
 endif
 
 rsvg_minver  = '2.40.6'
@@ -685,11 +751,17 @@ endif
 conf.set('HAVE_LIBBACKTRACE', libbacktrace.found())
 
 ## Check for libunwind
-libunwind = ( get_option('libunwind')
-  ? dependency('libunwind', version: '>=1.1.0', required: false)
-  : no_dep
-)
-conf.set('HAVE_LIBUNWIND', libunwind.found())
+# In most platforms, unw_*() functions are in the libunwind library.
+# In macOS, it is on libSystem (there we only need the SDK header).
+libunwind = no_dep
+if get_option('libunwind')
+  libunwind = dependency('libunwind', version: '>=1.1.0', required: false)
+  libunwind_h = platform_osx ? cc.has_header('libunwind.h', required: false) : false
+  have_unwind = libunwind.found() or libunwind_h
+else
+  have_unwind = false
+endif
+conf.set('HAVE_LIBUNWIND', have_unwind ? 1 : false)
 
 ## Check for backtrace() API
 # In musl, backtrace() is in the libexecinfo library.
@@ -711,11 +783,11 @@ if platform_windows
 elif platform_linux
   if not have_execinfo_h
     dashboard_backtrace='no (missing: execinfo.h)'
-  elif not libbacktrace.found() and not libunwind.found()
+  elif not libbacktrace.found() and not have_unwind
     dashboard_backtrace='rough (missing: libbacktrace and libunwind)'
   elif not libbacktrace.found()
     dashboard_backtrace='partially detailed (missing: libbacktrace)'
-  elif not libunwind.found()
+  elif not have_unwind
     dashboard_backtrace='partially detailed (missing: libunwind)'
   else
     dashboard_backtrace='detailed'
@@ -852,6 +924,8 @@ can_import_heic = false
 can_export_heic = false
 can_import_avif = false
 can_export_avif = false
+can_import_hej2 = false
+can_export_hej2 = false
 
 have_heif = libheif.found()
 if have_heif
@@ -925,12 +999,48 @@ if have_heif
     ''',
     dependencies: [ libheif ],
     name: 'export AVIF').returncode() == 0
+
+    can_import_hej2 = cc.run('''
+    #include <libheif/heif.h>
+    int main() {
+      int success;
+      heif_init (NULL);
+      success = heif_have_decoder_for_format (heif_compression_JPEG2000);
+      heif_deinit ();
+
+      if (success)
+        return 0;
+      else
+        return 1;
+    }
+    ''',
+    dependencies: [ libheif ],
+    name: 'import HEJ2').returncode() == 0
+
+    can_export_hej2 = cc.run('''
+    #include <libheif/heif.h>
+    int main() {
+      int success;
+      heif_init (NULL);
+      success = heif_have_encoder_for_format (heif_compression_JPEG2000);
+      heif_deinit ();
+
+      if (success)
+        return 0;
+      else
+        return 1;
+    }
+    ''',
+    dependencies: [ libheif ],
+    name: 'export HEJ2').returncode() == 0
   else
     # When cross-compiling and we can't run our test binaries.
     can_import_heic = true
     can_export_heic = true
     can_import_avif = true
     can_export_avif = true
+    can_import_hej2 = true
+    can_export_hej2 = true
   endif
 
   if not can_import_heic and not can_import_avif
@@ -1087,7 +1197,6 @@ perl = find_program('perl5', 'perl', 'perl5.005', 'perl5.004', 'perl')
 
 python3_minver = '>=3.6'
 
-python = pythonmod.find_installation('python3', required: true)
 message('Found Python @0@'.format(python.language_version()))
 
 if not python.language_version().version_compare(python3_minver)
@@ -1201,6 +1310,10 @@ xsltproc            = find_program('xsltproc')
 desktop_validate    = find_program('desktop-file-validate', required: false)
 
 appstreamcli = find_program('appstreamcli', version: '>=0.15.3', required: get_option('appdata-test'))
+
+# Check for .typelib generation tools
+
+g_ir_compiler = find_program('g-ir-compiler')
 
 # Check for doc generation tools
 
@@ -1325,7 +1438,6 @@ localedir      = get_option('datadir') / 'locale'
 
 # Check for internal tools
 extract_vector_icon = find_program('tools'/'extract-vector-icon.sh')
-generate_changelog  = find_program('tools'/'generate_changelog.sh')
 generate_news       = find_program('tools'/'generate-news')
 gimppath2svg        = find_program('tools'/'gimppath2svg.py')
 module_dependencies = find_program('tools'/'module-dependencies.py')
@@ -1549,6 +1661,9 @@ else
 endif
 conf.set_quoted('CC_VERSION',     cc_version.strip())
 
+# Python version
+conf.set_quoted('PYTHON_VERSION', python.language_version())
+
 # Names
 conf.set_quoted('GIMP_PACKAGE',   meson.project_name())
 conf.set_quoted('PACKAGE_NAME',   meson.project_name())
@@ -1561,9 +1676,9 @@ conf.set_quoted('GIMP_APP_VERSION_STRING',gimp_app_version)
 conf.set_quoted('GIMP_APP_VERSION',       gimp_app_version)
 conf.set_quoted('GIMP_USER_VERSION',      gimp_app_version)
 
-conf.set_quoted('GIMP_DATA_VERSION',      gimp_app_version)
-conf.set_quoted('GIMP_PLUGIN_VERSION',    gimp_app_version)
-conf.set_quoted('GIMP_SYSCONF_VERSION',   gimp_app_version)
+conf.set_quoted('GIMP_DATA_VERSION',      gimp_api_version)
+conf.set_quoted('GIMP_PLUGIN_VERSION',    gimp_api_version)
+conf.set_quoted('GIMP_SYSCONF_VERSION',   gimp_api_version)
 conf.set_quoted('GIMP_TOOL_VERSION',      gimp_app_version)
 conf.set_quoted('GIMP_PKGCONFIG_VERSION', gimp_api_version)
 
@@ -1815,17 +1930,6 @@ if xmllint.found()
   )
 endif
 
-custom_target('Changelog',
-  input : [ ],
-  output: [ 'Changelog', ],
-  command: [
-    generate_changelog,
-    meson.project_source_root(),
-    '@OUTPUT@'
-  ],
-  build_by_default: false,
-)
-
 meson.add_dist_script('meson_dist_script.py',
                       generate_version_h ?  gitversion_h.full_path() : gitversion_h,
                       meson.project_source_root(), meson.project_build_root())
@@ -1892,6 +1996,7 @@ gimp_run_env.set('GIMP_GLOBAL_SOURCE_ROOT', meson.global_source_root())
 if get_option('debug-self-in-build')
  gimp_run_env.set('GIMP_DEBUG_SELF', '1')
 endif
+gimp_run_env.set('GIMP_PYTHON_WITH_GI', python.full_path())
 
 if meson.can_run_host_binaries() and have_gobject_introspection
   if enable_console_bin
@@ -1945,7 +2050,7 @@ if meson.can_run_host_binaries() and have_gobject_introspection
     gimp_run_env.prepend('PATH', meson.global_build_root() / 'libgimpthumb')
     gimp_run_env.prepend('PATH', meson.global_build_root() / 'libgimpwidgets')
   elif platform_osx
-    gimp_exe_depends += [gimp_exe_typelib]
+    gimp_exe_depends += [patched_libgimp_gir, patched_libgimpui_gir]
 
     gimp_run_env.set('GIMP_GI_DIR', gi.get_variable('libdir'))
 
@@ -1985,6 +2090,7 @@ gimp_exe = find_program('tools'/'in-build-gimp.py')
 subdir('gimp-data/images/')
 
 # Unit testing
+subdir('app/tests')
 subdir('libgimp/tests')
 
 # Docs
@@ -2064,7 +2170,7 @@ pkgconfig.generate(libgimpui,
 # Ideally meson should take care of it automatically.
 # See: https://github.com/mesonbuild/meson/issues/12977
 if platform_windows and debugging_format == 'native' and cc.get_argument_syntax() != 'msvc'
-  install_win_debug_script = find_program('build/windows/2_bundle-gimp-uni_sym.py')
+  install_win_debug_script = find_program('tools/meson_install_win_debug.py')
   meson.add_install_script(install_win_debug_script)
 endif
 
@@ -2072,6 +2178,12 @@ endif
 if get_option('windows-installer') or get_option('ms-store')
   install_win_bundling_script = find_program('build/windows/2_bundle-gimp-uni_base.py')
   meson.add_install_script(install_win_bundling_script)
+endif
+
+# On macOS, install deps in an .app bundle before distributing
+if get_option('dmg')
+  install_macos_debug_script = find_program('build/macos/2_bundle-gimp-uni_base.py')
+  meson.add_install_script(install_macos_debug_script)
 endif
 
 ################################################################################
@@ -2116,6 +2228,7 @@ final_message = [
 '''  Debug symbols format:          @0@'''.format(debugging_format),
 '''  Binary symlinks:               @0@'''.format(enable_default_bin),
 '''  OpenMP:                        @0@'''.format(have_openmp),
+'''  Bash Completion:               @0@'''.format(have_bash_completion),
 '',
 '''Optional Plug-Ins:''',
 '''  Ascii Art:           @0@'''.format(libaa.found()),
@@ -2129,6 +2242,8 @@ final_message = [
                                 .format(can_import_heic, can_export_heic),
 '''  AVIF:                import: @0@ - export: @1@'''
                                 .format(can_import_avif, can_export_avif),
+'''  HEJ2:                import: @0@ - export: @1@'''
+                                .format(can_import_hej2, can_export_hej2),
 '''  PDF (export):        @0@'''.format(cairopdf.found()),
 '''  Print:               @0@'''.format(have_print),
 '''  Javascript plug-ins: @0@'''.format(have_javascript),

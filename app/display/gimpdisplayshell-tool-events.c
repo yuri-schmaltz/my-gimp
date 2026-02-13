@@ -258,8 +258,13 @@ gimp_display_shell_events (GtkWidget        *widget,
       {
         GdkEventFocus *fevent = (GdkEventFocus *) event;
 
-        if (fevent->in && shell->display->config->activate_on_focus)
-          set_display = TRUE;
+        if (fevent->in)
+          {
+            gimp_set_focused_once (gimp);
+
+            if (shell->display->config->activate_on_focus)
+              set_display = TRUE;
+          }
       }
       break;
 
@@ -1673,7 +1678,7 @@ gimp_display_shell_check_device_cursor (GimpDisplayShell *shell)
 
   current_device = gimp_device_manager_get_current_device (manager);
 
-  shell->draw_cursor = ! gimp_device_info_has_cursor (current_device);
+  shell->draw_cursor = (current_device && ! gimp_device_info_has_cursor (current_device));
 }
 
 static void

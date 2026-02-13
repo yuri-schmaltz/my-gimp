@@ -1,5 +1,6 @@
-## macOS files not here
+## Note about macOS build situation
 
-macOS build files are not stored here yet.
+These build files on GIMP repo are the recommended to build on macOS.
 
-They are in: [gimp-macos-build](https://gitlab.gnome.org/Infrastructure/gimp-macos-build) repo.
+The legacy build files are in: [gimp-macos-build]
+(https://gitlab.gnome.org/Infrastructure/gimp-macos-build) repo.
