@@ -443,8 +443,8 @@ Formula de score usada: `(Impacto x Probabilidade) / Esforco`, com escala numeri
   - Evidencia: `app/widgets/gimpfiledialog-backend.[ch]`, `app/widgets/gimpfiledialog-backend-gtk3.[ch]`, `app/widgets/gimpfiledialog.c`.
 - B05 parcialmente concluido: camada de compatibilidade de clipboard introduzida e aplicada em `app/widgets/gimpclipboard.c`.
   - Evidencia: `app/widgets/gimpclipboardcompat.[ch]`, `app/widgets/gimpclipboard.c`.
-- B06 parcialmente concluido: piloto de migracao de view em `GimpPathEditor`, trocando `GtkTreeView`/`GtkTreeSelection` por `GtkListBox` com preservacao da API publica.
-  - Evidencia: `libgimpwidgets/gimppatheditor.c`, `tools/ci/b06-path-editor-modernization.sh`, `.gitlab-ci.yml` job `b06-path-editor-modernization`.
+- B06 parcialmente concluido: piloto de migracao de view em `GimpPathEditor`, trocando `GtkTreeView`/`GtkTreeSelection` por `GtkListBox` com preservacao da API publica, mais cobertura automatizada dedicada e wrappers de compatibilidade para APIs de container removidas no GTK4.
+  - Evidencia: `libgimpwidgets/gimppatheditor.c`, `libgimpwidgets/gimpwidgets-compat.[ch]`, `libgimpwidgets/test-path-editor.c`, `libgimpwidgets/meson.build` (fonte `gimpwidgets-compat.c` + teste `path-editor`), `tools/ci/b06-path-editor-modernization.sh`, `tools/ci/b06-path-editor-junit.sh`, `.gitlab-ci.yml` jobs `b06-path-editor-modernization` e `b06-path-editor-junit`.
 - B07 parcialmente concluido: metrica p95 baseada em JUnit e top slow tests em CI.
   - Evidencia: `tools/ci/ui-test-metrics.sh`, job `ui-test-metrics`.
 - B08 parcialmente concluido: check de baseline visual documental/screenshot manifest em CI.

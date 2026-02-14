@@ -35,6 +35,7 @@
 #include "gimphelpui.h"
 #include "gimpicons.h"
 #include "gimppatheditor.h"
+#include "gimpwidgets-compat.h"
 
 #include "libgimp/libgimp-intl.h"
 
@@ -74,6 +75,14 @@ enum
   COLUMN_WRITABLE,
   NUM_COLUMNS
 };
+
+#define GIMP_PATH_EDITOR_LISTBOX_DATA_KEY      "gimp-path-editor-listbox"
+#define GIMP_PATH_EDITOR_ENTRY_DATA_KEY        "gimp-path-editor-entry"
+#define GIMP_PATH_EDITOR_NEW_BUTTON_DATA_KEY   "gimp-path-editor-new-button"
+#define GIMP_PATH_EDITOR_UP_BUTTON_DATA_KEY    "gimp-path-editor-up-button"
+#define GIMP_PATH_EDITOR_DOWN_BUTTON_DATA_KEY  "gimp-path-editor-down-button"
+#define GIMP_PATH_EDITOR_DELETE_BUTTON_DATA_KEY "gimp-path-editor-delete-button"
+#define GIMP_PATH_EDITOR_ROW_TOGGLE_DATA_KEY   "gimp-path-editor-row-toggle"
 
 
 struct _GimpPathEditor
@@ -195,21 +204,26 @@ gimp_path_editor_init (GimpPathEditor *editor)
                                   GTK_ORIENTATION_VERTICAL);
 
   editor->upper_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
-  gtk_box_pack_start (GTK_BOX (editor), editor->upper_hbox, FALSE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (editor), editor->upper_hbox,
+                                      FALSE, TRUE, 0);
   gtk_widget_show (editor->upper_hbox);
 
   button_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_set_homogeneous (GTK_BOX (button_box), TRUE);
-  gtk_box_pack_start (GTK_BOX (editor->upper_hbox), button_box, FALSE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (editor->upper_hbox), button_box,
+                                      FALSE, TRUE, 0);
   gtk_widget_show (button_box);
 
   editor->new_button = button = gtk_button_new ();
-  gtk_box_pack_start (GTK_BOX (button_box), button, TRUE, TRUE, 0);
+  g_object_set_data (G_OBJECT (editor), GIMP_PATH_EDITOR_NEW_BUTTON_DATA_KEY,
+                     editor->new_button);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (button_box), button,
+                                      TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   image = gtk_image_new_from_icon_name (GIMP_ICON_DOCUMENT_NEW,
                                         GTK_ICON_SIZE_BUTTON);
-  gtk_container_add (GTK_CONTAINER (button), image);
+  gimp_widgets_compat_container_add (button, image);
   gtk_widget_show (image);
 
   g_signal_connect (button, "clicked",
@@ -221,13 +235,16 @@ gimp_path_editor_init (GimpPathEditor *editor)
                            NULL);
 
   editor->up_button = button = gtk_button_new ();
+  g_object_set_data (G_OBJECT (editor), GIMP_PATH_EDITOR_UP_BUTTON_DATA_KEY,
+                     editor->up_button);
   gtk_widget_set_sensitive (button, FALSE);
-  gtk_box_pack_start (GTK_BOX (button_box), button, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (button_box), button,
+                                      TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   image = gtk_image_new_from_icon_name (GIMP_ICON_GO_UP,
                                         GTK_ICON_SIZE_BUTTON);
-  gtk_container_add (GTK_CONTAINER (button), image);
+  gimp_widgets_compat_container_add (button, image);
   gtk_widget_show (image);
 
   g_signal_connect (button, "clicked",
@@ -239,13 +256,16 @@ gimp_path_editor_init (GimpPathEditor *editor)
                            NULL);
 
   editor->down_button = button = gtk_button_new ();
+  g_object_set_data (G_OBJECT (editor), GIMP_PATH_EDITOR_DOWN_BUTTON_DATA_KEY,
+                     editor->down_button);
   gtk_widget_set_sensitive (button, FALSE);
-  gtk_box_pack_start (GTK_BOX (button_box), button, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (button_box), button,
+                                      TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   image = gtk_image_new_from_icon_name (GIMP_ICON_GO_DOWN,
                                         GTK_ICON_SIZE_BUTTON);
-  gtk_container_add (GTK_CONTAINER (button), image);
+  gimp_widgets_compat_container_add (button, image);
   gtk_widget_show (image);
 
   g_signal_connect (button, "clicked",
@@ -257,13 +277,16 @@ gimp_path_editor_init (GimpPathEditor *editor)
                            NULL);
 
   editor->delete_button = button = gtk_button_new ();
+  g_object_set_data (G_OBJECT (editor), GIMP_PATH_EDITOR_DELETE_BUTTON_DATA_KEY,
+                     editor->delete_button);
   gtk_widget_set_sensitive (button, FALSE);
-  gtk_box_pack_start (GTK_BOX (button_box), button, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (button_box), button,
+                                      TRUE, TRUE, 0);
   gtk_widget_show (button);
 
   image = gtk_image_new_from_icon_name (GIMP_ICON_EDIT_DELETE,
                                         GTK_ICON_SIZE_BUTTON);
-  gtk_container_add (GTK_CONTAINER (button), image);
+  gimp_widgets_compat_container_add (button, image);
   gtk_widget_show (image);
 
   g_signal_connect (button, "clicked",
@@ -280,7 +303,8 @@ gimp_path_editor_init (GimpPathEditor *editor)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
                                   GTK_POLICY_AUTOMATIC,
                                   GTK_POLICY_ALWAYS);
-  gtk_box_pack_start (GTK_BOX (editor), scrolled_window, TRUE, TRUE, 2);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (editor), scrolled_window,
+                                      TRUE, TRUE, 2);
   gtk_widget_show (scrolled_window);
 
   editor->dir_list = gtk_list_store_new (NUM_COLUMNS,
@@ -289,9 +313,11 @@ gimp_path_editor_init (GimpPathEditor *editor)
                                          G_TYPE_BOOLEAN);
 
   editor->listbox = gtk_list_box_new ();
+  g_object_set_data (G_OBJECT (editor), GIMP_PATH_EDITOR_LISTBOX_DATA_KEY,
+                     editor->listbox);
   gtk_list_box_set_selection_mode (GTK_LIST_BOX (editor->listbox),
                                    GTK_SELECTION_SINGLE);
-  gtk_container_add (GTK_CONTAINER (scrolled_window), editor->listbox);
+  gimp_widgets_compat_container_add (scrolled_window, editor->listbox);
   gtk_widget_show (editor->listbox);
 
   g_signal_connect (editor->listbox, "row-selected",
@@ -324,9 +350,12 @@ gimp_path_editor_new (const gchar *title,
   editor = g_object_new (GIMP_TYPE_PATH_EDITOR, NULL);
 
   editor->file_entry = _gimp_file_entry_new (title, "", TRUE, TRUE);
+  g_object_set_data (G_OBJECT (editor), GIMP_PATH_EDITOR_ENTRY_DATA_KEY,
+                     _gimp_file_entry_get_entry (GIMP_FILE_ENTRY (editor->file_entry)));
   gtk_widget_set_sensitive (editor->file_entry, FALSE);
-  gtk_box_pack_start (GTK_BOX (editor->upper_hbox), editor->file_entry,
-                      TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (editor->upper_hbox),
+                                      editor->file_entry,
+                                      TRUE, TRUE, 0);
   gtk_widget_show (editor->file_entry);
 
   g_signal_connect (editor->file_entry, "filename-changed",
@@ -766,6 +795,11 @@ gimp_path_editor_refresh_listbox (GimpPathEditor *editor)
       gtk_grid_attach (GTK_GRID (grid), label,  1, 0, 1, 1);
       gtk_list_box_insert (GTK_LIST_BOX (editor->listbox), grid, -1);
       gtk_widget_show_all (grid);
+
+      g_object_set_data (G_OBJECT (gtk_list_box_get_row_at_index (GTK_LIST_BOX (editor->listbox),
+                                                                   row_index)),
+                         GIMP_PATH_EDITOR_ROW_TOGGLE_DATA_KEY,
+                         toggle);
 
       if (! editor->writable_visible)
         gtk_widget_hide (toggle);

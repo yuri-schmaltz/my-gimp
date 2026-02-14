@@ -97,6 +97,7 @@ libgimpwidgets_sources = [
   'gimpcontroller.c',
   'gimpeevl.c',
   'gimpfileentry.c',
+  'gimpwidgets-compat.c',
   'gimpwidgets-private.c',
 
   'gimpwidgetsenums.c',
@@ -249,4 +250,24 @@ test_eevl = executable('test-eevl',
   c_args: '-DG_LOG_DOMAIN="LibGimpWidgets"',
   link_with: [ libgimpwidgets, ],
   install: false,
+)
+
+test_path_editor = executable('test-path-editor',
+  'test-path-editor.c',
+  include_directories: rootInclude,
+  dependencies: [
+    gtk3,
+  ],
+  c_args: '-DG_LOG_DOMAIN="LibGimpWidgets"',
+  link_with: [ libgimpwidgets, ],
+  install: false,
+  build_by_default: false,
+)
+
+test('path-editor',
+  test_path_editor,
+  env: [ 'UI_TEST=yes' ],
+  suite: 'libgimpwidgets',
+  timeout: 60,
+  is_parallel: false,
 )

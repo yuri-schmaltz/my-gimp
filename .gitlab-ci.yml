@@ -835,6 +835,18 @@ b06-path-editor-modernization:
   script:
     - sh tools/ci/b06-path-editor-modernization.sh
 
+b06-path-editor-junit:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  needs: ["gimp-debian-nonreloc"]
+  stage: analysis
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - sh tools/ci/b06-path-editor-junit.sh
+
 e2e-core-checklist:
   extends: .default
   rules:
