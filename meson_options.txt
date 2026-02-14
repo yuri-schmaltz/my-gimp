@@ -70,3 +70,8 @@ option('javascript',        type: 'feature', value: 'auto', description: 'Instal
 option('lua',               type: 'boolean', value: false,  description: 'Install Lua plug-ins (experimental)')
 
 option('debug-self-in-build', type: 'boolean', value: false, description: 'Run in-build GIMP within gdb for debugging purpose')
+
+# Toolkit migration
+option('gtk-toolkit', type: 'combo', value: 'gtk3',
+       choices: [ 'gtk3', 'gtk4' ],
+       description: 'Select UI toolkit backend used for building GIMP')

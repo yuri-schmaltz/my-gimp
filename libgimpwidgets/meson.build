@@ -97,6 +97,7 @@ libgimpwidgets_sources = [
   'gimpcontroller.c',
   'gimpeevl.c',
   'gimpfileentry.c',
+  'gimpgtk4-migration-probes.c',
   'gimpwidgets-compat.c',
   'gimpwidgets-private.c',
 
@@ -208,7 +209,7 @@ libgimpwidgets = library('gimpwidgets-'+ gimp_api_version,
   libgimpwidgets_sources,
   include_directories: rootInclude,
   dependencies: [
-    gegl, gexiv2, gtk3, lcms, math, mscms
+    gegl, exiv2, gexiv2, gtk3, lcms, math, mscms
   ],
   c_args: [ '-DG_LOG_DOMAIN="LibGimpWidgets"', '-DGIMP_WIDGETS_COMPILATION', ],
   link_with: [
@@ -271,3 +272,104 @@ test('path-editor',
   timeout: 60,
   is_parallel: false,
 )
+
+test_file_entry = executable('test-file-entry',
+  'test-file-entry.c',
+  include_directories: rootInclude,
+  dependencies: [
+    gegl, gtk3,
+  ],
+  c_args: '-DG_LOG_DOMAIN="LibGimpWidgets"',
+  link_with: [ libgimpwidgets, ],
+  install: false,
+  build_by_default: false,
+)
+
+test('file-entry',
+  test_file_entry,
+  env: [ 'UI_TEST=yes' ],
+  suite: 'libgimpwidgets',
+  timeout: 60,
+  is_parallel: false,
+)
+
+test_chain_button = executable('test-chain-button',
+  'test-chain-button.c',
+  include_directories: rootInclude,
+  dependencies: [
+    gegl, gtk3,
+  ],
+  c_args: '-DG_LOG_DOMAIN="LibGimpWidgets"',
+  link_with: [ libgimpwidgets, ],
+  install: false,
+  build_by_default: false,
+)
+
+test('chain-button',
+  test_chain_button,
+  env: [ 'UI_TEST=yes' ],
+  suite: 'libgimpwidgets',
+  timeout: 60,
+  is_parallel: false,
+)
+
+test_browser = executable('test-browser',
+  'test-browser.c',
+  include_directories: rootInclude,
+  dependencies: [
+    gegl, gtk3,
+  ],
+  c_args: '-DG_LOG_DOMAIN="LibGimpWidgets"',
+  link_with: [ libgimpwidgets, ],
+  install: false,
+  build_by_default: false,
+)
+
+test('browser',
+  test_browser,
+  env: [ 'UI_TEST=yes' ],
+  suite: 'libgimpwidgets',
+  timeout: 60,
+  is_parallel: false,
+)
+
+test_busybox = executable('test-busybox',
+  'test-busybox.c',
+  include_directories: rootInclude,
+  dependencies: [
+    gegl, gtk3,
+  ],
+  c_args: '-DG_LOG_DOMAIN="LibGimpWidgets"',
+  link_with: [ libgimpwidgets, ],
+  install: false,
+  build_by_default: false,
+)
+
+test('busybox',
+  test_busybox,
+  env: [ 'UI_TEST=yes' ],
+  suite: 'libgimpwidgets',
+  timeout: 60,
+  is_parallel: false,
+)
+
+test_frame = executable('test-frame',
+  'test-frame.c',
+  include_directories: rootInclude,
+  dependencies: [
+    gegl, gtk3,
+  ],
+  c_args: '-DG_LOG_DOMAIN="LibGimpWidgets"',
+  link_with: [ libgimpwidgets, ],
+  install: false,
+  build_by_default: false,
+)
+
+test('frame',
+  test_frame,
+  env: [ 'UI_TEST=yes' ],
+  suite: 'libgimpwidgets',
+  timeout: 60,
+  is_parallel: false,
+)
+

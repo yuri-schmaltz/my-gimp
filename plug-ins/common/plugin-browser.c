@@ -29,6 +29,7 @@
 
 #include <libgimp/gimp.h>
 #include <libgimp/gimpui.h>
+#include "libgimpwidgets/gimpwidgets-compat.h"
 
 #include "libgimp/stdplugins-intl.h"
 
@@ -68,8 +69,8 @@ typedef struct
 
   GtkWidget   *browser;
 
-  GtkTreeView *list_view;
-  GtkTreeView *tree_view;
+  GtkWidget   *list_view;
+  GtkWidget   *tree_view;
 } PluginBrowser;
 
 typedef struct
@@ -114,9 +115,9 @@ static GimpValueArray * browser_run              (GimpProcedure        *procedur
 
 static GtkWidget * browser_dialog_new             (void);
 static void        browser_dialog_quit            (PluginBrowser    *browser);
-static void        browser_list_selection_changed (GtkTreeSelection *selection,
+static void        browser_list_selection_changed (gpointer          selection,
                                                    PluginBrowser    *browser);
-static void        browser_tree_selection_changed (GtkTreeSelection *selection,
+static void        browser_tree_selection_changed (gpointer          selection,
                                                    PluginBrowser    *browser);
 
 static gboolean    find_existing_mpath            (GtkTreeModel     *model,
@@ -285,7 +286,7 @@ get_parent (PluginBrowser *browser,
   if (! mpath)
     return;
 
-  tree_store = GTK_TREE_STORE (gtk_tree_view_get_model (browser->tree_view));
+  tree_store = GTK_TREE_STORE (gimp_widgets_compat_tree_view_get_model (browser->tree_view));
 
   /* Lookup for existing mpath */
   if (find_existing_mpath (GTK_TREE_MODEL (tree_store), mpath, parent))
@@ -340,7 +341,7 @@ insert_into_tree_view (PluginBrowser *browser,
 
   get_parent (browser, menu_path, &parent);
 
-  tree_store = GTK_TREE_STORE (gtk_tree_view_get_model (browser->tree_view));
+  tree_store = GTK_TREE_STORE (gimp_widgets_compat_tree_view_get_model (browser->tree_view));
   gtk_tree_store_append (tree_store, &iter, &parent);
   gtk_tree_store_set (tree_store, &iter,
                       TREE_COLUMN_MPATH,       menu_path,
@@ -405,15 +406,15 @@ browser_search (GimpBrowser   *gimp_browser,
   gimp_browser_set_search_summary (gimp_browser, str);
   g_free (str);
 
-  list_store = GTK_LIST_STORE (gtk_tree_view_get_model (browser->list_view));
+  list_store = GTK_LIST_STORE (gimp_widgets_compat_tree_view_get_model (browser->list_view));
   gtk_list_store_clear (list_store);
 
-  tree_store = GTK_TREE_STORE (gtk_tree_view_get_model (browser->tree_view));
+  tree_store = GTK_TREE_STORE (gimp_widgets_compat_tree_view_get_model (browser->tree_view));
   gtk_tree_store_clear (tree_store);
 
   if (num_plugins > 0)
     {
-      GtkTreeSelection  *sel;
+      gpointer           sel;
       GtkTreeIter        iter;
       const gchar      **accel_strs;
       const gchar      **prog_strs;
@@ -507,8 +508,8 @@ browser_search (GimpBrowser   *gimp_browser,
           g_free (menu_label);
         }
 
-      gtk_tree_view_columns_autosize (GTK_TREE_VIEW (browser->list_view));
-      gtk_tree_view_columns_autosize (GTK_TREE_VIEW (browser->tree_view));
+      gimp_widgets_compat_tree_view_columns_autosize (browser->list_view);
+      gimp_widgets_compat_tree_view_columns_autosize (browser->tree_view);
 
       gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (list_store),
                                             LIST_COLUMN_NAME,
@@ -517,11 +518,11 @@ browser_search (GimpBrowser   *gimp_browser,
                                             TREE_COLUMN_PATH_NAME,
                                             GTK_SORT_ASCENDING);
 
-      sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (browser->list_view));
+      sel = gimp_widgets_compat_tree_view_get_selection (browser->list_view);
 
       gtk_tree_model_get_iter_first (GTK_TREE_MODEL (list_store),
                                      &iter);
-      gtk_tree_selection_select_iter (sel, &iter);
+      gimp_widgets_compat_tree_selection_select_iter (sel, &iter);
     }
   else
     {
@@ -544,7 +545,7 @@ browser_dialog_new (void)
   GtkWidget         *tree_view;
   GtkTreeViewColumn *column;
   GtkCellRenderer   *renderer;
-  GtkTreeSelection  *selection;
+  gpointer           selection;
   GtkTreeIter        iter;
 
   gimp_ui_init (PLUG_IN_BINARY);
@@ -593,10 +594,10 @@ browser_dialog_new (void)
                                    G_TYPE_STRING,
                                    G_TYPE_POINTER);
 
-  list_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (list_store));
+  list_view = gimp_widgets_compat_tree_view_new_with_model (GTK_TREE_MODEL (list_store));
   g_object_unref (list_store);
 
-  browser->list_view = GTK_TREE_VIEW (list_view);
+  browser->list_view = list_view;
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes (_("Name"),
@@ -604,7 +605,7 @@ browser_dialog_new (void)
                                                      "text", LIST_COLUMN_NAME,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id  (column, LIST_COLUMN_NAME);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (list_view), column);
+  gimp_widgets_compat_tree_view_append_column (list_view, column);
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes (_("Menu Path"),
@@ -612,7 +613,7 @@ browser_dialog_new (void)
                                                      "text", LIST_COLUMN_PATH,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id  (column, LIST_COLUMN_PATH);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (list_view), column);
+  gimp_widgets_compat_tree_view_append_column (list_view, column);
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes (_("Image Types"),
@@ -621,7 +622,7 @@ browser_dialog_new (void)
                                                      LIST_COLUMN_IMAGE_TYPES,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id  (column, LIST_COLUMN_IMAGE_TYPES);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (list_view), column);
+  gimp_widgets_compat_tree_view_append_column (list_view, column);
 
   renderer = gtk_cell_renderer_text_new ();
 
@@ -631,7 +632,7 @@ browser_dialog_new (void)
                                                      LIST_COLUMN_DATE_STRING,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id  (column, LIST_COLUMN_DATE);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (list_view), column);
+  gimp_widgets_compat_tree_view_append_column (list_view, column);
 
   scrolled_window = gtk_scrolled_window_new (NULL, NULL);
   gtk_container_set_border_width (GTK_CONTAINER (scrolled_window), 2);
@@ -640,8 +641,8 @@ browser_dialog_new (void)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-  selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (list_view));
-  gtk_tree_selection_set_mode (selection, GTK_SELECTION_BROWSE);
+  selection = gimp_widgets_compat_tree_view_get_selection (list_view);
+  gimp_widgets_compat_tree_selection_set_mode (selection, GTK_SELECTION_BROWSE);
 
   g_signal_connect (selection, "changed",
                     G_CALLBACK (browser_list_selection_changed),
@@ -662,10 +663,10 @@ browser_dialog_new (void)
                                    G_TYPE_STRING,
                                    G_TYPE_POINTER);
 
-  tree_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (tree_store));
+  tree_view = gimp_widgets_compat_tree_view_new_with_model (GTK_TREE_MODEL (tree_store));
   g_object_unref (tree_store);
 
-  browser->tree_view = GTK_TREE_VIEW (tree_view);
+  browser->tree_view = tree_view;
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes (_("Menu Path"),
@@ -674,7 +675,7 @@ browser_dialog_new (void)
                                                      TREE_COLUMN_PATH_NAME,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id  (column, TREE_COLUMN_PATH_NAME);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (tree_view), column);
+  gimp_widgets_compat_tree_view_append_column (tree_view, column);
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes (_("Image Types"),
@@ -683,7 +684,7 @@ browser_dialog_new (void)
                                                      TREE_COLUMN_IMAGE_TYPES,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id  (column, TREE_COLUMN_IMAGE_TYPES);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (tree_view), column);
+  gimp_widgets_compat_tree_view_append_column (tree_view, column);
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes (_("Installation Date"),
@@ -692,7 +693,7 @@ browser_dialog_new (void)
                                                      TREE_COLUMN_DATE_STRING,
                                                      NULL);
   gtk_tree_view_column_set_sort_column_id  (column, TREE_COLUMN_DATE);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (tree_view), column);
+  gimp_widgets_compat_tree_view_append_column (tree_view, column);
 
   scrolled_window = gtk_scrolled_window_new (NULL, NULL);
   gtk_container_set_border_width (GTK_CONTAINER (scrolled_window), 2);
@@ -701,8 +702,8 @@ browser_dialog_new (void)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-  selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (tree_view));
-  gtk_tree_selection_set_mode (selection, GTK_SELECTION_BROWSE);
+  selection = gimp_widgets_compat_tree_view_get_selection (tree_view);
+  gimp_widgets_compat_tree_selection_set_mode (selection, GTK_SELECTION_BROWSE);
 
   g_signal_connect (selection, "changed",
                     G_CALLBACK (browser_tree_selection_changed),
@@ -722,8 +723,8 @@ browser_dialog_new (void)
   gtk_widget_show (browser->dialog);
 
   if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (list_store), &iter))
-    gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (list_view)),
-                                    &iter);
+    gimp_widgets_compat_tree_selection_select_iter (gimp_widgets_compat_tree_view_get_selection (list_view),
+                                                    &iter);
 
   return browser->dialog;
 }
@@ -736,7 +737,7 @@ browser_dialog_quit (PluginBrowser *browser)
 }
 
 static void
-browser_list_selection_changed (GtkTreeSelection *selection,
+browser_list_selection_changed (gpointer       selection,
                                 PluginBrowser    *browser)
 {
   PInfo        *pinfo = NULL;
@@ -746,7 +747,7 @@ browser_list_selection_changed (GtkTreeSelection *selection,
 
   g_return_if_fail (browser != NULL);
 
-  if (gtk_tree_selection_get_selected (selection, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (selection, &model, &iter))
     {
       gtk_tree_model_get (model, &iter,
                           LIST_COLUMN_PINFO, &pinfo,
@@ -757,28 +758,28 @@ browser_list_selection_changed (GtkTreeSelection *selection,
   if (!pinfo || !mpath)
     return;
 
-  model = gtk_tree_view_get_model (browser->tree_view);
+  model = gimp_widgets_compat_tree_view_get_model (browser->tree_view);
 
   if (find_existing_mpath (model, mpath, &iter))
     {
-      GtkTreeSelection *tree_selection;
+      gpointer          tree_selection;
       GtkTreePath      *tree_path;
 
       tree_path = gtk_tree_model_get_path (model, &iter);
-      gtk_tree_view_expand_to_path (browser->tree_view, tree_path);
-      tree_selection = gtk_tree_view_get_selection (browser->tree_view);
+      gimp_widgets_compat_tree_view_expand_to_path (browser->tree_view, tree_path);
+      tree_selection = gimp_widgets_compat_tree_view_get_selection (browser->tree_view);
 
       g_signal_handlers_block_by_func (tree_selection,
                                        browser_tree_selection_changed,
                                        browser);
-      gtk_tree_selection_select_iter (tree_selection, &iter);
+      gimp_widgets_compat_tree_selection_select_iter (tree_selection, &iter);
       g_signal_handlers_unblock_by_func (tree_selection,
                                          browser_tree_selection_changed,
                                          browser);
 
-      gtk_tree_view_scroll_to_cell (browser->tree_view,
-                                    tree_path, NULL,
-                                    TRUE, 0.5, 0.0);
+      gimp_widgets_compat_tree_view_scroll_to_cell (browser->tree_view,
+                                                    tree_path,
+                                                    TRUE, 0.5, 0.0);
     }
   else
     {
@@ -792,7 +793,7 @@ browser_list_selection_changed (GtkTreeSelection *selection,
 }
 
 static void
-browser_tree_selection_changed (GtkTreeSelection *selection,
+browser_tree_selection_changed (gpointer       selection,
                                 PluginBrowser    *browser)
 {
   PInfo        *pinfo = NULL;
@@ -803,7 +804,7 @@ browser_tree_selection_changed (GtkTreeSelection *selection,
 
   g_return_if_fail (browser != NULL);
 
-  if (gtk_tree_selection_get_selected (selection, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (selection, &model, &iter))
     {
       gtk_tree_model_get (model, &iter,
                           TREE_COLUMN_PINFO, &pinfo,
@@ -815,7 +816,7 @@ browser_tree_selection_changed (GtkTreeSelection *selection,
     return;
 
   /* Get the first iter in the list */
-  model = gtk_tree_view_get_model (browser->list_view);
+  model = gimp_widgets_compat_tree_view_get_model (browser->list_view);
   valid = gtk_tree_model_get_iter_first (model, &iter);
   found = FALSE;
 
@@ -841,23 +842,23 @@ browser_tree_selection_changed (GtkTreeSelection *selection,
 
   if (found)
     {
-      GtkTreeSelection *list_selection;
+      gpointer          list_selection;
       GtkTreePath      *tree_path;
 
       tree_path = gtk_tree_model_get_path (model, &iter);
-      list_selection = gtk_tree_view_get_selection (browser->list_view);
+      list_selection = gimp_widgets_compat_tree_view_get_selection (browser->list_view);
 
       g_signal_handlers_block_by_func (list_selection,
                                        browser_list_selection_changed,
                                        browser);
-      gtk_tree_selection_select_iter (list_selection, &iter);
+      gimp_widgets_compat_tree_selection_select_iter (list_selection, &iter);
       g_signal_handlers_unblock_by_func (list_selection,
                                          browser_list_selection_changed,
                                          browser);
 
-      gtk_tree_view_scroll_to_cell (browser->list_view,
-                                    tree_path, NULL,
-                                    TRUE, 0.5, 0.0);
+      gimp_widgets_compat_tree_view_scroll_to_cell (browser->list_view,
+                                                    tree_path,
+                                                    TRUE, 0.5, 0.0);
     }
   else
     {

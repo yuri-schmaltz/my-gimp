@@ -835,6 +835,15 @@ b06-path-editor-modernization:
   script:
     - sh tools/ci/b06-path-editor-modernization.sh
 
+b06-gtk4-listview-gate:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  stage: analysis
+  script:
+    - sh tools/ci/b06-gtk4-listview-gate.sh
+
 b04-file-dialog-backend-check:
   extends: .default
   rules:
@@ -914,6 +923,23 @@ ui-visual-diff-smoke:
   stage: analysis
   script:
     - sh tools/ci/ui-visual-diff-smoke.sh
+  artifacts:
+    paths:
+      - _log/ui-visual/current/
+      - _log/ui-visual/report/
+    expire_in: 2 days
+
+ui-visual-diff-strict:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  needs: ["ui-visual-diff-smoke"]
+  stage: analysis
+  variables:
+    UI_VISUAL_REQUIRE_CURRENT: "1"
+  script:
+    - sh tools/ci/ui-visual-diff.sh
 
 color-icc-checklist:
   extends: .default
@@ -943,6 +969,26 @@ color-icc-diff-smoke:
   stage: analysis
   script:
     - sh tools/ci/color-icc-diff-smoke.sh
+  artifacts:
+    paths:
+      - _log/color-icc-smoke/
+    expire_in: 2 days
+
+color-icc-diff-strict:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  needs: ["color-icc-diff-smoke"]
+  stage: analysis
+  variables:
+    ICC_MANIFEST: "_log/color-icc-smoke/corpus.txt"
+    ICC_EXPECTED_DIR: "_log/color-icc-smoke/expected"
+    ICC_ACTUAL_DIR: "_log/color-icc-smoke/actual"
+    ICC_REPORT_DIR: "_log/color-icc/report"
+    ICC_REQUIRE_ACTUAL: "1"
+  script:
+    - sh tools/ci/color-icc-diff.sh
 
 tablet-matrix-check:
   extends: .default

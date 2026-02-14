@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../../..
+includedir=${prefix}/include
+libdir=${prefix}/lib/x86_64-linux-gnu
+
+Name: GExiv2
+Description: GObject bindings for exiv2
+URL: https://wiki.gnome.org/Projects/gexiv2
+Version: 0.16.0
+Requires: glib-2.0, gobject-2.0 >=  2.46.0, gio-2.0 >=  2.46.0
+Requires.private: exiv2 >=  0.28
+Libs: -L${libdir} -lgexiv2-0.16
+Cflags: -I${includedir}/gexiv2-0.16

@@ -127,6 +127,9 @@ static void   gimp_path_editor_writable_toggled   (GtkToggleButton       *toggle
 static void   gimp_path_editor_sync_selection     (GimpPathEditor        *editor,
                                                    GtkListBoxRow         *row);
 static void   gimp_path_editor_refresh_listbox    (GimpPathEditor        *editor);
+#if GTK_CHECK_VERSION(4, 0, 0)
+static void   gimp_path_editor_gtk4_listview_probe (void) G_GNUC_UNUSED;
+#endif
 
 
 G_DEFINE_TYPE (GimpPathEditor, gimp_path_editor, GTK_TYPE_BOX)
@@ -827,6 +830,28 @@ gimp_path_editor_refresh_listbox (GimpPathEditor *editor)
 
   gimp_path_editor_sync_selection (editor, selected_row);
 }
+
+#if GTK_CHECK_VERSION(4, 0, 0)
+static void
+gimp_path_editor_gtk4_listview_probe (void)
+{
+  GtkSelectionModel *selection_model;
+  GtkListItemFactory *factory;
+  GtkWidget *list_view;
+  GtkWidget *column_view;
+
+  selection_model = GTK_SELECTION_MODEL (gtk_no_selection_new (NULL));
+  factory = gtk_signal_list_item_factory_new ();
+
+  list_view = gtk_list_view_new (selection_model, factory);
+  column_view = gtk_column_view_new (GTK_SELECTION_MODEL (gtk_no_selection_new (NULL)));
+
+  g_clear_object (&selection_model);
+  g_clear_object (&factory);
+  g_clear_object (&list_view);
+  g_clear_object (&column_view);
+}
+#endif
 
 static void
 gimp_path_editor_new_clicked (GtkWidget      *widget,

@@ -30,6 +30,7 @@
 #include "gimpwidgetstypes.h"
 
 #include "gimpframe.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgetsutils.h"
 
 
@@ -143,9 +144,9 @@ gimp_frame_label_widget_notify (GimpFrame *frame)
           gtk_label_set_xalign (GTK_LABEL (label), xalign);
           gtk_label_set_yalign (GTK_LABEL (label), yalign);
         }
-      else if (GTK_IS_BIN (label_widget))
+      else
         {
-          GtkWidget *child = gtk_bin_get_child (GTK_BIN (label_widget));
+          GtkWidget *child = gimp_widgets_compat_bin_get_child (label_widget);
 
           if (GTK_IS_LABEL (child))
             label = GTK_LABEL (child);
@@ -177,7 +178,7 @@ gimp_frame_child_added (GimpFrame *frame,
 static void
 gimp_frame_apply_margins (GimpFrame *frame)
 {
-  GtkWidget *child = gtk_bin_get_child (GTK_BIN (frame));
+  GtkWidget *child = gimp_widgets_compat_bin_get_child (GTK_WIDGET (frame));
 
   if (child)
     {

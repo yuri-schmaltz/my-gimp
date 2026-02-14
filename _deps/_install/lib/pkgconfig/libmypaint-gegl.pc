@@ -1,0 +1,11 @@
+prefix=/home/yurix/Documentos/my-gimp/_deps/libmypaint/../_install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libmypaint-gegl
+Description: MyPaint brush engine library, with GEGL integration.
+Version: 1.6.1
+Requires: gegl-0.4 libmypaint
+Cflags: -I${includedir}/libmypaint-gegl
+Libs: -L${libdir} -lmypaint-gegl

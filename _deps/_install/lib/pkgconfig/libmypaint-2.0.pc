@@ -1,0 +1,12 @@
+prefix=/home/yurix/Documentos/my-gimp/_deps/libmypaint/../_install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libmypaint
+Description: MyPaint's brushstroke rendering library (2.0.0-beta)
+URL: https://github.com/mypaint/libmypaint
+Version: 2.0.0
+Requires: json-c gobject-2.0
+Cflags: -I${includedir}/libmypaint-2.0
+Libs: -L${libdir} -lmypaint-2.0 

@@ -29,6 +29,7 @@
 #include "gimpwidgetstypes.h"
 
 #include "gimpbusybox.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgetsutils.h"
 
 
@@ -114,8 +115,10 @@ gimp_busy_box_init (GimpBusyBox *box)
   /* the spinner */
   spinner = gtk_spinner_new ();
   gtk_spinner_start (GTK_SPINNER (spinner));
-  gtk_box_pack_start (GTK_BOX (box), spinner, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (box), spinner, FALSE, FALSE, 0);
   gtk_widget_show (spinner);
+
+  g_object_set_data (G_OBJECT (box), "gimp-busy-box-spinner", spinner);
 
   /* the label */
   label = gtk_label_new (NULL);
@@ -123,8 +126,10 @@ gimp_busy_box_init (GimpBusyBox *box)
   gimp_label_set_attributes (GTK_LABEL (label),
                              PANGO_ATTR_STYLE, PANGO_STYLE_ITALIC,
                              -1);
-  gtk_box_pack_start (GTK_BOX (box), label, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (box), label, FALSE, FALSE, 0);
   gtk_widget_show (label);
+
+  g_object_set_data (G_OBJECT (box), "gimp-busy-box-label", label);
 }
 
 static void

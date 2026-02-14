@@ -29,6 +29,7 @@
 
 #include "gimpchainbutton.h"
 #include "gimpicons.h"
+#include "gimpwidgets-compat.h"
 
 
 /**
@@ -195,8 +196,11 @@ gimp_chain_button_init (GimpChainButton *button)
   button->image    = gtk_image_new ();
   button->button   = gtk_button_new ();
 
+  g_object_set_data (G_OBJECT (button), "gimp-chain-button-image",  button->image);
+  g_object_set_data (G_OBJECT (button), "gimp-chain-button-button", button->button);
+
   gtk_button_set_relief (GTK_BUTTON (button->button), GTK_RELIEF_NONE);
-  gtk_container_add (GTK_CONTAINER (button->button), button->image);
+  gimp_widgets_compat_container_add (button->button, button->image);
   gtk_widget_show (button->image);
 
   g_signal_connect (button->button, "clicked",
@@ -213,6 +217,9 @@ gimp_chain_button_constructed (GObject *object)
 
   button->line1 = gimp_chain_line_new (button->position, 1);
   button->line2 = gimp_chain_line_new (button->position, -1);
+
+  g_object_set_data (G_OBJECT (button), "gimp-chain-button-line1", button->line1);
+  g_object_set_data (G_OBJECT (button), "gimp-chain-button-line2", button->line2);
 
   gimp_chain_button_update_image (button);
 

@@ -1,0 +1,13 @@
+prefix=/home/yurix/Documentos/my-gimp/_deps/_install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: exiv2
+Description: Exif/IPTC/Xmp C++ metadata library and tools plus ICC Profiles, Previews and more.
+Version: 0.28.2
+URL: https://exiv2.org
+Requires.private: expat, libbrotlidec, zlib
+Libs: -L${libdir} -lexiv2
+Libs.private: 
+Cflags: -I${includedir}

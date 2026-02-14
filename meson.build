@@ -463,7 +463,7 @@ gegl              = dependency('gegl-0.4',           version: '>='+gegl_minver)
 exiv2_minver      = '0.27.4'
 exiv2             = dependency('exiv2',              version: '>='+exiv2_minver)
 gexiv2_minver     = '0.14.0'
-gexiv2_maxver     = '0.15.0'
+gexiv2_maxver     = '0.99.0'
 gexiv2            = dependency('gexiv2',             version: ['>='+gexiv2_minver, '<'+gexiv2_maxver])
 
 gio               = dependency('gio-2.0')
@@ -489,11 +489,22 @@ gi                = dependency('gobject-introspection-1.0')
 gobject           = dependency('gobject-2.0',        version: '>='+glib_minver)
 gmodule           = dependency('gmodule-no-export-2.0')
 
+gtk_toolkit       = get_option('gtk-toolkit')
 gtk3_minver       = '3.24.0'
-gtk3              = dependency('gtk+-3.0',           version: '>='+gtk3_minver)
-gdk_specific_name = platform_osx ? 'gdk-quartz-3.0' : 'gdk-3.0'
-gdk_specific      = dependency(gdk_specific_name)
-gtk_version_split = gtk3_minver.split('.')
+gtk4_minver       = '4.6.0'
+if gtk_toolkit == 'gtk4'
+  gtk_dep_name      = 'gtk4'
+  gtk_minver        = gtk4_minver
+  gtk3              = dependency(gtk_dep_name,       version: '>='+gtk_minver)
+  gdk_specific_name = 'gdk-4.0'
+else
+  gtk_dep_name      = 'gtk+-3.0'
+  gtk_minver        = gtk3_minver
+  gtk3              = dependency(gtk_dep_name,       version: '>='+gtk_minver)
+  gdk_specific_name = platform_osx ? 'gdk-quartz-3.0' : 'gdk-3.0'
+endif
+gdk_specific      = dependency(gdk_specific_name, required: false)
+gtk_version_split = gtk_minver.split('.')
 gtk_major = gtk_version_split[0].to_int()
 gtk_minor = gtk_version_split[1].to_int()
 gtk_min_macro = 'GDK_VERSION_@0@_@1@'.format(gtk_major, gtk_minor)
@@ -699,9 +710,9 @@ endif
 # Check for extension support
 
 appstream_minver = '0.16.1'
-appstream = dependency('appstream', version: '>='+appstream_minver)
+appstream = dependency('appstream', version: '>='+appstream_minver, required: false)
 
-libarchive = dependency('libarchive')
+libarchive = dependency('libarchive', required: false)
 
 ################################################################################
 # Check for 32-bit DLLs (Win32 64-bit)
@@ -809,16 +820,16 @@ conf.set('HAVE_EXCHNDL', drmingw.found())
 ################################################################################
 # Check for x11 support
 
-x11_target = gtk3.get_variable(pkgconfig: 'targets').contains('x11')
+x11_target = gtk_toolkit == 'gtk3' and gtk3.get_variable(pkgconfig: 'targets').contains('x11')
 
 x11   = x11_target ? dependency('x11')    : no_dep
-xmu   = x11_target ? dependency('xmu')    : no_dep
-xext  = x11_target ? dependency('xext')   : no_dep
-xfixes= x11_target ? dependency('xfixes') : no_dep
+xmu   = x11_target ? dependency('xmu', required: false)    : no_dep
+xext  = x11_target ? dependency('xext', required: false)   : no_dep
+xfixes= x11_target ? dependency('xfixes', required: false) : no_dep
 x11_deps = [ x11, xmu, xext, xfixes ]
 conf.set('HAVE_XFIXES', xfixes.found())
 
-if x11_target
+if x11_target and xmu.found() and xext.found()
   foreach header : [ 'X11/Xmu/WinUtil.h', 'X11/extensions/shape.h', ]
     if not cc.has_header(header, dependencies: [ xext, xmu ])
       error('x11 install does not provide required header ' + header)
@@ -1804,7 +1815,7 @@ install_conf.set('EXIV2_REQUIRED_VERSION',        exiv2_minver)
 install_conf.set('GEXIV2_REQUIRED_VERSION',       gexiv2_minver)
 install_conf.set('GEXIV2_MAX_VERSION',            gexiv2_maxver)
 install_conf.set('GLIB_REQUIRED_VERSION',         glib_minver)
-install_conf.set('GTK_REQUIRED_VERSION',          gtk3_minver)
+install_conf.set('GTK_REQUIRED_VERSION',          gtk_minver)
 install_conf.set('HARFBUZZ_REQUIRED_VERSION',     harfbuzz_minver)
 install_conf.set('JSON_GLIB_REQUIRED_VERSION',    json_glib_minver)
 install_conf.set('LCMS_REQUIRED_VERSION',         lcms_minver)
@@ -2154,7 +2165,7 @@ pkgconfig.generate(libgimpui,
   version: gimp_version,
   requires: [
     libgimp,
-    gtk3,
+    gtk_dep_name,
   ],
   libraries: [
     libgimpwidgets,

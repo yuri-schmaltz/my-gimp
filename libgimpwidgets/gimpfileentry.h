@@ -47,16 +47,16 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (GimpFileEntry, _gimp_file_entry, GIMP, FILE_ENTRY, GtkBox)
 
 
-G_GNUC_INTERNAL GtkWidget * _gimp_file_entry_new          (const gchar   *title,
-                                                           const gchar   *filename,
-                                                           gboolean       dir_only,
-                                                           gboolean       check_valid);
+GtkWidget * _gimp_file_entry_new          (const gchar   *title,
+                                           const gchar   *filename,
+                                           gboolean       dir_only,
+                                           gboolean       check_valid);
 
-G_GNUC_INTERNAL gchar     * _gimp_file_entry_get_filename (GimpFileEntry *entry);
-G_GNUC_INTERNAL void        _gimp_file_entry_set_filename (GimpFileEntry *entry,
-                                                           const gchar   *filename);
+gchar     * _gimp_file_entry_get_filename (GimpFileEntry *entry);
+void        _gimp_file_entry_set_filename (GimpFileEntry *entry,
+                                           const gchar   *filename);
 
-G_GNUC_INTERNAL GtkWidget * _gimp_file_entry_get_entry    (GimpFileEntry *entry);
+GtkWidget * _gimp_file_entry_get_entry    (GimpFileEntry *entry);
 
 
 G_END_DECLS

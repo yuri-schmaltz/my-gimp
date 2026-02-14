@@ -43,8 +43,8 @@ struct _GimpColorDisplayEditor
   GtkListStore          *src;
   GtkListStore          *dest;
 
-  GtkTreeSelection      *src_sel;
-  GtkTreeSelection      *dest_sel;
+  gpointer               src_sel;
+  gpointer               dest_sel;
 
   GimpColorDisplay      *selected;
 

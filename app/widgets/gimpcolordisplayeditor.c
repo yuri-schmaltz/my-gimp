@@ -25,6 +25,7 @@
 
 #include "libgimpcolor/gimpcolor.h"
 #include "libgimpconfig/gimpconfig.h"
+#include "libgimpwidgets/gimpwidgets-compat.h"
 #include "libgimpwidgets/gimpwidgets.h"
 
 #include "widgets-types.h"
@@ -72,9 +73,9 @@ static void   gimp_color_display_editor_down_clicked   (GtkWidget              *
 static void   gimp_color_display_editor_reset_clicked  (GtkWidget              *widget,
                                                         GimpColorDisplayEditor *editor);
 
-static void   gimp_color_display_editor_src_changed    (GtkTreeSelection       *sel,
+static void   gimp_color_display_editor_src_changed    (gpointer                sel,
                                                         GimpColorDisplayEditor *editor);
-static void   gimp_color_display_editor_dest_changed   (GtkTreeSelection       *sel,
+static void   gimp_color_display_editor_dest_changed   (gpointer                sel,
                                                         GimpColorDisplayEditor *editor);
 
 static void   gimp_color_display_editor_added          (GimpColorDisplayStack  *stack,
@@ -152,14 +153,14 @@ gimp_color_display_editor_init (GimpColorDisplayEditor *editor)
                                     G_TYPE_GTYPE);
   gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (editor->src),
                                         SRC_COLUMN_NAME, GTK_SORT_ASCENDING);
-  tv = gtk_tree_view_new_with_model (GTK_TREE_MODEL (editor->src));
+  tv = gimp_widgets_compat_tree_view_new_with_model (GTK_TREE_MODEL (editor->src));
   g_object_unref (editor->src);
 
-  gtk_tree_view_set_headers_clickable (GTK_TREE_VIEW (tv), FALSE);
+  gimp_widgets_compat_tree_view_set_headers_clickable (tv, FALSE);
 
   column = gtk_tree_view_column_new ();
   gtk_tree_view_column_set_title (column, _("Available Filters"));
-  gtk_tree_view_append_column (GTK_TREE_VIEW (tv), column);
+  gimp_widgets_compat_tree_view_append_column (tv, column);
 
   rend = gtk_cell_renderer_pixbuf_new ();
   gtk_tree_view_column_pack_start (column, rend, FALSE);
@@ -176,7 +177,7 @@ gimp_color_display_editor_init (GimpColorDisplayEditor *editor)
   gtk_container_add (GTK_CONTAINER (scrolled_win), tv);
   gtk_widget_show (tv);
 
-  editor->src_sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (tv));
+  editor->src_sel = gimp_widgets_compat_tree_view_get_selection (tv);
 
   g_signal_connect (editor->src_sel, "changed",
                     G_CALLBACK (gimp_color_display_editor_src_changed),
@@ -254,10 +255,10 @@ gimp_color_display_editor_init (GimpColorDisplayEditor *editor)
                                      G_TYPE_STRING,
                                      G_TYPE_STRING,
                                      GIMP_TYPE_COLOR_DISPLAY);
-  tv = gtk_tree_view_new_with_model (GTK_TREE_MODEL (editor->dest));
+  tv = gimp_widgets_compat_tree_view_new_with_model (GTK_TREE_MODEL (editor->dest));
   g_object_unref (editor->dest);
 
-  gtk_tree_view_set_headers_clickable (GTK_TREE_VIEW (tv), FALSE);
+  gimp_widgets_compat_tree_view_set_headers_clickable (tv, FALSE);
 
   rend = gtk_cell_renderer_toggle_new ();
 
@@ -269,7 +270,7 @@ gimp_color_display_editor_init (GimpColorDisplayEditor *editor)
                                                      "active",
                                                      DEST_COLUMN_ENABLED,
                                                      NULL);
-  gtk_tree_view_insert_column (GTK_TREE_VIEW (tv), column, 0);
+  gimp_widgets_compat_tree_view_insert_column (tv, column, 0);
 
   image = gtk_image_new_from_icon_name (GIMP_ICON_VISIBLE,
                                         GTK_ICON_SIZE_MENU);
@@ -278,7 +279,7 @@ gimp_color_display_editor_init (GimpColorDisplayEditor *editor)
 
   column = gtk_tree_view_column_new ();
   gtk_tree_view_column_set_title (column, _("Active Filters"));
-  gtk_tree_view_append_column (GTK_TREE_VIEW (tv), column);
+  gimp_widgets_compat_tree_view_append_column (tv, column);
 
   rend = gtk_cell_renderer_pixbuf_new ();
   gtk_tree_view_column_pack_start (column, rend, FALSE);
@@ -295,7 +296,7 @@ gimp_color_display_editor_init (GimpColorDisplayEditor *editor)
   gtk_container_add (GTK_CONTAINER (scrolled_win), tv);
   gtk_widget_show (tv);
 
-  editor->dest_sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (tv));
+  editor->dest_sel = gimp_widgets_compat_tree_view_get_selection (tv);
 
   g_signal_connect (editor->dest_sel, "changed",
                     G_CALLBACK (gimp_color_display_editor_dest_changed),
@@ -447,7 +448,7 @@ gimp_color_display_editor_add_clicked (GtkWidget              *widget,
   GtkTreeModel *model;
   GtkTreeIter   iter;
 
-  if (gtk_tree_selection_get_selected (editor->src_sel, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (editor->src_sel, &model, &iter))
     {
       GimpColorDisplay *display;
       GType             type;
@@ -500,7 +501,7 @@ gimp_color_display_editor_reset_clicked (GtkWidget              *widget,
 }
 
 static void
-gimp_color_display_editor_src_changed (GtkTreeSelection       *sel,
+gimp_color_display_editor_src_changed (gpointer                sel,
                                        GimpColorDisplayEditor *editor)
 {
   GtkTreeModel *model;
@@ -508,7 +509,7 @@ gimp_color_display_editor_src_changed (GtkTreeSelection       *sel,
   gchar        *tip  = NULL;
   const gchar  *name = NULL;
 
-  if (gtk_tree_selection_get_selected (sel, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (sel, &model, &iter))
     {
       GValue val = G_VALUE_INIT;
 
@@ -528,7 +529,7 @@ gimp_color_display_editor_src_changed (GtkTreeSelection       *sel,
 }
 
 static void
-gimp_color_display_editor_dest_changed (GtkTreeSelection       *sel,
+gimp_color_display_editor_dest_changed (gpointer                sel,
                                         GimpColorDisplayEditor *editor)
 {
   GtkTreeModel     *model;
@@ -538,7 +539,7 @@ gimp_color_display_editor_dest_changed (GtkTreeSelection       *sel,
 
   g_clear_weak_pointer (&editor->selected);
 
-  if (gtk_tree_selection_get_selected (sel, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (sel, &model, &iter))
     {
       GValue val = G_VALUE_INIT;
 
@@ -805,7 +806,7 @@ gimp_color_display_editor_update_buttons (GimpColorDisplayEditor *editor)
   gboolean      up_sensitive   = FALSE;
   gboolean      down_sensitive = FALSE;
 
-  if (gtk_tree_selection_get_selected (editor->dest_sel, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (editor->dest_sel, &model, &iter))
     {
       GList       *filters = gimp_color_display_stack_get_filters (editor->stack);
       GtkTreePath *path    = gtk_tree_model_get_path (model, &iter);

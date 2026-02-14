@@ -1,0 +1,16 @@
+prefix=${pcfiledir}/../../..
+includedir=${prefix}/include
+libdir=${prefix}/lib/x86_64-linux-gnu
+
+datadir=${prefix}/share
+pluginsdir=${libdir}/babl-0.1
+girdir=${datadir}/gir-1.0
+typelibdir=${libdir}/girepository-1.0
+
+Name: babl
+Description: Pixel encoding and color space conversion engine.
+Version: 0.1.123
+Requires.private: lcms2 >= 2.8
+Libs: -L${libdir} -lbabl-0.1
+Libs.private: -lm -pthread -ldl
+Cflags: -I${includedir}/babl-0.1

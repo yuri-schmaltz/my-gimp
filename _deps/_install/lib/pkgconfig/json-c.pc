@@ -1,0 +1,12 @@
+prefix=/home/yurix/Documentos/my-gimp/_deps/_install
+exec_prefix=/home/yurix/Documentos/my-gimp/_deps/_install
+libdir=/home/yurix/Documentos/my-gimp/_deps/_install/lib
+includedir=/home/yurix/Documentos/my-gimp/_deps/_install/include
+
+Name: json-c
+Description: A JSON implementation in C
+Version: 0.18.99
+Requires:
+Libs.private: -lm
+Libs: -L${libdir} -ljson-c
+Cflags: -I${includedir} -I${includedir}/json-c

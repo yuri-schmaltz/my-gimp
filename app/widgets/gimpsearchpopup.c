@@ -26,6 +26,7 @@
 #include <gdk/gdkkeysyms.h>
 
 #include "libgimpbase/gimpbase.h"
+#include "libgimpwidgets/gimpwidgets-compat.h"
 #include "libgimpwidgets/gimpwidgets.h"
 
 #include "widgets-types.h"
@@ -108,9 +109,9 @@ static gboolean   keyword_entry_key_release_event        (GtkWidget            *
 static gboolean   results_list_key_press_event           (GtkWidget         *widget,
                                                           GdkEventKey       *kevent,
                                                           GimpSearchPopup   *popup);
-static void       results_list_row_activated             (GtkTreeView       *treeview,
+static void       results_list_row_activated             (GtkWidget         *treeview,
                                                           GtkTreePath       *path,
-                                                          GtkTreeViewColumn *col,
+                                                          gpointer           col,
                                                           GimpSearchPopup   *popup);
 
 /* Utils */
@@ -357,7 +358,7 @@ gimp_search_popup_add_result (GimpSearchPopup *popup,
 
   action_name = g_markup_escape_text (gimp_action_get_name (action), -1);
 
-  model = gtk_tree_view_get_model (GTK_TREE_VIEW (popup->priv->results_list));
+  model = gimp_widgets_compat_tree_view_get_model (popup->priv->results_list);
   store = GTK_LIST_STORE (model);
   if (gtk_tree_model_get_iter_first (model, &next_section))
     {
@@ -586,14 +587,15 @@ keyword_entry_key_press_event (GtkWidget       *widget,
   if (event->keyval == GDK_KEY_Down &&
       gtk_widget_get_visible (popup->priv->list_view))
     {
-      GtkTreeView *tree_view = GTK_TREE_VIEW (popup->priv->results_list);
+      GtkWidget *tree_view = popup->priv->results_list;
       GtkTreePath *path;
 
       /* When hitting the down key while editing, select directly the
        * second item, since the first could have run directly with
        * Enter. */
       path = gtk_tree_path_new_from_string ("1");
-      gtk_tree_selection_select_path (gtk_tree_view_get_selection (tree_view), path);
+      gimp_widgets_compat_tree_selection_select_path (gimp_widgets_compat_tree_view_get_selection (tree_view),
+                                                      path);
       gtk_tree_path_free (path);
 
       gtk_widget_grab_focus (GTK_WIDGET (popup->priv->results_list));
@@ -608,7 +610,7 @@ keyword_entry_key_release_event (GtkWidget       *widget,
                                  GdkEventKey     *event,
                                  GimpSearchPopup *popup)
 {
-  GtkTreeView *tree_view = GTK_TREE_VIEW (popup->priv->results_list);
+  GtkWidget  *tree_view = popup->priv->results_list;
   GtkTreePath *path;
   gchar       *entry_text;
   gint         width;
@@ -634,11 +636,12 @@ keyword_entry_key_release_event (GtkWidget       *widget,
       path = gtk_tree_path_new_from_string ("0");
       gtk_window_resize (GTK_WINDOW (popup),
                          width, window_height);
-      gtk_list_store_clear (GTK_LIST_STORE (gtk_tree_view_get_model (tree_view)));
+      gtk_list_store_clear (GTK_LIST_STORE (gimp_widgets_compat_tree_view_get_model (tree_view)));
       gtk_widget_show_all (popup->priv->list_view);
       popup->priv->build_results (popup, entry_text,
                                   popup->priv->build_results_data);
-      gtk_tree_selection_select_path (gtk_tree_view_get_selection (tree_view), path);
+      gimp_widgets_compat_tree_selection_select_path (gimp_widgets_compat_tree_view_get_selection (tree_view),
+                                                      path);
       gtk_tree_path_free (path);
     }
   else if (strcmp (entry_text, "") == 0 && (event->keyval == GDK_KEY_Down))
@@ -646,26 +649,27 @@ keyword_entry_key_release_event (GtkWidget       *widget,
       path = gtk_tree_path_new_from_string ("0");
       gtk_window_resize (GTK_WINDOW (popup),
                          width, window_height);
-      gtk_list_store_clear (GTK_LIST_STORE (gtk_tree_view_get_model (tree_view)));
+      gtk_list_store_clear (GTK_LIST_STORE (gimp_widgets_compat_tree_view_get_model (tree_view)));
       gtk_widget_show_all (popup->priv->list_view);
       popup->priv->build_results (popup, NULL,
                                   popup->priv->build_results_data);
-      gtk_tree_selection_select_path (gtk_tree_view_get_selection (tree_view), path);
+      gimp_widgets_compat_tree_selection_select_path (gimp_widgets_compat_tree_view_get_selection (tree_view),
+                                                      path);
       gtk_tree_path_free (path);
     }
   else
     {
-      GtkTreeSelection *selection;
+      gpointer          selection;
       GtkTreeModel     *model;
       GtkTreeIter       iter;
 
-      selection = gtk_tree_view_get_selection (tree_view);
-      gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+      selection = gimp_widgets_compat_tree_view_get_selection (tree_view);
+      gimp_widgets_compat_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
 
-      if (gtk_tree_selection_get_selected (selection, &model, &iter))
+      if (gimp_widgets_compat_tree_selection_get_selected (selection, &model, &iter))
         {
           path = gtk_tree_model_get_path (model, &iter);
-          gtk_tree_selection_unselect_path (selection, path);
+          gimp_widgets_compat_tree_selection_unselect_path (selection, path);
 
           gtk_tree_path_free (path);
         }
@@ -696,14 +700,14 @@ results_list_key_press_event (GtkWidget       *widget,
     case GDK_KEY_Up:
       {
         gboolean          event_processed = FALSE;
-        GtkTreeSelection *selection;
+        gpointer          selection;
         GtkTreeModel     *model;
         GtkTreeIter       iter;
 
-        selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (popup->priv->results_list));
-        gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+        selection = gimp_widgets_compat_tree_view_get_selection (popup->priv->results_list);
+        gimp_widgets_compat_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
 
-        if (gtk_tree_selection_get_selected (selection, &model, &iter))
+        if (gimp_widgets_compat_tree_selection_get_selected (selection, &model, &iter))
           {
             GtkTreePath *path = gtk_tree_model_get_path (model, &iter);
             gchar       *path_str;
@@ -752,25 +756,29 @@ results_list_key_press_event (GtkWidget       *widget,
 }
 
 static void
-results_list_row_activated (GtkTreeView       *treeview,
+results_list_row_activated (GtkWidget         *treeview,
                             GtkTreePath       *path,
-                            GtkTreeViewColumn *col,
+                            gpointer           col,
                             GimpSearchPopup   *popup)
 {
+  (void) treeview;
+  (void) path;
+  (void) col;
+
   gimp_search_popup_run_selected (popup);
 }
 
 static void
 gimp_search_popup_run_selected (GimpSearchPopup *popup)
 {
-  GtkTreeSelection *selection;
+  gpointer          selection;
   GtkTreeModel     *model;
   GtkTreeIter       iter;
 
-  selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (popup->priv->results_list));
-  gtk_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
+  selection = gimp_widgets_compat_tree_view_get_selection (popup->priv->results_list);
+  gimp_widgets_compat_tree_selection_set_mode (selection, GTK_SELECTION_SINGLE);
 
-  if (gtk_tree_selection_get_selected (selection, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (selection, &model, &iter))
     {
       GimpAction *action;
 
@@ -805,11 +813,10 @@ gimp_search_popup_setup_results (GtkWidget **results_list,
                               GIMP_TYPE_ACTION,
                               G_TYPE_BOOLEAN,
                               G_TYPE_INT);
-  *results_list = gtk_tree_view_new_with_model (GTK_TREE_MODEL (store));
-  gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (*results_list), FALSE);
+  *results_list = gimp_widgets_compat_tree_view_new_with_model (GTK_TREE_MODEL (store));
+  gimp_widgets_compat_tree_view_set_headers_visible (*results_list, FALSE);
 #ifdef GIMP_UNSTABLE
-  gtk_tree_view_set_tooltip_column (GTK_TREE_VIEW (*results_list),
-                                    COLUMN_TOOLTIP);
+  gimp_widgets_compat_tree_view_set_tooltip_column (*results_list, COLUMN_TOOLTIP);
 #endif
 
   cell = gtk_cell_renderer_pixbuf_new ();
@@ -817,7 +824,7 @@ gimp_search_popup_setup_results (GtkWidget **results_list,
                                                      "icon-name", COLUMN_ICON,
                                                      "sensitive", COLUMN_SENSITIVE,
                                                      NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (*results_list), column);
+  gimp_widgets_compat_tree_view_append_column (*results_list, column);
   gtk_tree_view_column_set_min_width (column, 22);
 
   cell = gtk_cell_renderer_text_new ();
@@ -825,7 +832,7 @@ gimp_search_popup_setup_results (GtkWidget **results_list,
                                                      "markup",    COLUMN_MARKUP,
                                                      "sensitive", COLUMN_SENSITIVE,
                                                      NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (*results_list), column);
+  gimp_widgets_compat_tree_view_append_column (*results_list, column);
   gtk_tree_view_column_set_max_width (column, wid1);
 
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (*list_view),
@@ -839,17 +846,17 @@ gimp_search_popup_setup_results (GtkWidget **results_list,
 static void
 gimp_search_popup_help (GimpSearchPopup *popup)
 {
-  GtkTreeView      *tree_view;
+  GtkWidget        *tree_view;
   const gchar      *help_id = NULL;
   GimpAction       *action  = NULL;
-  GtkTreeSelection *selection;
+  gpointer          selection;
   GtkTreeModel     *model;
   GtkTreeIter       iter;
 
-  tree_view = GTK_TREE_VIEW (popup->priv->results_list);
-  selection = gtk_tree_view_get_selection (tree_view);
+  tree_view = popup->priv->results_list;
+  selection = gimp_widgets_compat_tree_view_get_selection (tree_view);
 
-  if (gtk_tree_selection_get_selected (selection, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (selection, &model, &iter))
     {
       gtk_tree_model_get (model, &iter, COLUMN_ACTION, &action, -1);
       help_id = gimp_action_get_help_id (action);

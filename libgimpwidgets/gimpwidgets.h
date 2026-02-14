@@ -24,6 +24,8 @@
 
 #define __GIMP_WIDGETS_H_INSIDE__
 
+#include <gegl.h>
+
 #include <libgimpwidgets/gimpwidgetstypes.h>
 
 #include <libgimpwidgets/gimpbrowser.h>
@@ -55,6 +57,7 @@
 #include <libgimpwidgets/gimpenumstore.h>
 #include <libgimpwidgets/gimpenumwidgets.h>
 #include <libgimpwidgets/gimpfilechooser.h>
+#include <libgimpwidgets/gimpfileentry.h>
 #include <libgimpwidgets/gimpframe.h>
 #include <libgimpwidgets/gimphelpui.h>
 #include <libgimpwidgets/gimphintbox.h>

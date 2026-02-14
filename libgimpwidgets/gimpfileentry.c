@@ -33,6 +33,7 @@
 
 #undef GIMP_DISABLE_DEPRECATED
 #include "gimpfileentry.h"
+#include "gimpwidgets-compat.h"
 
 #include "gimphelpui.h"
 #include "gimpicons.h"
@@ -147,15 +148,58 @@ _gimp_file_entry_init (GimpFileEntry *entry)
   gtk_box_set_spacing (GTK_BOX (entry), 4);
   gtk_box_set_homogeneous (GTK_BOX (entry), FALSE);
 
+  /*  The "file exists" icon (initially hidden)  */
+  entry->file_exists = gtk_image_new_from_icon_name ("gtk-no",
+                                                     GTK_ICON_SIZE_BUTTON);
+  g_object_set_data (G_OBJECT (entry), "gimp-file-entry-file-exists", entry->file_exists);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->file_exists,
+                                      FALSE, FALSE, 0);
+
+  /*  The entry  */
+  entry->entry = gtk_entry_new ();
+  g_object_set_data (G_OBJECT (entry), "gimp-file-entry-entry", entry->entry);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->entry,
+                                      TRUE, TRUE, 0);
+  gtk_widget_show (entry->entry);
+
+  g_signal_connect (entry->entry, "changed",
+                    G_CALLBACK (gimp_file_entry_entry_changed),
+                    entry); /* Pass entry as user_data, will extract button later */
+  g_signal_connect (entry->entry, "activate",
+                    G_CALLBACK (gimp_file_entry_entry_activate),
+                    entry);
+  g_signal_connect (entry->entry, "focus-out-event",
+                    G_CALLBACK (gimp_file_entry_entry_focus_out),
+                    entry);
+
+  /*  The browse button  */
+  entry->browse_button = gtk_button_new ();
+  g_object_set_data (G_OBJECT (entry), "gimp-file-entry-browse-button", entry->browse_button);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->browse_button,
+                                      FALSE, FALSE, 0);
+  gtk_widget_show (entry->browse_button);
+
+  image = gtk_image_new_from_icon_name (GIMP_ICON_DOCUMENT_OPEN,
+                                        GTK_ICON_SIZE_BUTTON);
+  gimp_widgets_compat_container_add (entry->browse_button, image);
+  gtk_widget_show (image);
+
+  g_signal_connect (entry->browse_button, "clicked",
+                    G_CALLBACK (gimp_file_entry_browse_clicked),
+                    entry);
+
+  /*  The file manager button  */
   button = gtk_button_new ();
-  gtk_box_pack_end (GTK_BOX (entry), button, FALSE, FALSE, 0);
+  g_object_set_data (G_OBJECT (entry), "gimp-file-entry-manager-button", button);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), button,
+                                      FALSE, FALSE, 0);
   gtk_widget_show (button);
 
   gtk_widget_set_sensitive (button, FALSE);
 
   image = gtk_image_new_from_icon_name (GIMP_ICON_FILE_MANAGER,
                                         GTK_ICON_SIZE_BUTTON);
-  gtk_container_add (GTK_CONTAINER (button), image);
+  gimp_widgets_compat_container_add (button, image);
   gtk_widget_show (image);
 
   g_signal_connect (button, "clicked",
@@ -166,32 +210,10 @@ _gimp_file_entry_init (GimpFileEntry *entry)
                            _("Show file location in the file manager"),
                            NULL);
 
-  entry->browse_button = gtk_button_new ();
-  gtk_box_pack_end (GTK_BOX (entry), entry->browse_button, FALSE, FALSE, 0);
-  gtk_widget_show (entry->browse_button);
-
-  image = gtk_image_new_from_icon_name (GIMP_ICON_DOCUMENT_OPEN,
-                                        GTK_ICON_SIZE_BUTTON);
-  gtk_container_add (GTK_CONTAINER (entry->browse_button), image);
-  gtk_widget_show (image);
-
-  g_signal_connect (entry->browse_button, "clicked",
-                    G_CALLBACK (gimp_file_entry_browse_clicked),
-                    entry);
-
-  entry->entry = gtk_entry_new ();
-  gtk_box_pack_end (GTK_BOX (entry), entry->entry, TRUE, TRUE, 0);
-  gtk_widget_show (entry->entry);
-
+  /* We need to update the button sensitivity callback */
   g_signal_connect (entry->entry, "changed",
                     G_CALLBACK (gimp_file_entry_entry_changed),
                     button);
-  g_signal_connect (entry->entry, "activate",
-                    G_CALLBACK (gimp_file_entry_entry_activate),
-                    entry);
-  g_signal_connect (entry->entry, "focus-out-event",
-                    G_CALLBACK (gimp_file_entry_entry_focus_out),
-                    entry);
 }
 
 static void
@@ -240,9 +262,6 @@ _gimp_file_entry_new (const gchar *title,
 
   if (check_valid)
     {
-      entry->file_exists = gtk_image_new_from_icon_name ("gtk-no",
-                                                         GTK_ICON_SIZE_BUTTON);
-      gtk_box_pack_start (GTK_BOX (entry), entry->file_exists, FALSE, FALSE, 0);
       gtk_widget_show (entry->file_exists);
 
       gimp_help_set_help_data (entry->file_exists,

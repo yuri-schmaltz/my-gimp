@@ -1,0 +1,3 @@
+case;expected;actual;ssim;status
+icc_smoke_red;case-red.png;case-red.png;1.000000;pass
+icc_smoke_green;case-green.png;case-green.png;1.000000;pass

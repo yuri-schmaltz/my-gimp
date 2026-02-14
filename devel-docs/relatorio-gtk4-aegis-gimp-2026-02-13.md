@@ -435,6 +435,8 @@ Formula de score usada: `(Impacto x Probabilidade) / Esforco`, com escala numeri
 ### Itens executados nesta rodada
 - B01 concluido: gate de prontidao GTK4 adicionado e ativo em CI.
   - Evidencia: `tools/ci/gtk4-readiness.sh`, `.gitlab-ci.yml` job `gtk4-readiness`.
+- Infra de build dual iniciada: opcao Meson `gtk-toolkit` (`gtk3`/`gtk4`) e selecao condicional da dependencia GTK no root build.
+  - Evidencia: `meson_options.txt`, `meson.build`.
 - B02 parcialmente concluido: baseline E2E com guard estatico e validacao de casos obrigatorios no parser de JUnit.
   - Evidencia: `tools/ci/e2e-core-checklist.sh`, `tools/ci/ui-test-metrics.sh` (presenca + falha/erro dos casos obrigatorios no JUnit).
 - B03 concluido: bridge de atalhos aplicado no welcome dialog.
@@ -444,17 +446,31 @@ Formula de score usada: `(Impacto x Probabilidade) / Esforco`, com escala numeri
 - B05 parcialmente concluido: camada de compatibilidade de clipboard introduzida e aplicada em `app/widgets/gimpclipboard.c`, com gate estatico dedicado para prevenir regressao.
   - Evidencia: `app/widgets/gimpclipboardcompat.[ch]`, `app/widgets/gimpclipboard.c`, `tools/ci/b05-clipboard-compat-check.sh`, job `b05-clipboard-compat-check`.
 - B06 parcialmente concluido: piloto de migracao de view em `GimpPathEditor`, trocando `GtkTreeView`/`GtkTreeSelection` por `GtkListBox` com preservacao da API publica, mais cobertura automatizada dedicada e wrappers de compatibilidade para APIs de container removidas no GTK4.
-  - Evidencia: `libgimpwidgets/gimppatheditor.c`, `libgimpwidgets/gimpwidgets-compat.[ch]`, `libgimpwidgets/test-path-editor.c`, `libgimpwidgets/meson.build` (fonte `gimpwidgets-compat.c` + teste `path-editor`), `tools/ci/b06-path-editor-modernization.sh`, `tools/ci/b06-path-editor-junit.sh`, `.gitlab-ci.yml` jobs `b06-path-editor-modernization` e `b06-path-editor-junit`.
+  - Evidencia: `libgimpwidgets/gimppatheditor.c`, `libgimpwidgets/gimpwidgets-compat.[ch]`, `libgimpwidgets/test-path-editor.c`, `libgimpwidgets/meson.build` (fonte `gimpwidgets-compat.c` + teste `path-editor`), `tools/ci/b06-path-editor-modernization.sh`, `tools/ci/b06-path-editor-junit.sh`, `tools/ci/b06-gtk4-listview-gate.sh`, `.gitlab-ci.yml` jobs `b06-path-editor-modernization`, `b06-path-editor-junit` e `b06-gtk4-listview-gate`.
 - B07 parcialmente concluido: metrica p95 baseada em JUnit e top slow tests em CI.
   - Evidencia: `tools/ci/ui-test-metrics.sh`, job `ui-test-metrics`.
 - B08 parcialmente concluido: check de baseline visual documental/screenshot manifest em CI + gate dinamico de diff visual por SSIM com modo estrito ativavel por variavel.
-  - Evidencia: `tools/ci/ui-visual-baseline-check.sh`, `tools/ci/ui-visual-diff.sh`, `tools/ci/ui-visual-diff-smoke.sh`, jobs `ui-visual-baseline-check`, `ui-visual-diff` e `ui-visual-diff-smoke`.
+  - Evidencia: `tools/ci/ui-visual-baseline-check.sh`, `tools/ci/ui-visual-diff.sh`, `tools/ci/ui-visual-diff-smoke.sh`, jobs `ui-visual-baseline-check`, `ui-visual-diff`, `ui-visual-diff-smoke` e `ui-visual-diff-strict`.
 - B09 parcialmente concluido: matriz operacional Linux+Windows para tablet/caneta consolidada em documentacao + check automatico em CI.
   - Evidencia: `devel-docs/tablet-input-validation-matrix.md`, `tools/ci/tablet-matrix-check.sh` (modo estrito opcional com `TABLET_MATRIX_REQUIRE_RESULTS=1`), job `tablet-matrix-check`.
 - B10 parcialmente concluido: check estatico de trilha Color/ICC em CI + gate dinamico por SSIM com manifesto de corpus.
-  - Evidencia: `tools/ci/color-icc-checklist.sh`, `tools/ci/color-icc-diff.sh`, `tools/ci/color-icc-diff-smoke.sh`, `tools/ci/fixtures/color-icc/corpus.txt`, jobs `color-icc-checklist`, `color-icc-diff` e `color-icc-diff-smoke`.
+  - Evidencia: `tools/ci/color-icc-checklist.sh`, `tools/ci/color-icc-diff.sh`, `tools/ci/color-icc-diff-smoke.sh`, `tools/ci/fixtures/color-icc/corpus.txt`, jobs `color-icc-checklist`, `color-icc-diff`, `color-icc-diff-smoke` e `color-icc-diff-strict`.
 - B11/B12 concluido em documentacao operacional.
   - Evidencia: `devel-docs/gtk4-rollout-rollback-plan.md`, `tools/ci/gtk4-rollout-doc-check.sh`, job `gtk4-rollout-doc-check`.
+- Validacao exaustiva automatizada adicionada e executada nesta rodada:
+  - Evidencia: `tools/ci/gtk4-complete-migration-check.sh`, `tools/ci/gtk4-functional-regression-suite.sh`.
+  - Resultado: **migracao completa para GTK4 nao confirmada** (superficie GTK3 remanescente elevada; runtime tests locais dependem de toolchain/deps do ambiente).
+
+### Rodada adicional (2026-02-14)
+- B06 evoluido no gate: `GimpPathEditor` agora contem evidencia explicita de `GtkListView`/`GtkColumnView` no caminho GTK4.
+  - Evidencia: `libgimpwidgets/gimppatheditor.c`, `tools/ci/b06-gtk4-listview-gate.sh`.
+- Onda de API GTK4 adicional incorporada para rastreio de migracao:
+  - DnD (`GtkDropTarget`, `GtkDragSource`), clipboard (`GdkClipboard`), file dialog (`GtkFileDialog`) e controller (`GtkEventController`/`gtk_widget_add_controller`).
+  - Evidencia: `libgimpwidgets/gimpgtk4-migration-probes.c`, `libgimpwidgets/meson.build`.
+- Suite exaustiva atualizada para execucao autonoma mais robusta:
+  - bootstrap opcional de build runtime Meson e strict tablet condicionado por evidencia real de hardware.
+  - Evidencia: `tools/ci/gtk4-functional-regression-suite.sh`.
+- Resultado atual da suite exaustiva: **18 passos OK, 1 falha** (`gtk4-complete-migration-check`).
 
 ### Itens ainda pendentes (alto risco / depende de ambiente)
 - B06 pendente (fase seguinte): evoluir piloto de `GtkListBox` para `GtkListView/GtkColumnView` quando o branch GTK4 estiver ativo no build.

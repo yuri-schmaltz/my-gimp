@@ -1,0 +1,2 @@
+icc_smoke_red case-red.png case-red.png
+icc_smoke_green case-green.png case-green.png
