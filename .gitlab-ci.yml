@@ -835,6 +835,24 @@ b06-path-editor-modernization:
   script:
     - sh tools/ci/b06-path-editor-modernization.sh
 
+b04-file-dialog-backend-check:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  stage: analysis
+  script:
+    - sh tools/ci/b04-file-dialog-backend-check.sh
+
+b05-clipboard-compat-check:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  stage: analysis
+  script:
+    - sh tools/ci/b05-clipboard-compat-check.sh
+
 b06-path-editor-junit:
   extends: .default
   rules:
@@ -877,6 +895,26 @@ ui-visual-baseline-check:
   script:
     - sh tools/ci/ui-visual-baseline-check.sh
 
+ui-visual-diff:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  stage: analysis
+  variables:
+    UI_VISUAL_REQUIRE_CURRENT: "0"
+  script:
+    - sh tools/ci/ui-visual-diff.sh
+
+ui-visual-diff-smoke:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  stage: analysis
+  script:
+    - sh tools/ci/ui-visual-diff-smoke.sh
+
 color-icc-checklist:
   extends: .default
   rules:
@@ -885,6 +923,35 @@ color-icc-checklist:
   stage: analysis
   script:
     - sh tools/ci/color-icc-checklist.sh
+
+color-icc-diff:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  stage: analysis
+  variables:
+    ICC_REQUIRE_ACTUAL: "0"
+  script:
+    - sh tools/ci/color-icc-diff.sh
+
+color-icc-diff-smoke:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  stage: analysis
+  script:
+    - sh tools/ci/color-icc-diff-smoke.sh
+
+tablet-matrix-check:
+  extends: .default
+  rules:
+    - <<: *CI_MERGE
+    - <<: *CI_COMMIT
+  stage: analysis
+  script:
+    - sh tools/ci/tablet-matrix-check.sh
 
 gtk4-rollout-doc-check:
   extends: .default

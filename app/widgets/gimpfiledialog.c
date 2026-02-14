@@ -355,9 +355,8 @@ gimp_file_dialog_constructed (GObject *object)
 
       if (GIMP_GUI_CONFIG (dialog->gimp->config)->show_help_button)
         {
-          gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-                                  _("_Help"), GTK_RESPONSE_HELP,
-                                  NULL);
+          gimp_file_dialog_backend_add_help_button (GTK_DIALOG (dialog),
+                                                    _("_Help"));
         }
     }
 

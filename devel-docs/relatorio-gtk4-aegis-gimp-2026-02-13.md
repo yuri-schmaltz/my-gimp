@@ -436,29 +436,31 @@ Formula de score usada: `(Impacto x Probabilidade) / Esforco`, com escala numeri
 - B01 concluido: gate de prontidao GTK4 adicionado e ativo em CI.
   - Evidencia: `tools/ci/gtk4-readiness.sh`, `.gitlab-ci.yml` job `gtk4-readiness`.
 - B02 parcialmente concluido: baseline E2E com guard estatico e validacao de casos obrigatorios no parser de JUnit.
-  - Evidencia: `tools/ci/e2e-core-checklist.sh`, `tools/ci/ui-test-metrics.sh`.
+  - Evidencia: `tools/ci/e2e-core-checklist.sh`, `tools/ci/ui-test-metrics.sh` (presenca + falha/erro dos casos obrigatorios no JUnit).
 - B03 concluido: bridge de atalhos aplicado no welcome dialog.
   - Evidencia: `app/widgets/gimpshortcutbridge.[ch]`, `app/dialogs/welcome-dialog.c`.
-- B04 parcialmente concluido: backend de file dialog desacoplado em camadas (backend generico + backend GTK3).
-  - Evidencia: `app/widgets/gimpfiledialog-backend.[ch]`, `app/widgets/gimpfiledialog-backend-gtk3.[ch]`, `app/widgets/gimpfiledialog.c`.
-- B05 parcialmente concluido: camada de compatibilidade de clipboard introduzida e aplicada em `app/widgets/gimpclipboard.c`.
-  - Evidencia: `app/widgets/gimpclipboardcompat.[ch]`, `app/widgets/gimpclipboard.c`.
+- B04 parcialmente concluido: backend de file dialog desacoplado em camadas (backend generico + backend GTK3), incluindo adicao de botao Help via backend para reduzir acoplamento direto no dialog.
+  - Evidencia: `app/widgets/gimpfiledialog-backend.[ch]`, `app/widgets/gimpfiledialog-backend-gtk3.[ch]`, `app/widgets/gimpfiledialog.c`, `tools/ci/b04-file-dialog-backend-check.sh`, job `b04-file-dialog-backend-check`.
+- B05 parcialmente concluido: camada de compatibilidade de clipboard introduzida e aplicada em `app/widgets/gimpclipboard.c`, com gate estatico dedicado para prevenir regressao.
+  - Evidencia: `app/widgets/gimpclipboardcompat.[ch]`, `app/widgets/gimpclipboard.c`, `tools/ci/b05-clipboard-compat-check.sh`, job `b05-clipboard-compat-check`.
 - B06 parcialmente concluido: piloto de migracao de view em `GimpPathEditor`, trocando `GtkTreeView`/`GtkTreeSelection` por `GtkListBox` com preservacao da API publica, mais cobertura automatizada dedicada e wrappers de compatibilidade para APIs de container removidas no GTK4.
   - Evidencia: `libgimpwidgets/gimppatheditor.c`, `libgimpwidgets/gimpwidgets-compat.[ch]`, `libgimpwidgets/test-path-editor.c`, `libgimpwidgets/meson.build` (fonte `gimpwidgets-compat.c` + teste `path-editor`), `tools/ci/b06-path-editor-modernization.sh`, `tools/ci/b06-path-editor-junit.sh`, `.gitlab-ci.yml` jobs `b06-path-editor-modernization` e `b06-path-editor-junit`.
 - B07 parcialmente concluido: metrica p95 baseada em JUnit e top slow tests em CI.
   - Evidencia: `tools/ci/ui-test-metrics.sh`, job `ui-test-metrics`.
-- B08 parcialmente concluido: check de baseline visual documental/screenshot manifest em CI.
-  - Evidencia: `tools/ci/ui-visual-baseline-check.sh`, job `ui-visual-baseline-check`.
-- B10 parcialmente concluido: check estatico de trilha Color/ICC em CI.
-  - Evidencia: `tools/ci/color-icc-checklist.sh`, job `color-icc-checklist`.
+- B08 parcialmente concluido: check de baseline visual documental/screenshot manifest em CI + gate dinamico de diff visual por SSIM com modo estrito ativavel por variavel.
+  - Evidencia: `tools/ci/ui-visual-baseline-check.sh`, `tools/ci/ui-visual-diff.sh`, `tools/ci/ui-visual-diff-smoke.sh`, jobs `ui-visual-baseline-check`, `ui-visual-diff` e `ui-visual-diff-smoke`.
+- B09 parcialmente concluido: matriz operacional Linux+Windows para tablet/caneta consolidada em documentacao + check automatico em CI.
+  - Evidencia: `devel-docs/tablet-input-validation-matrix.md`, `tools/ci/tablet-matrix-check.sh` (modo estrito opcional com `TABLET_MATRIX_REQUIRE_RESULTS=1`), job `tablet-matrix-check`.
+- B10 parcialmente concluido: check estatico de trilha Color/ICC em CI + gate dinamico por SSIM com manifesto de corpus.
+  - Evidencia: `tools/ci/color-icc-checklist.sh`, `tools/ci/color-icc-diff.sh`, `tools/ci/color-icc-diff-smoke.sh`, `tools/ci/fixtures/color-icc/corpus.txt`, jobs `color-icc-checklist`, `color-icc-diff` e `color-icc-diff-smoke`.
 - B11/B12 concluido em documentacao operacional.
   - Evidencia: `devel-docs/gtk4-rollout-rollback-plan.md`, `tools/ci/gtk4-rollout-doc-check.sh`, job `gtk4-rollout-doc-check`.
 
 ### Itens ainda pendentes (alto risco / depende de ambiente)
 - B06 pendente (fase seguinte): evoluir piloto de `GtkListBox` para `GtkListView/GtkColumnView` quando o branch GTK4 estiver ativo no build.
-- B09 pendente: matriz de teste tablet/caneta Linux+Windows com hardware real.
-- B10 pendente (parte dinamica): gate com corpus ICC e comparacao de saida de imagem.
-- B08 pendente (parte dinamica): diff visual automatizado de janelas da aplicacao (captura runtime).
+- B09 pendente (parte dinamica): executar matriz em hardware real Linux+Windows, preencher o log de execucao e ativar validacao estrita (`TABLET_MATRIX_REQUIRE_RESULTS=1`).
+- B10 pendente (parte dinamica): substituir smoke por corpus real, popular `tools/ci/fixtures/color-icc/expected` e publicar saidas em `_log/color-icc/actual` para habilitar `ICC_REQUIRE_ACTUAL=1` com dados de producao.
+- B08 pendente (parte dinamica): substituir smoke por capturas runtime reais em `_log/ui-visual/current` e manter `UI_VISUAL_REQUIRE_CURRENT=1`.
 
 ### Estado consolidado do backlog
 | ID | Estado |
@@ -471,7 +473,7 @@ Formula de score usada: `(Impacto x Probabilidade) / Esforco`, com escala numeri
 | B06 | PARCIAL |
 | B07 | PARCIAL |
 | B08 | PARCIAL |
-| B09 | PENDENTE |
+| B09 | PARCIAL |
 | B10 | PARCIAL |
 | B11 | CONCLUIDO |
 | B12 | CONCLUIDO |

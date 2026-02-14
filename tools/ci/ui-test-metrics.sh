@@ -68,6 +68,41 @@ if [ "$required_fail" -ne 0 ]; then
   exit 1
 fi
 
+required_pattern="create_new_image_via_dialog|restore_recently_closed_multi_column_dock|switch_to_single_window_mode|opened_xcf_file_files|saved_imported_file_files|exported_file_files"
+if awk -v required_pattern="$required_pattern" '
+  BEGIN { in_case = 0; fail = 0; current = "" }
+  /<testcase / {
+    in_case = 0
+    current = ""
+    if (match($0, /name="[^"]+"/)) {
+      current = substr($0, RSTART + 6, RLENGTH - 7)
+      if (current ~ required_pattern) {
+        in_case = 1
+      }
+    }
+  }
+  /<failure/ {
+    if (in_case) {
+      printf("FAIL  required testcase failed: %s\n", current)
+      fail = 1
+    }
+  }
+  /<error/ {
+    if (in_case) {
+      printf("FAIL  required testcase error: %s\n", current)
+      fail = 1
+    }
+  }
+  END { exit fail }
+' "$junit_file"; then
+  echo "PASS: required UI/core testcases passed in JUnit."
+else
+  echo "FAIL: at least one required UI/core testcase failed in JUnit."
+  exit 1
+fi
+
+echo
+
 sort -t ';' -k3,3n "$tmp_data" > "$tmp_sorted"
 
 idx95=$(( (95 * count + 99) / 100 ))

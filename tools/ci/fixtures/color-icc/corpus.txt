@@ -1,0 +1,4 @@
+# case-id expected-relative-path actual-relative-path
+# Enable entries as soon as dynamic ICC outputs are produced in CI.
+# Example:
+# srgb_to_display expected/srgb_to_display.png srgb_to_display.png

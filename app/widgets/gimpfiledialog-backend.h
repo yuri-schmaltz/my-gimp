@@ -25,6 +25,8 @@
 
 void gimp_file_dialog_backend_add_default_buttons (GtkDialog      *dialog,
                                                    const gchar    *ok_button_label);
+void gimp_file_dialog_backend_add_help_button     (GtkDialog      *dialog,
+                                                   const gchar    *help_button_label);
 void gimp_file_dialog_backend_configure_chooser   (GtkFileChooser *chooser,
                                                    gboolean        local_only,
                                                    gboolean        overwrite_confirmation);
