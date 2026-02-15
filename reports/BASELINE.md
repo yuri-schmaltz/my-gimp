@@ -44,3 +44,15 @@ Fonte: `reports/EVIDENCE/30_baseline_summary.tsv`
 - Execução não interativa com `/usr/bin/time` (elapsed/RSS/CPU) por check.
 - Registro integral de comando, saída e exit code em `reports/EVIDENCE/*_baseline_*.log`.
 - Consolidação em `reports/EVIDENCE/30_baseline_summary.tsv`.
+
+## Baseline incremental (rodada 3)
+
+Fonte: `reports/EVIDENCE/69_before_wave3_summary.tsv`
+
+| Check | Exit | Elapsed(s) | Max RSS(KB) |
+|---|---:|---:|---:|
+| build libgimpwidgets target | 0 | 0.05 | 16320 |
+| gtk4-readiness | 0 | 0.19 | 6400 |
+| gtk4-complete-migration-check | 1 | 0.37 | 6400 |
+| e2e-core-checklist | 0 | 0.03 | 4160 |
+| ui-visual-diff-smoke | 0 | 3.11 | 57224 |

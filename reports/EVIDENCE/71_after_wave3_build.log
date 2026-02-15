@@ -1,0 +1,10 @@
+# CMD: ninja -C _build-local libgimpwidgets/libgimpwidgets-3.0.so.0.200.0 -j4
+# DATE: 2026-02-15T19:43:02-03:00
+ninja: Entering directory `_build-local'
+[1/3] Compiling C object libgimpwidgets/libgimpwidgets-3.0.so.0.200.0.p/gimpcolornotebook.c.o
+[2/3] Compiling C object libgimpwidgets/libgimpwidgets-3.0.so.0.200.0.p/gimpwidgets.c.o
+[3/3] Linking target libgimpwidgets/libgimpwidgets-3.0.so.0.200.0
+TIME_ELAPSED=0.79
+MAX_RSS_KB=96640
+CPU_PCT=166%
+EXIT_CODE=0

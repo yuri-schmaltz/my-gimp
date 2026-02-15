@@ -1,0 +1,45 @@
+# CMD: sh tools/ci/gtk4-complete-migration-check.sh
+# DATE: 2026-02-15T19:42:14-03:00
+GTK4 complete migration gate (strict)
+Scope: app libgimp libgimpwidgets modules plug-ins
+
+Dependency checks:
+PASS  Meson option gtk-toolkit exists
+PASS  GTK4 selection path exists
+PASS  Hardcoded GTK3 dependency removed from root Meson
+
+Legacy API checks (must be zero):
+ID   COUNT   STATUS  PATTERN
+L01  1827    FAIL    gtk_box_pack_start
+L02  106     FAIL    gtk_box_pack_end
+L03  514     FAIL    gtk_container_add
+L04  891     FAIL    GtkContainer|gtk_container_
+L05  665     FAIL    GtkTreeView|gtk_tree_view_
+L06  201     FAIL    GtkTreeSelection|gtk_tree_selection_
+L07  13      FAIL    GtkFileChooserDialog
+L08  222     FAIL    gtk_file_chooser_
+L09  88      FAIL    GtkClipboard|gtk_clipboard_
+L10  11      FAIL    gtk_dialog_add_buttons
+L11  19      FAIL    gtk_drag_dest_set
+L12  7       FAIL    gtk_drag_source_set
+L13  80      FAIL    gtk_selection_data_
+L14  325     FAIL    GdkWindow|gdk_window_|gtk_widget_get_window
+
+GTK4 API evidence checks (must be non-zero):
+ID   COUNT   STATUS  PATTERN
+N01  1       PASS    GtkListView|gtk_list_view_
+N02  1       PASS    GtkColumnView|gtk_column_view_
+N03  2       PASS    gtk_box_append|gtk_box_prepend
+N04  1       PASS    gtk_window_set_child
+N05  2       PASS    GtkDropTarget|gtk_drop_target_
+N06  2       PASS    GtkDragSource|gtk_drag_source_new|gtk_drag_source_set_actions
+N07  1       PASS    GdkClipboard|gdk_clipboard_
+N08  2       PASS    GtkFileDialog|gtk_file_dialog_
+N09  2       PASS    gtk_widget_add_controller|GtkEventController
+
+FAIL: GTK4 complete migration is NOT confirmed.
+Command exited with non-zero status 1
+TIME_ELAPSED=0.37
+MAX_RSS_KB=6400
+CPU_PCT=652%
+EXIT_CODE=1

@@ -1,0 +1,13 @@
+# latest commits
+a2de1556f8 libgimpwidgets: migrate color notebook and widget helpers to compat packing
+fb3cdbc113 docs: add AGENTS rules, orchestrator skill, and execution reports
+fdfa75aaec libgimpwidgets: continue GTK4 compat migration in radio/hint/memsize widgets
+748e439576 libgimpwidgets: port file chooser and scrolled preview packing helpers
+d4c698bda8 libgimpwidgets: migrate remaining simple container/box GTK3 calls
+bc2d7565db libgimpwidgets: expand GTK4 compat wrappers and migrate box/container uses
+
+# wave3 commit stat
+a2de1556f8 libgimpwidgets: migrate color notebook and widget helpers to compat packing
+ libgimpwidgets/gimpcolornotebook.c |  7 ++++---
+ libgimpwidgets/gimpwidgets.c       | 11 ++++++-----
+ 2 files changed, 10 insertions(+), 8 deletions(-)

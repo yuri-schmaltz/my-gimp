@@ -1,0 +1,24 @@
+# CMD: sh tools/ci/e2e-core-checklist.sh
+# DATE: 2026-02-15T19:43:04-03:00
+E2E core checklist (static coverage guard)
+
+PASS  Fluxo arquivo: open
+PASS  Fluxo arquivo: save
+PASS  Fluxo arquivo: export
+PASS  Fluxo edicao: undo
+PASS  Fluxo edicao: redo
+PASS  Fluxo janelas: hide docks
+PASS  Fluxo janelas: single window
+PASS  Fluxo filtros: acoes registradas
+PASS  Teste UI: criar nova imagem
+PASS  Teste UI: restaurar dock
+PASS  Teste UI: geometria de docks
+PASS  Teste UI: alternar modo de janela
+PASS  Teste UI: troca de ferramentas
+PASS  Teste sessao: persistencia sessionrc/dockrc
+
+PASS: checklist E2E core atendido.
+TIME_ELAPSED=0.03
+MAX_RSS_KB=4160
+CPU_PCT=100%
+EXIT_CODE=0

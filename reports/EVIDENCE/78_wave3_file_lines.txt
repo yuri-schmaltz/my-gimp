@@ -1,0 +1,135 @@
+# gimpcolornotebook.c key lines
+    28	#include <gtk/gtk.h>
+    29	
+    30	#include "libgimpcolor/gimpcolor.h"
+    31	
+    32	#include "gimpwidgetstypes.h"
+    33	
+    34	#include "gimpcolornotebook.h"
+    35	#include "gimpcolorscales.h"
+    36	#include "gimphelpui.h"
+    37	#include "gimpwidgets-compat.h"
+    38	
+    39	#include "libgimp/libgimp-intl.h"
+    40	
+
+   146	gimp_color_notebook_init (GimpColorNotebook *notebook)
+   147	{
+   148	  GType *selector_types;
+   149	  guint  n_selector_types;
+   150	  guint  i;
+   151	
+   152	  notebook->notebook = gtk_notebook_new ();
+   153	  gtk_notebook_popup_enable (GTK_NOTEBOOK (notebook->notebook));
+   154	  gimp_widgets_compat_box_pack_start (GTK_BOX (notebook), notebook->notebook, TRUE, TRUE, 0);
+   155	  gtk_widget_show (notebook->notebook);
+   156	
+   157	  g_signal_connect (notebook->notebook, "switch-page",
+   158	                    G_CALLBACK (gimp_color_notebook_switch_page),
+
+   436	
+   437	  show_alpha = gimp_color_selector_get_show_alpha (GIMP_COLOR_SELECTOR (notebook));
+   438	  gimp_color_selector_set_show_alpha (GIMP_COLOR_SELECTOR (page), show_alpha);
+   439	
+   440	  menu_widget = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 4);
+   441	
+   442	  image = gtk_image_new_from_icon_name (selector_class->icon_name,
+   443	                                        GTK_ICON_SIZE_MENU);
+   444	  gimp_widgets_compat_box_pack_start (GTK_BOX (menu_widget), image, FALSE, FALSE, 0);
+   445	  gtk_widget_show (image);
+   446	
+   447	  label = gtk_label_new (gettext (selector_class->name));
+   448	  gimp_widgets_compat_box_pack_start (GTK_BOX (menu_widget), label, FALSE, FALSE, 0);
+   449	  gtk_widget_show (label);
+   450	
+   451	  image = gtk_image_new_from_icon_name (selector_class->icon_name,
+   452	                                        DEFAULT_TAB_ICON_SIZE);
+
+# gimpwidgets.c key lines
+    24	#include <gegl.h>
+    25	#include <gtk/gtk.h>
+    26	
+    27	#include "libgimpcolor/gimpcolor.h"
+    28	#include "libgimpmath/gimpmath.h"
+    29	#include "libgimpbase/gimpbase.h"
+    30	
+    31	#include "gimpwidgets.h"
+    32	#include "gimpwidgets-compat.h"
+    33	
+    34	#include "libgimp/libgimp-intl.h"
+    35	
+    36	
+
+   118	
+   119	      item_ptr = GINT_TO_POINTER (item_data);
+   120	
+   121	      if (label != GINT_TO_POINTER (1))
+   122	        button = gtk_radio_button_new_with_mnemonic (group, label);
+   123	      else
+   124	        button = gtk_radio_button_new (group);
+   125	
+   126	      group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (button));
+   127	      gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+   128	
+   129	      if (item_data)
+   130	        {
+   131	          g_object_set_data (G_OBJECT (button), "gimp-item-data", item_ptr);
+   132	
+
+   150	    }
+   151	  va_end (args);
+   152	
+   153	  if (in_frame)
+   154	    {
+   155	      GtkWidget *frame;
+   156	
+   157	      frame = gimp_frame_new (frame_title);
+   158	      gimp_widgets_compat_container_add (frame, vbox);
+   159	      gtk_widget_show (vbox);
+   160	
+
+   246	  /* If we're being asked to generate a random seed, generate one. */
+   247	  if (*random_seed)
+   248	    *seed = g_random_int ();
+   249	
+   250	  adj = gtk_adjustment_new (*seed, 0, (guint32) -1, 1, 10, 0);
+   251	  spinbutton = gimp_spin_button_new (adj, 1.0, 0);
+   252	  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton), TRUE);
+   253	  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), spinbutton, FALSE, FALSE, 0);
+   254	  gtk_widget_show (spinbutton);
+   255	
+   256	  g_signal_connect (adj, "value-changed",
+   257	                    G_CALLBACK (gimp_uint_adjustment_update),
+   258	                    seed);
+   259	
+   260	  gimp_help_set_help_data (spinbutton,
+   261	                           _("Use this value for random number generator "
+   262	                             "seed - this allows you to repeat a "
+   263	                             "given \"random\" operation"), NULL);
+   264	
+   265	  button = gtk_button_new_with_mnemonic (_("_New Seed"));
+   266	  g_object_set (gtk_bin_get_child (GTK_BIN (button)),
+   267	                "margin-start", 2,
+   268	                "margin-end",   2,
+   269	                NULL);
+   270	  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+   271	  gtk_widget_show (button);
+   272	
+   273	  /* Send spinbutton as data so that we can change the value in
+   274	   * gimp_random_seed_update()
+   275	   */
+   276	  g_signal_connect (button, "clicked",
+   277	                    G_CALLBACK (gimp_random_seed_update),
+   278	                    spinbutton);
+   279	
+   280	  gimp_help_set_help_data (button,
+   281	                           _("Seed random number generator with a generated "
+   282	                             "random number"),
+   283	                           NULL);
+   284	
+   285	  toggle = gtk_check_button_new_with_mnemonic (_("_Randomize"));
+   286	  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (toggle), *random_seed);
+   287	  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), toggle, FALSE, FALSE, 0);
+   288	  gtk_widget_show (toggle);
+   289	
+   290	  g_signal_connect (toggle, "toggled",

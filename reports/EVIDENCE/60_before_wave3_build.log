@@ -1,0 +1,8 @@
+# CMD: ninja -C _build-local libgimpwidgets/libgimpwidgets-3.0.so.0.200.0 -j4
+# DATE: 2026-02-15T19:42:14-03:00
+ninja: Entering directory `_build-local'
+ninja: no work to do.
+TIME_ELAPSED=0.05
+MAX_RSS_KB=16320
+CPU_PCT=98%
+EXIT_CODE=0

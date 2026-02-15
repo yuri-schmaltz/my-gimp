@@ -1,0 +1,49 @@
+# CMD: sh tools/ci/ui-visual-diff-smoke.sh
+# DATE: 2026-02-15T19:43:04-03:00
+UI visual diff smoke prepared with 31 images.
+UI visual diff gate
+Baseline dir: devel-docs/reference/gimp-ui/images
+Current dir: _log/ui-visual/current
+SSIM threshold: 1.0
+
+PASS  browser.png (SSIM=1.000000)
+PASS  busy-box.png (SSIM=1.000000)
+PASS  button.png (SSIM=1.000000)
+PASS  chain-button.png (SSIM=1.000000)
+PASS  color-area.png (SSIM=1.000000)
+PASS  color-button.png (SSIM=1.000000)
+PASS  color-hex-entry.png (SSIM=1.000000)
+PASS  color-notebook.png (SSIM=1.000000)
+PASS  color-profile-combo-box.png (SSIM=1.000000)
+PASS  color-profile-view.png (SSIM=1.000000)
+PASS  color-scale.png (SSIM=1.000000)
+PASS  color-scales.png (SSIM=1.000000)
+PASS  color-select.png (SSIM=1.000000)
+PASS  color-selection.png (SSIM=1.000000)
+PASS  dialog.png (SSIM=1.000000)
+PASS  enum-combo-box.png (SSIM=1.000000)
+PASS  enum-label.png (SSIM=1.000000)
+PASS  file-entry.png (SSIM=1.000000)
+PASS  frame.png (SSIM=1.000000)
+PASS  hint-box.png (SSIM=1.000000)
+PASS  int-combo-box.png (SSIM=1.000000)
+PASS  memsize-entry.png (SSIM=1.000000)
+PASS  number-pair-entry.png (SSIM=1.000000)
+PASS  offset-area.png (SSIM=1.000000)
+PASS  page-selector.png (SSIM=1.000000)
+PASS  path-editor.png (SSIM=1.000000)
+PASS  pick-button.png (SSIM=1.000000)
+PASS  preview-area.png (SSIM=1.000000)
+PASS  ruler.png (SSIM=1.000000)
+PASS  string-combo-box.png (SSIM=1.000000)
+PASS  unit-combo-box.png (SSIM=1.000000)
+
+Compared images: 31
+Missing current images: 0
+Below-threshold images: 0
+Report: _log/ui-visual/report/ssim.csv
+PASS: visual diff gate passed.
+TIME_ELAPSED=3.05
+MAX_RSS_KB=56848
+CPU_PCT=109%
+EXIT_CODE=0

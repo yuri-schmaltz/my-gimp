@@ -1,0 +1,6 @@
+name|exit|elapsed_s|max_rss_kb|cpu
+71_after_wave3_build|0|0.79|96640|166%
+72_after_wave3_readiness|0|0.18|6400|660%
+73_after_wave3_complete|1|0.35|6720|637%
+74_after_wave3_e2e|0|0.03|4160|100%
+75_after_wave3_visual|0|3.05|56848|109%
