@@ -31,6 +31,7 @@
 
 #include "gimpintradioframe.h"
 #include "gimpintstore.h"
+#include "gimpwidgets-compat.h"
 
 
 /**
@@ -145,7 +146,7 @@ static void
 gimp_int_radio_frame_init (GimpIntRadioFrame *radio_frame)
 {
   radio_frame->box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-  gtk_container_add (GTK_CONTAINER (radio_frame), radio_frame->box);
+  gimp_widgets_compat_container_add (GTK_WIDGET (radio_frame), radio_frame->box);
   gtk_widget_show (GTK_WIDGET (radio_frame->box));
 }
 
@@ -674,7 +675,7 @@ gimp_int_radio_frame_fill (GimpIntRadioFrame *frame)
                               -1);
 
           button = gtk_radio_button_new_with_mnemonic (group, label);
-          gtk_box_pack_start (GTK_BOX (frame->box), button, FALSE, FALSE, 0);
+          gimp_widgets_compat_box_pack_start (GTK_BOX (frame->box), button, FALSE, FALSE, 0);
           gtk_widget_show (button);
 
           g_free (label);

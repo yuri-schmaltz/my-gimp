@@ -28,6 +28,7 @@
 
 #include "gimpmemsizeentry.h"
 #include "gimpwidgets.h"
+#include "gimpwidgets-compat.h"
 
 #include "libgimp/libgimp-intl.h"
 
@@ -232,7 +233,7 @@ gimp_memsize_entry_new (guint64  value,
 #undef CAST
 
   gtk_entry_set_width_chars (GTK_ENTRY (entry->spinbutton), 7);
-  gtk_box_pack_start (GTK_BOX (entry), entry->spinbutton, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->spinbutton, FALSE, FALSE, 0);
   gtk_widget_show (entry->spinbutton);
 
   g_signal_connect (entry->adjustment, "value-changed",
@@ -250,7 +251,7 @@ gimp_memsize_entry_new (guint64  value,
                     G_CALLBACK (gimp_memsize_entry_unit_callback),
                     entry);
 
-  gtk_box_pack_start (GTK_BOX (entry), entry->menu, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->menu, FALSE, FALSE, 0);
   gtk_widget_show (entry->menu);
 
   return GTK_WIDGET (entry);
