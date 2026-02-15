@@ -16,15 +16,16 @@ Score = (Impacto × Probabilidade) ÷ Esforço
 ## Achados detalhados
 
 ### B001 — Migração GTK4 completa ainda não confirmada
-- Evidência: `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log` (`gtk4-complete-migration-check` FAIL).
-- Contagens legadas atuais relevantes: `L01=1820`, `L03=513`, `L04=890`, `L05=665`.
+- Evidência: `reports/EVIDENCE/90_gtk4_functional_suite_after_color_widgets.log` (`gtk4-complete-migration-check` FAIL).
+- Contagens legadas atuais relevantes: `L01=1801`, `L02=102`, `L03=510`, `L04=887`, `L05=665`.
+- Delta da última rodada: `reports/EVIDENCE/91_legacy_api_delta_after_color_widgets.tsv`.
 - Impacto: bloqueia fechamento formal da migração completa GTK4.
 - Recomendação: continuar ondas incrementais por arquivo com foco em APIs de maior volume.
 - Validação: FAIL.
 - Rollback: `git revert <commit_da_onda>`.
 
 ### B002 — Superfície legada GtkTreeView/selection ainda alta
-- Evidência: `L05=665`, `L06=201` em `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`.
+- Evidência: `L05=665`, `L06=201` em `reports/EVIDENCE/89_gtk4_complete_migration_after_color_widgets.log`.
 - Impacto: requer transformação estrutural além de wrappers simples.
 - Recomendação: plano por domínio para `GtkListView`/`GtkColumnView`.
 - Validação: FAIL (gate completo).
@@ -49,7 +50,7 @@ Score = (Impacto × Probabilidade) ÷ Esforço
 - Validação: PASS checklist; runtime real NÃO VERIFICADO.
 
 ### B006 — Runtime tests dependem de toolchain/deps locais completos
-- Evidência: `fatal error: gegl.h: No such file or directory` durante compilação de testes em `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`.
+- Evidência: `fatal error: gegl.h: No such file or directory` durante compilação de testes em `reports/EVIDENCE/90_gtk4_functional_suite_after_color_widgets.log`.
 - Impacto: execução runtime local pode virar SKIP e reduzir profundidade de validação.
 - Recomendação: padronizar ambiente local/CI com dependências necessárias para compilar todos os testes.
 - Validação: mitigado por fallback SKIP controlado; pendência de ambiente.

@@ -33,6 +33,26 @@ Referências:
 - Depois: `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`
 - Delta: `reports/EVIDENCE/88_hardening_suite_delta.tsv`
 
+## Rodada 5 — Migração incremental de widgets de cor
+
+| Validação | Antes (rodada 4) | Depois (rodada 5) | Resultado |
+|---|---|---|---|
+| gtk4-complete-migration-check | FAIL (`84_..._runtime_fix`) | FAIL (`89_gtk4_complete_migration_after_color_widgets.log`) | Melhorou contagens |
+| L01 gtk_box_pack_start | 1820 | 1801 | Melhorou |
+| L02 gtk_box_pack_end | 106 | 102 | Melhorou |
+| L03 gtk_container_add | 513 | 510 | Melhorou |
+| L04 GtkContainer/gtk_container_ | 890 | 887 | Melhorou |
+| gtk4-readiness | PASS (`R01=1820`, `R03=513`, `R04=890`) | PASS (`R01=1801`, `R03=510`, `R04=887`) | Melhorou |
+| Build incremental do alvo impactado | PASS (build anterior) | PASS (`99_build_libgimpwidgets_target_after_color_widgets.log`) | Mantido |
+| gtk4-functional-regression-suite | 1 falha (`84_..._runtime_fix`) | 1 falha (`90_gtk4_functional_suite_after_color_widgets.log`) | Mantido |
+
+Referências:
+- `reports/EVIDENCE/89_gtk4_complete_migration_after_color_widgets.log`
+- `reports/EVIDENCE/90_gtk4_functional_suite_after_color_widgets.log`
+- `reports/EVIDENCE/91_legacy_api_delta_after_color_widgets.tsv`
+- `reports/EVIDENCE/99_build_libgimpwidgets_target_after_color_widgets.log`
+- `reports/EVIDENCE/100_gtk4_readiness_after_color_widgets.log`
+
 ## AEGIS UI / A11y
 
 - Regressão visual smoke e strict sem divergências no conjunto atual.

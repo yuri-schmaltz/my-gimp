@@ -66,3 +66,41 @@
   - Delta: `reports/EVIDENCE/88_hardening_suite_delta.tsv`
 - Rollback:
   - `git revert <commit_onda4>`
+
+## Correção de escopo — Submódulos (executada)
+
+- Commit: `5f97047d34`
+- Mensagem: `fix: revert unintended submodule pointer updates from hardening wave`
+- Arquivos alterados:
+  - `_deps/gegl`
+  - `_deps/gexiv2`
+  - `_deps/json-c`
+  - `_deps/libmypaint`
+  - `_deps/mypaint-brushes`
+- Motivo:
+  - remover avanço não intencional de ponteiros de submódulos do commit de endurecimento para manter reversibilidade e foco da migração GTK4.
+- Rollback:
+  - `git revert 5f97047d34`
+
+## Onda 3b — Migração incremental de widgets de cor (executada)
+
+- Arquivos alterados:
+  - `libgimpwidgets/gimpcolorselection.c`
+  - `libgimpwidgets/gimpcolorselect.c`
+- Mudanças:
+  - substituição de `gtk_box_pack_start`, `gtk_box_pack_end` e `gtk_container_add` por wrappers `gimp_widgets_compat_*`.
+  - inclusão de `gimpwidgets-compat.h` nos dois arquivos.
+- Contexto ANTES/DEPOIS:
+  - Patch: `reports/EVIDENCE/93_color_widgets_migration.patch`
+  - Diffstat: `reports/EVIDENCE/92_color_widgets_migration_diffstat.txt`
+- Efeito medido:
+  - `L01`: `1820 -> 1801`
+  - `L02`: `106 -> 102`
+  - `L03`: `513 -> 510`
+  - `L04`: `890 -> 887`
+  - Evidência consolidada: `reports/EVIDENCE/91_legacy_api_delta_after_color_widgets.tsv`
+- Validação:
+  - Gate estrito: FAIL esperado (`reports/EVIDENCE/89_gtk4_complete_migration_after_color_widgets.log`)
+  - Suite exaustiva: 1 falha total, somente `gtk4-complete-migration-check` (`reports/EVIDENCE/90_gtk4_functional_suite_after_color_widgets.log`)
+- Rollback:
+  - `git revert <commit_onda3b>`

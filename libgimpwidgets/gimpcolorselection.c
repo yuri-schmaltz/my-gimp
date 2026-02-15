@@ -37,6 +37,7 @@
 #include "gimphelpui.h"
 #include "gimpicons.h"
 #include "gimpwidgets.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgets-private.h"
 
 #include "libgimp/libgimp-intl.h"
@@ -186,12 +187,12 @@ gimp_color_selection_init (GimpColorSelection *selection)
   selection->channel = GIMP_COLOR_SELECTOR_HUE;
 
   main_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-  gtk_box_pack_start (GTK_BOX (selection), main_hbox, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (selection), main_hbox, TRUE, TRUE, 0);
   gtk_widget_show (main_hbox);
 
   /*  The left vbox with the notebook  */
   selection->left_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
-  gtk_box_pack_start (GTK_BOX (main_hbox), selection->left_vbox,
+  gimp_widgets_compat_box_pack_start (GTK_BOX (main_hbox), selection->left_vbox,
                       TRUE, TRUE, 0);
   gtk_widget_show (selection->left_vbox);
 
@@ -208,7 +209,7 @@ gimp_color_selection_init (GimpColorSelection *selection)
 
   gimp_color_selector_set_toggles_visible
     (GIMP_COLOR_SELECTOR (selection->notebook), FALSE);
-  gtk_box_pack_start (GTK_BOX (selection->left_vbox), selection->notebook,
+  gimp_widgets_compat_box_pack_start (GTK_BOX (selection->left_vbox), selection->notebook,
                       TRUE, TRUE, 0);
   gtk_widget_show (selection->notebook);
 
@@ -222,17 +223,17 @@ gimp_color_selection_init (GimpColorSelection *selection)
 
   /*  The hbox for the color_areas  */
   hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-  gtk_box_pack_end (GTK_BOX (selection->left_vbox), hbox, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_end (GTK_BOX (selection->left_vbox), hbox, FALSE, FALSE, 0);
   gtk_widget_show (hbox);
 
   /*  The labels  */
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
   gtk_widget_show (vbox);
 
   label = gtk_label_new (_("Current:"));
   gtk_label_set_xalign (GTK_LABEL (label), 1.0);
-  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
   gtk_widget_show (label);
 
   new_group = gtk_size_group_new (GTK_SIZE_GROUP_VERTICAL);
@@ -241,7 +242,7 @@ gimp_color_selection_init (GimpColorSelection *selection)
 
   label = gtk_label_new (_("Old:"));
   gtk_label_set_xalign (GTK_LABEL (label), 1.0);
-  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
   gtk_widget_show (label);
 
   old_group = gtk_size_group_new (GTK_SIZE_GROUP_VERTICAL);
@@ -251,11 +252,11 @@ gimp_color_selection_init (GimpColorSelection *selection)
   /*  The color areas  */
   frame = gtk_frame_new (NULL);
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
-  gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
   gtk_widget_show (frame);
 
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-  gtk_container_add (GTK_CONTAINER (frame), vbox);
+  gimp_widgets_compat_container_add (frame, vbox);
   gtk_widget_show (vbox);
 
   selection->new_color = gimp_color_area_new (selection->color,
@@ -265,7 +266,7 @@ gimp_color_selection_init (GimpColorSelection *selection)
                                               GDK_BUTTON1_MASK |
                                               GDK_BUTTON2_MASK);
   gtk_size_group_add_widget (new_group, selection->new_color);
-  gtk_box_pack_start (GTK_BOX (vbox), selection->new_color, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), selection->new_color, FALSE, FALSE, 0);
   gtk_widget_show (selection->new_color);
 
   g_signal_connect (selection->new_color, "color-changed",
@@ -280,12 +281,12 @@ gimp_color_selection_init (GimpColorSelection *selection)
                                               GDK_BUTTON2_MASK);
   gtk_drag_dest_unset (selection->old_color);
   gtk_size_group_add_widget (old_group, selection->old_color);
-  gtk_box_pack_start (GTK_BOX (vbox), selection->old_color, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), selection->old_color, FALSE, FALSE, 0);
   gtk_widget_show (selection->old_color);
 
   /*  The right vbox with color scales  */
   selection->right_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
-  gtk_box_pack_start (GTK_BOX (main_hbox), selection->right_vbox,
+  gimp_widgets_compat_box_pack_start (GTK_BOX (main_hbox), selection->right_vbox,
                       TRUE, TRUE, 0);
   gtk_widget_show (selection->right_vbox);
 
@@ -295,7 +296,7 @@ gimp_color_selection_init (GimpColorSelection *selection)
     (GIMP_COLOR_SELECTOR (selection->scales), TRUE);
   gimp_color_selector_set_show_alpha (GIMP_COLOR_SELECTOR (selection->scales),
                                       selection->show_alpha);
-  gtk_box_pack_start (GTK_BOX (selection->right_vbox), selection->scales,
+  gimp_widgets_compat_box_pack_start (GTK_BOX (selection->right_vbox), selection->scales,
                       TRUE, TRUE, 0);
   gtk_widget_show (selection->scales);
 
@@ -307,12 +308,12 @@ gimp_color_selection_init (GimpColorSelection *selection)
                     selection);
 
   hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-  gtk_box_pack_start (GTK_BOX (selection->right_vbox), hbox, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (selection->right_vbox), hbox, FALSE, FALSE, 0);
   gtk_widget_show (hbox);
 
   /*  The color picker  */
   button = gimp_pick_button_new ();
-  gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 0);
   gtk_widget_show (button);
 
   g_signal_connect (button, "color-picked",
@@ -321,12 +322,12 @@ gimp_color_selection_init (GimpColorSelection *selection)
 
   /* The hex triplet entry */
   entry = gimp_color_hex_entry_new ();
-  gtk_box_pack_end (GTK_BOX (hbox), entry, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_end (GTK_BOX (hbox), entry, TRUE, TRUE, 0);
   gtk_widget_show (entry);
 
   label = gtk_label_new_with_mnemonic (_("HTML _notation:"));
   gtk_label_set_mnemonic_widget (GTK_LABEL (label), entry);
-  gtk_box_pack_end (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_end (GTK_BOX (hbox), label, FALSE, FALSE, 0);
   gtk_widget_show (label);
 
   g_object_set_data (G_OBJECT (selection), "color-hex-entry", entry);

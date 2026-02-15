@@ -1,0 +1,7 @@
+INFO: autodetecting backend as ninja
+
+ERROR: Can't invoke target `libgimpwidgets`: target not found
+Command exited with non-zero status 1
+TIME_ELAPSED=0.41
+MAX_RSS_KB=51164
+CPU_PCT=100%

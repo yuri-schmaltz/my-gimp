@@ -1,0 +1,3 @@
+ libgimpwidgets/gimpcolorselect.c    | 19 ++++++++++---------
+ libgimpwidgets/gimpcolorselection.c | 35 ++++++++++++++++++-----------------
+ 2 files changed, 28 insertions(+), 26 deletions(-)

@@ -1,0 +1,29 @@
+## gimpcolorselection compat calls
+190:  gimp_widgets_compat_box_pack_start (GTK_BOX (selection), main_hbox, TRUE, TRUE, 0);
+195:  gimp_widgets_compat_box_pack_start (GTK_BOX (main_hbox), selection->left_vbox,
+212:  gimp_widgets_compat_box_pack_start (GTK_BOX (selection->left_vbox), selection->notebook,
+226:  gimp_widgets_compat_box_pack_end (GTK_BOX (selection->left_vbox), hbox, FALSE, FALSE, 0);
+231:  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
+236:  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+245:  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+255:  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
+259:  gimp_widgets_compat_container_add (frame, vbox);
+269:  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), selection->new_color, FALSE, FALSE, 0);
+284:  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), selection->old_color, FALSE, FALSE, 0);
+289:  gimp_widgets_compat_box_pack_start (GTK_BOX (main_hbox), selection->right_vbox,
+299:  gimp_widgets_compat_box_pack_start (GTK_BOX (selection->right_vbox), selection->scales,
+311:  gimp_widgets_compat_box_pack_start (GTK_BOX (selection->right_vbox), hbox, FALSE, FALSE, 0);
+316:  gimp_widgets_compat_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+325:  gimp_widgets_compat_box_pack_end (GTK_BOX (hbox), entry, TRUE, TRUE, 0);
+330:  gimp_widgets_compat_box_pack_end (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+
+## gimpcolorselect compat calls
+376:  gimp_widgets_compat_box_pack_start (GTK_BOX (select), hbox, TRUE, TRUE, 0);
+382:  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
+393:  gimp_widgets_compat_container_add (frame, select->xy_color);
+414:  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), frame, FALSE, FALSE, 0);
+424:  gimp_widgets_compat_container_add (frame, select->z_color);
+438:  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
+451:      gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), select->toggle_box[model],
+491:            gimp_widgets_compat_box_pack_start (GTK_BOX (select->toggle_box[model]), button,
+514:  gimp_widgets_compat_box_pack_start (GTK_BOX (select), grid, FALSE, FALSE, 0);

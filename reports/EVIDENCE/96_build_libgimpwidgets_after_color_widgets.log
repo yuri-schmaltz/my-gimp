@@ -1,0 +1,9 @@
+
+ERROR: Current directory is not a meson build directory: `/home/yurix/Documentos/my-gimp/_build`.
+Please specify a valid build dir or change the working directory to it.
+It is also possible that the build directory was generated with an old
+meson version. Please regenerate it in this case.
+Command exited with non-zero status 1
+TIME_ELAPSED=0.32
+MAX_RSS_KB=33280
+CPU_PCT=99%

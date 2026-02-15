@@ -63,3 +63,23 @@ Fonte: `reports/EVIDENCE/69_before_wave3_summary.tsv`
 - Execução exaustiva depois do ajuste: `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`.
 - Delta de falhas: `2 -> 1` (`reports/EVIDENCE/88_hardening_suite_delta.tsv`).
 - Falha remanescente esperada: `gtk4-complete-migration-check`.
+
+## Baseline incremental (rodada 5)
+
+- Gate estrito pós-migração de widgets de cor:
+  - `reports/EVIDENCE/89_gtk4_complete_migration_after_color_widgets.log`
+  - Exit: `1` (esperado nesta fase)
+  - Elapsed: `0.37s`
+  - Max RSS: `7040 KB`
+- Readiness pós-migração de widgets de cor:
+  - `reports/EVIDENCE/100_gtk4_readiness_after_color_widgets.log`
+  - Exit: `0`
+  - Elapsed: `0.20s`
+  - Max RSS: `6720 KB`
+- Suite exaustiva pós-migração de widgets de cor:
+  - `reports/EVIDENCE/90_gtk4_functional_suite_after_color_widgets.log`
+  - Exit: `1` (única falha: `gtk4-complete-migration-check`)
+  - Elapsed: `10.79s`
+  - Max RSS: `98880 KB`
+- Delta de superfície legada nesta rodada:
+  - `reports/EVIDENCE/91_legacy_api_delta_after_color_widgets.tsv`

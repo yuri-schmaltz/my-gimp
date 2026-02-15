@@ -1,0 +1,9 @@
+ libgimpwidgets/gimpcolorselect.c    | 19 ++++++++++---------
+ libgimpwidgets/gimpcolorselection.c | 35 +++++++++++++++++-----------------
+ reports/BACKLOG.md                  |  9 +++++----
+ reports/BASELINE.md                 | 15 +++++++++++++++
+ reports/CHANGES.md                  | 38 +++++++++++++++++++++++++++++++++++++
+ reports/EXEC_SUMMARY.md             | 10 ++++++++++
+ reports/RELEASE_CHECKLIST.md        |  9 ++++++---
+ reports/VALIDATION.md               | 16 ++++++++++++++++
+ 8 files changed, 118 insertions(+), 33 deletions(-)

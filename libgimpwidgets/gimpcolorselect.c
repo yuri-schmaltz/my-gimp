@@ -38,6 +38,7 @@
 #include "gimpcolorselect.h"
 #include "gimphelpui.h"
 #include "gimpicons.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgetsutils.h"
 
 #include "libgimp/libgimp-intl.h"
@@ -372,13 +373,13 @@ gimp_color_select_init (GimpColorSelect *select)
   select->drag_mode     = DRAG_NONE;
 
   hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 4);
-  gtk_box_pack_start (GTK_BOX (select), hbox, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (select), hbox, TRUE, TRUE, 0);
   gtk_widget_show (hbox);
 
   /*  The x/y component preview  */
   frame = gtk_frame_new (NULL);
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
-  gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
   gtk_widget_show (frame);
 
   select->xy_color = gtk_event_box_new ();
@@ -389,7 +390,7 @@ gimp_color_select_init (GimpColorSelect *select)
                                GIMP_COLOR_SELECTOR_SIZE,
                                GIMP_COLOR_SELECTOR_SIZE);
   gtk_widget_set_events (select->xy_color, COLOR_AREA_EVENT_MASK);
-  gtk_container_add (GTK_CONTAINER (frame), select->xy_color);
+  gimp_widgets_compat_container_add (frame, select->xy_color);
   gtk_widget_show (select->xy_color);
 
   g_signal_connect (select->xy_color, "size-allocate",
@@ -410,7 +411,7 @@ gimp_color_select_init (GimpColorSelect *select)
   /*  The z component preview  */
   frame = gtk_frame_new (NULL);
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
-  gtk_box_pack_start (GTK_BOX (hbox), frame, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), frame, FALSE, FALSE, 0);
   gtk_widget_show (frame);
 
   select->z_color = gtk_event_box_new ();
@@ -420,7 +421,7 @@ gimp_color_select_init (GimpColorSelect *select)
   gtk_widget_set_size_request (select->z_color,
                                GIMP_COLOR_SELECTOR_BAR_SIZE, -1);
   gtk_widget_set_events (select->z_color, COLOR_AREA_EVENT_MASK);
-  gtk_container_add (GTK_CONTAINER (frame), select->z_color);
+  gimp_widgets_compat_container_add (frame, select->z_color);
   gtk_widget_show (select->z_color);
 
   g_signal_connect (select->z_color, "size-allocate",
@@ -434,7 +435,7 @@ gimp_color_select_init (GimpColorSelect *select)
                     select);
 
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
-  gtk_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), vbox, FALSE, FALSE, 0);
   gtk_widget_show (vbox);
 
   model_class   = g_type_class_ref (GIMP_TYPE_COLOR_SELECTOR_MODEL);
@@ -447,7 +448,7 @@ gimp_color_select_init (GimpColorSelect *select)
       enum_desc = gimp_enum_get_desc (model_class, model);
 
       select->toggle_box[model] = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
-      gtk_box_pack_start (GTK_BOX (vbox), select->toggle_box[model],
+      gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), select->toggle_box[model],
                           FALSE, FALSE, 0);
 
       if (gimp_color_selector_get_model_visible (selector, model))
@@ -487,7 +488,7 @@ gimp_color_select_init (GimpColorSelect *select)
                                                          gettext (enum_desc->value_desc));
             group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (button));
             gtk_toggle_button_set_mode (GTK_TOGGLE_BUTTON (button), FALSE);
-            gtk_box_pack_start (GTK_BOX (select->toggle_box[model]), button,
+            gimp_widgets_compat_box_pack_start (GTK_BOX (select->toggle_box[model]), button,
                                 TRUE, TRUE, 0);
             gtk_widget_show (button);
 
@@ -510,7 +511,7 @@ gimp_color_select_init (GimpColorSelect *select)
   grid = gtk_grid_new ();
   gtk_grid_set_row_spacing (GTK_GRID (grid), 1);
   gtk_grid_set_column_spacing (GTK_GRID (grid), 1);
-  gtk_box_pack_start (GTK_BOX (select), grid, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (select), grid, FALSE, FALSE, 0);
   gtk_widget_set_visible (grid, TRUE);
 
   select->label = gtk_label_new (NULL);

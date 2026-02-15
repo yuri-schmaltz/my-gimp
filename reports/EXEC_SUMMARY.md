@@ -14,3 +14,13 @@
   - Onda 4 scripts: `git revert <commit_onda4>`
   - Onda 3 código: `git revert a2de1556f8`
   - Onda 2 código: `git revert fdfa75aaec`
+- Commit corretivo aplicado para manter escopo da migração limpo: `5f97047d34` (reversão de ponteiros de submódulos alterados acidentalmente).
+- Nova rodada incremental de migração GTK4 em `libgimpwidgets`:
+  - `libgimpwidgets/gimpcolorselection.c`
+  - `libgimpwidgets/gimpcolorselect.c`
+- Redução medida no gate estrito após a rodada:
+  - `L01: 1820 -> 1801`
+  - `L02: 106 -> 102`
+  - `L03: 513 -> 510`
+  - `L04: 890 -> 887`
+- Suite exaustiva permanece com 1 falha total (apenas `gtk4-complete-migration-check`) em `reports/EVIDENCE/90_gtk4_functional_suite_after_color_widgets.log`.
