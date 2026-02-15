@@ -69,6 +69,10 @@ gimp_widgets_compat_container_add (GtkWidget *container,
 #if GTK_CHECK_VERSION(4, 0, 0)
   if (GTK_IS_BUTTON (container))
     gtk_button_set_child (GTK_BUTTON (container), child);
+  else if (GTK_IS_FRAME (container))
+    gtk_frame_set_child (GTK_FRAME (container), child);
+  else if (GTK_IS_VIEWPORT (container))
+    gtk_viewport_set_child (GTK_VIEWPORT (container), child);
   else if (GTK_IS_SCROLLED_WINDOW (container))
     gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (container), child);
   else if (GTK_IS_LIST_BOX_ROW (container))

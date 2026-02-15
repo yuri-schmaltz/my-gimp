@@ -32,6 +32,7 @@
 
 #include "gimpcairo-utils.h"
 #include "gimpcolorarea.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgetsutils.h"
 #include "gimpwidgets-private.h"
 
@@ -902,7 +903,7 @@ gimp_color_area_drag_begin (GtkWidget      *widget,
 
   frame = gtk_frame_new (NULL);
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
-  gtk_container_add (GTK_CONTAINER (window), frame);
+  gimp_widgets_compat_container_add (window, frame);
 
   color = gimp_color_area_get_color (GIMP_COLOR_AREA (widget));
   color_area = gimp_color_area_new (color, area->type, 0);
@@ -910,7 +911,7 @@ gimp_color_area_drag_begin (GtkWidget      *widget,
 
   gtk_widget_set_size_request (color_area,
                                DRAG_PREVIEW_SIZE, DRAG_PREVIEW_SIZE);
-  gtk_container_add (GTK_CONTAINER (frame), color_area);
+  gimp_widgets_compat_container_add (frame, color_area);
   gtk_widget_show (color_area);
   gtk_widget_show (frame);
 

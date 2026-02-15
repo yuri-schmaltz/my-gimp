@@ -27,6 +27,7 @@
 #include "libgimpbase/gimpbase.h"
 
 #include "gimpwidgets.h"
+#include "gimpwidgets-compat.h"
 
 #include "libgimp/libgimp-intl.h"
 
@@ -185,13 +186,13 @@ create_query_box (const gchar   *title,
       content_area = gtk_dialog_get_content_area (GTK_DIALOG (query_box->qbox));
 
       hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 12);
-      gtk_container_set_border_width (GTK_CONTAINER (hbox), 12);
-      gtk_box_pack_start (GTK_BOX (content_area), hbox, TRUE, TRUE, 0);
+      gimp_widgets_compat_widget_set_border_width (hbox, 12);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (content_area), hbox, TRUE, TRUE, 0);
       gtk_widget_show (hbox);
 
       image = gtk_image_new_from_icon_name (icon_name, GTK_ICON_SIZE_DIALOG);
       gtk_widget_set_valign (image, GTK_ALIGN_START);
-      gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
       gtk_widget_show (image);
     }
 
@@ -202,7 +203,7 @@ create_query_box (const gchar   *title,
 
   if (hbox)
     {
-      gtk_box_pack_start (GTK_BOX (hbox), query_box->vbox, FALSE, FALSE, 0);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), query_box->vbox, FALSE, FALSE, 0);
     }
   else
     {
@@ -210,9 +211,9 @@ create_query_box (const gchar   *title,
 
       content_area = gtk_dialog_get_content_area (GTK_DIALOG (query_box->qbox));
 
-      gtk_container_set_border_width (GTK_CONTAINER (query_box->vbox), 12);
-      gtk_box_pack_start (GTK_BOX (content_area), query_box->vbox,
-                          TRUE, TRUE, 0);
+      gimp_widgets_compat_widget_set_border_width (query_box->vbox, 12);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (content_area), query_box->vbox,
+                                          TRUE, TRUE, 0);
     }
 
   gtk_widget_show (query_box->vbox);
@@ -222,7 +223,7 @@ create_query_box (const gchar   *title,
       label = gtk_label_new (message);
       gtk_label_set_xalign (GTK_LABEL (label), 0.0);
       gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-      gtk_box_pack_start (GTK_BOX (query_box->vbox), label, FALSE, FALSE, 0);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (query_box->vbox), label, FALSE, FALSE, 0);
       gtk_widget_show (label);
     }
 
@@ -284,7 +285,7 @@ gimp_query_string_box (const gchar             *title,
   entry = gtk_entry_new ();
   gtk_entry_set_text (GTK_ENTRY (entry), initial ? initial : "");
   gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
-  gtk_box_pack_start (GTK_BOX (query_box->vbox), entry, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (query_box->vbox), entry, FALSE, FALSE, 0);
   gtk_widget_grab_focus (entry);
   gtk_widget_show (entry);
 
@@ -348,7 +349,7 @@ gimp_query_int_box (const gchar          *title,
   spinbutton = gimp_spin_button_new (adjustment, 1.0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton), TRUE);
   gtk_entry_set_activates_default (GTK_ENTRY (spinbutton), TRUE);
-  gtk_box_pack_start (GTK_BOX (query_box->vbox), spinbutton, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (query_box->vbox), spinbutton, FALSE, FALSE, 0);
   gtk_widget_grab_focus (spinbutton);
   gtk_widget_show (spinbutton);
 
@@ -414,7 +415,7 @@ gimp_query_double_box (const gchar             *title,
   spinbutton = gimp_spin_button_new (adjustment, 1.0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton), TRUE);
   gtk_entry_set_activates_default (GTK_ENTRY (spinbutton), TRUE);
-  gtk_box_pack_start (GTK_BOX (query_box->vbox), spinbutton, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (query_box->vbox), spinbutton, FALSE, FALSE, 0);
   gtk_widget_grab_focus (spinbutton);
   gtk_widget_show (spinbutton);
 
@@ -500,7 +501,7 @@ gimp_query_size_box (const gchar           *title,
   spinbutton = gimp_size_entry_get_help_widget (GIMP_SIZE_ENTRY (sizeentry), 0);
   gtk_entry_set_activates_default (GTK_ENTRY (spinbutton), TRUE);
 
-  gtk_box_pack_start (GTK_BOX (query_box->vbox), sizeentry, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (query_box->vbox), sizeentry, FALSE, FALSE, 0);
   gimp_size_entry_grab_focus (GIMP_SIZE_ENTRY (sizeentry));
   gtk_widget_show (sizeentry);
 

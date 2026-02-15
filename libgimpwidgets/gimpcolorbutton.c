@@ -39,6 +39,7 @@
 #include "gimpdialog.h"
 #include "gimphelpui.h"
 #include "gimpicons.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgets-private.h"
 
 #include "libgimp/libgimp-intl.h"
@@ -329,7 +330,7 @@ gimp_color_button_init (GimpColorButton *button)
                     G_CALLBACK (gimp_color_button_area_changed),
                     button);
 
-  gtk_container_add (GTK_CONTAINER (button), priv->color_area);
+  gimp_widgets_compat_container_add (GTK_WIDGET (button), priv->color_area);
   gtk_widget_show (priv->color_area);
 }
 
@@ -570,13 +571,13 @@ gimp_color_button_clicked (GtkButton *button)
                         &priv->dialog);
 
       priv->selection = gimp_color_selection_new ();
-      gtk_container_set_border_width (GTK_CONTAINER (priv->selection), 6);
+      gimp_widgets_compat_widget_set_border_width (priv->selection, 6);
       gimp_color_selection_set_show_alpha (GIMP_COLOR_SELECTION (priv->selection),
                                            gimp_color_button_has_alpha (color_button));
       gimp_color_selection_set_config (GIMP_COLOR_SELECTION (priv->selection),
                                        priv->config);
-      gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))),
-                          priv->selection, TRUE, TRUE, 0);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))),
+                                          priv->selection, TRUE, TRUE, 0);
       gtk_widget_show (priv->selection);
 
       g_signal_connect (priv->selection, "color-changed",

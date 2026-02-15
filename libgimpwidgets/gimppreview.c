@@ -27,6 +27,7 @@
 #include "libgimpmath/gimpmath.h"
 
 #include "gimpwidgets.h"
+#include "gimpwidgets-compat.h"
 
 #include "gimppreview.h"
 
@@ -200,11 +201,11 @@ gimp_preview_init (GimpPreview *preview)
 
   priv->frame = gtk_aspect_frame_new (NULL, xalign, 0.0, 1.0, TRUE);
   gtk_frame_set_shadow_type (GTK_FRAME (priv->frame), GTK_SHADOW_NONE);
-  gtk_box_pack_start (GTK_BOX (preview), priv->frame, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (preview), priv->frame, TRUE, TRUE, 0);
   gtk_widget_show (priv->frame);
 
   priv->grid = gtk_grid_new ();
-  gtk_container_add (GTK_CONTAINER (priv->frame), priv->grid);
+  gimp_widgets_compat_container_add (priv->frame, priv->grid);
   gtk_widget_show (priv->grid);
 
   priv->timeout_id = 0;
@@ -228,7 +229,7 @@ gimp_preview_init (GimpPreview *preview)
   gtk_widget_show (frame);
 
   priv->area = gimp_preview_area_new ();
-  gtk_container_add (GTK_CONTAINER (frame), priv->area);
+  gimp_widgets_compat_container_add (frame, priv->area);
   gtk_widget_show (priv->area);
 
   g_signal_connect_swapped (priv->area, "notify::check-size",
@@ -284,7 +285,7 @@ gimp_preview_init (GimpPreview *preview)
   priv->toggle = gtk_check_button_new_with_mnemonic (_("_Preview"));
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->toggle),
                                 priv->update_preview);
-  gtk_box_pack_start (GTK_BOX (priv->controls), priv->toggle, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (priv->controls), priv->toggle, TRUE, TRUE, 0);
   gtk_widget_show (priv->toggle);
 
   g_signal_connect (priv->toggle, "toggled",
