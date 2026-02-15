@@ -1,3 +1,27 @@
+[submodule "_deps/babl"]
+	path = _deps/babl
+	url = https://gitlab.gnome.org/GNOME/babl.git
+[submodule "_deps/exiv2"]
+	path = _deps/exiv2
+	url = https://github.com/Exiv2/exiv2.git
+[submodule "_deps/gegl"]
+	path = _deps/gegl
+	url = https://gitlab.gnome.org/GNOME/gegl.git
+[submodule "_deps/gexiv2"]
+	path = _deps/gexiv2
+	url = https://gitlab.gnome.org/GNOME/gexiv2.git
+	ignore = untracked
+[submodule "_deps/json-c"]
+	path = _deps/json-c
+	url = https://github.com/json-c/json-c.git
+[submodule "_deps/libmypaint"]
+	path = _deps/libmypaint
+	url = https://github.com/mypaint/libmypaint.git
+	ignore = untracked
+[submodule "_deps/mypaint-brushes"]
+	path = _deps/mypaint-brushes
+	url = https://github.com/mypaint/mypaint-brushes.git
+	ignore = untracked
 [submodule "gimp-data"]
 	path = gimp-data
 	url = https://gitlab.gnome.org/GNOME/gimp-data.git
