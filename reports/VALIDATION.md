@@ -60,6 +60,6 @@ Referências:
 
 ## Rollback validado
 
-- Onda 4 scripts: `git revert <commit_onda4>`
+- Onda 4 scripts: `git revert 793ba02355`
 - Onda 3 código: `git revert a2de1556f8`
 - Onda 2 código: `git revert fdfa75aaec`

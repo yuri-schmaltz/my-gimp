@@ -65,7 +65,7 @@
   - Depois runtime-fix: 1 falha (`reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`)
   - Delta: `reports/EVIDENCE/88_hardening_suite_delta.tsv`
 - Rollback:
-  - `git revert <commit_onda4>`
+  - `git revert 793ba02355`
 
 ## Correção de escopo — Submódulos (executada)
 
@@ -103,4 +103,4 @@
   - Gate estrito: FAIL esperado (`reports/EVIDENCE/89_gtk4_complete_migration_after_color_widgets.log`)
   - Suite exaustiva: 1 falha total, somente `gtk4-complete-migration-check` (`reports/EVIDENCE/90_gtk4_functional_suite_after_color_widgets.log`)
 - Rollback:
-  - `git revert <commit_onda3b>`
+  - `git revert c51d8942d6`

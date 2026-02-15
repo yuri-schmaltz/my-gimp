@@ -20,9 +20,9 @@
 
 ## Rollback
 
-- Onda 4 scripts: `git revert <commit_onda4>`
+- Onda 4 scripts: `git revert 793ba02355`
 - Onda 3 código: `git revert a2de1556f8`
-- Onda 3b código: `git revert <commit_onda3b>`
+- Onda 3b código: `git revert c51d8942d6`
 - Onda 2 código: `git revert fdfa75aaec`
 - Correção de submódulos: `git revert 5f97047d34`
 - Revalidação pós-rollback:
