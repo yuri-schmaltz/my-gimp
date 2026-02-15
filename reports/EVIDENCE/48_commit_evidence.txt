@@ -1,0 +1,16 @@
+# latest commits relevant
+fdfa75aaec libgimpwidgets: continue GTK4 compat migration in radio/hint/memsize widgets
+748e439576 libgimpwidgets: port file chooser and scrolled preview packing helpers
+d4c698bda8 libgimpwidgets: migrate remaining simple container/box GTK3 calls
+bc2d7565db libgimpwidgets: expand GTK4 compat wrappers and migrate box/container uses
+31317d553e Fix submodule mappings for _deps
+87360be734 feat: Introduce GTK4 compatibility functions and update widget usage across libgimpwidgets.
+211419bae8 feat: add required UI/core test case validation to JUnit metrics, integrate new CI jobs for file dialog backend, clipboard compatibility, visual diff, color ICC diff, and tablet matrix checks, and ref
+4f1df7e16a feat: Modernize GimpPathEditor with GTK4 compatibility wrappers, dedicated tests, and CI integration.
+
+# commit stats
+fdfa75aaec libgimpwidgets: continue GTK4 compat migration in radio/hint/memsize widgets
+ libgimpwidgets/gimphintbox.c       | 5 +++--
+ libgimpwidgets/gimpintradioframe.c | 5 +++--
+ libgimpwidgets/gimpmemsizeentry.c  | 5 +++--
+ 3 files changed, 9 insertions(+), 6 deletions(-)

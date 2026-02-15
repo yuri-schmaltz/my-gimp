@@ -1,0 +1,26 @@
+# CMD: sh tools/ci/b04-file-dialog-backend-check.sh
+# DATE: 2026-02-15T17:45:23-03:00
+B04 file dialog backend checklist
+
+PASS  Includes backend header
+PASS  Uses backend for default buttons
+PASS  Uses backend for help button
+PASS  Uses backend chooser config
+PASS  Uses backend extra widget
+PASS  Uses backend progress pack
+PASS  Uses backend shortcut folders
+PASS  No direct gtk_dialog_add_buttons in dialog file
+PASS  No direct gtk_file_chooser_set_extra_widget in dialog file
+PASS  No direct gtk_file_chooser_add_shortcut_folder in dialog file
+PASS  Backend header exports help button API
+PASS  Backend source implements help button API
+PASS  GTK3 backend header exports help API
+PASS  GTK3 backend source implements help API
+PASS  Meson includes backend shim source
+PASS  Meson includes GTK3 backend source
+
+PASS: B04 file dialog backend checklist passed.
+TIME_ELAPSED=0.04
+MAX_RSS_KB=4480
+CPU_PCT=100%
+EXIT_CODE=0

@@ -1,0 +1,118 @@
+# gimpintradioframe.c snippet
+   136	                                   PROP_STORE,
+   137	                                   g_param_spec_object ("store",
+   138	                                                        "GimpRadioFrame int store",
+   139	                                                        "The int store for the radio frame",
+   140	                                                        GIMP_TYPE_INT_STORE,
+   141	                                                        GIMP_PARAM_READWRITE |
+   142	                                                        G_PARAM_EXPLICIT_NOTIFY));
+   143	}
+   144	
+   145	static void
+   146	gimp_int_radio_frame_init (GimpIntRadioFrame *radio_frame)
+   147	{
+   148	  radio_frame->box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+   149	  gimp_widgets_compat_container_add (GTK_WIDGET (radio_frame), radio_frame->box);
+   150	  gtk_widget_show (GTK_WIDGET (radio_frame->box));
+   151	}
+   152	
+   153	static void
+   154	gimp_int_radio_frame_constructed (GObject *object)
+   155	{
+   156	  G_OBJECT_CLASS (parent_class)->constructed (object);
+   157	
+   158	  g_signal_connect (object, "draw",
+   159	                    G_CALLBACK (gimp_int_radio_frame_draw),
+   160	                    NULL);
+
+   666	           iter_valid = gtk_tree_model_iter_next (model, &iter))
+   667	        {
+   668	          GtkWidget *button;
+   669	          gchar     *label;
+   670	          gint       value;
+   671	
+   672	          gtk_tree_model_get (model, &iter,
+   673	                              GIMP_INT_STORE_LABEL, &label,
+   674	                              GIMP_INT_STORE_VALUE, &value,
+   675	                              -1);
+   676	
+   677	          button = gtk_radio_button_new_with_mnemonic (group, label);
+   678	          gimp_widgets_compat_box_pack_start (GTK_BOX (frame->box), button, FALSE, FALSE, 0);
+   679	          gtk_widget_show (button);
+   680	
+   681	          g_free (label);
+   682	
+   683	          group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (button));
+   684	
+   685	          g_object_set_data (G_OBJECT (button), "gimp-radio-frame-value",
+   686	                             GINT_TO_POINTER (value));
+   687	
+   688	          g_signal_connect (button, "toggled",
+   689	                            G_CALLBACK (gimp_int_radio_frame_button_toggled),
+   690	                            frame);
+
+# gimphintbox.c snippet
+   118	  gtk_box_set_spacing (GTK_BOX (box), 12);
+   119	
+   120	  if (box->icon_name)
+   121	    {
+   122	      image = gtk_image_new_from_icon_name (box->icon_name,
+   123	                                            GTK_ICON_SIZE_DIALOG);
+   124	    }
+   125	
+   126	  if (image)
+   127	    {
+   128	      gimp_widgets_compat_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 0);
+   129	      gtk_widget_set_visible (image, TRUE);
+   130	    }
+   131	
+   132	  label = g_object_new (GTK_TYPE_LABEL,
+   133	                        "label",   box->hint,
+   134	                        "wrap",    TRUE,
+   135	                        "justify", GTK_JUSTIFY_LEFT,
+   136	                        "xalign",  0.0,
+   137	                        "yalign",  0.5,
+   138	                        NULL);
+   139	
+   140	  gimp_label_set_attributes (GTK_LABEL (label),
+   141	                             PANGO_ATTR_STYLE, PANGO_STYLE_ITALIC,
+   142	                             -1);
+   143	  gimp_widgets_compat_box_pack_start (GTK_BOX (box), label, FALSE, FALSE, 0);
+   144	  gtk_widget_set_visible (label, TRUE);
+   145	}
+   146	
+   147	static void
+   148	gimp_hint_box_finalize (GObject *object)
+
+# gimpmemsizeentry.c snippet
+   228	                                            1, 8, 0);
+   229	
+   230	  entry->spinbutton = gimp_spin_button_new (entry->adjustment, 1.0, 0);
+   231	  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entry->spinbutton), TRUE);
+   232	
+   233	#undef CAST
+   234	
+   235	  gtk_entry_set_width_chars (GTK_ENTRY (entry->spinbutton), 7);
+   236	  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->spinbutton, FALSE, FALSE, 0);
+   237	  gtk_widget_show (entry->spinbutton);
+   238	
+   239	  g_signal_connect (entry->adjustment, "value-changed",
+   240	                    G_CALLBACK (gimp_memsize_entry_adj_callback),
+   241	                    entry);
+   242	
+   243	  entry->menu = gimp_int_combo_box_new (_("Kibibyte"), 10,
+   244	                                        _("Mebibyte"), 20,
+   245	                                        _("Gibibyte"), 30,
+   246	                                        NULL);
+   247	
+   248	  gimp_int_combo_box_set_active (GIMP_INT_COMBO_BOX (entry->menu), shift);
+   249	
+   250	  g_signal_connect (entry->menu, "changed",
+   251	                    G_CALLBACK (gimp_memsize_entry_unit_callback),
+   252	                    entry);
+   253	
+   254	  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->menu, FALSE, FALSE, 0);
+   255	  gtk_widget_show (entry->menu);
+   256	
+   257	  return GTK_WIDGET (entry);
+   258	}

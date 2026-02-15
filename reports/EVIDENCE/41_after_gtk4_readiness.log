@@ -1,0 +1,24 @@
+# CMD: sh tools/ci/gtk4-readiness.sh
+# DATE: 2026-02-15T17:46:29-03:00
+GTK4 readiness gate (legacy GTK3 surface must not increase)
+Scope: app libgimp libgimpwidgets modules plug-ins
+
+ID   BASE    CURR    STATUS  PATTERN
+R01  1863    1827    OK      gtk_box_pack_start
+R02  110     106     OK      gtk_box_pack_end
+R03  535     514     OK      gtk_container_add
+R04  915     891     OK      GtkContainer|gtk_container_
+R05  722     665     OK      GtkTreeView|gtk_tree_view_
+R06  13      13      OK      GtkFileChooserDialog
+R07  12      12      OK      GtkAccelGroup
+R08  19      19      OK      gtk_drag_dest_set
+R09  7       7       OK      gtk_drag_source_set
+R10  80      80      OK      gtk_selection_data_
+R11  66      25      OK      gtk_clipboard_
+R12  325     325     OK      GdkWindow|gdk_window_|gtk_widget_get_window
+
+PASS: legacy GTK3 surface did not increase.
+TIME_ELAPSED=0.18
+MAX_RSS_KB=6400
+CPU_PCT=630%
+EXIT_CODE=0

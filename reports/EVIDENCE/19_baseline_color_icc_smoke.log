@@ -1,0 +1,21 @@
+# CMD: sh tools/ci/color-icc-diff-smoke.sh
+# DATE: 2026-02-15T17:45:27-03:00
+ICC diff smoke prepared with 2 cases.
+ICC dynamic diff gate
+Manifest: _log/color-icc-smoke/corpus.txt
+Expected dir: _log/color-icc-smoke/expected
+Actual dir: _log/color-icc-smoke/actual
+SSIM threshold: 1.0
+
+PASS  icc_smoke_red (SSIM=1.000000)
+PASS  icc_smoke_green (SSIM=1.000000)
+
+Compared ICC cases: 2
+Missing actual images: 0
+Below-threshold cases: 0
+Report: _log/color-icc-smoke/report/ssim.csv
+PASS: ICC dynamic diff gate passed.
+TIME_ELAPSED=0.50
+MAX_RSS_KB=55992
+CPU_PCT=108%
+EXIT_CODE=0

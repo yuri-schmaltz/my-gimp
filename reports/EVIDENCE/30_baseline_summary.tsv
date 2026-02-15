@@ -1,0 +1,14 @@
+name|exit|elapsed_s|max_rss_kb|cpu
+10_baseline_git_status|0|0.07|6704|153%
+11_baseline_gtk4_readiness|0|0.21|6400|679%
+12_baseline_b04_file_dialog|0|0.04|4480|100%
+13_baseline_b05_clipboard|0|0.05|4480|100%
+14_baseline_b06_modernization|0|0.04|4160|100%
+15_baseline_b06_listview_gate|0|0.01|5440|133%
+16_baseline_e2e_core|0|0.03|4160|97%
+17_baseline_ui_metrics|0|0.07|2560|102%
+18_baseline_ui_visual_smoke|0|3.04|57812|109%
+19_baseline_color_icc_smoke|0|0.50|55992|108%
+20_baseline_tablet_matrix|0|0.02|4160|125%
+21_baseline_gtk4_complete|1|0.37|6400|641%
+22_baseline_libgimpwidgets_build|0|0.04|16320|97%

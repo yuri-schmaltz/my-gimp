@@ -1,0 +1,4 @@
+ libgimpwidgets/gimphintbox.c       | 5 +++--
+ libgimpwidgets/gimpintradioframe.c | 5 +++--
+ libgimpwidgets/gimpmemsizeentry.c  | 5 +++--
+ 3 files changed, 9 insertions(+), 6 deletions(-)

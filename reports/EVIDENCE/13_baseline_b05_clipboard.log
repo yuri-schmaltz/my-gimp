@@ -1,0 +1,28 @@
+# CMD: sh tools/ci/b05-clipboard-compat-check.sh
+# DATE: 2026-02-15T17:45:23-03:00
+B05 clipboard compat checklist
+
+PASS  Includes clipboard compat header
+PASS  Uses compat default clipboard getter
+PASS  Uses compat owner check
+PASS  Uses compat set_with_owner
+PASS  Uses compat wait_for_contents
+PASS  Uses compat set_text
+PASS  Uses compat clear
+PASS  No direct gtk_clipboard_get_for_display in clipboard file
+PASS  No direct gtk_clipboard_set_with_owner in clipboard file
+PASS  No direct gtk_clipboard_wait_for_contents in clipboard file
+PASS  No direct gtk_clipboard_clear in clipboard file
+PASS  No direct gtk_clipboard_store in clipboard file
+PASS  No direct gtk_clipboard_set_text in clipboard file
+PASS  Compat header exports default getter
+PASS  Compat header exports set_with_owner
+PASS  Compat source implements default getter
+PASS  Compat source implements set_with_owner
+PASS  Meson includes gimpclipboardcompat source
+
+PASS: B05 clipboard compat checklist passed.
+TIME_ELAPSED=0.05
+MAX_RSS_KB=4480
+CPU_PCT=100%
+EXIT_CODE=0

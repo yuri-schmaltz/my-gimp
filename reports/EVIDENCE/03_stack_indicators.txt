@@ -1,0 +1,321 @@
+# gtk/python/web indicators
+.gitlab-ci.yml:7:        - GIMP_CI_FLATPAK #trigger the flatpak build and publishing (base but slow)
+.gitlab-ci.yml:321:## AppImage CI (Debian) ##
+.gitlab-ci.yml:325:    - if: '$CI_MERGE_REQUEST_LABELS =~ /.*Package:AppImage.*/ || $CI_MERGE_REQUEST_DESCRIPTION =~ /.*Package:AppImage.*/'
+.gitlab-ci.yml:368:                                   -Dbuild-id=org.gimp.GIMP_official.AppImage.$(uname -m)
+.gitlab-ci.yml:388:.flatpak:
+.gitlab-ci.yml:390:  #We need to specify this since .flatpak from flatpak_ci_initiative.yml sets to true
+.gitlab-ci.yml:398:      - RUNNER: [flatpak-aarch64, flatpak-x86_64]
+.gitlab-ci.yml:410:deps-flatpak:
+.gitlab-ci.yml:411:  extends: .flatpak
+.gitlab-ci.yml:414:    - sh build/linux/flatpak/1_build-deps-flatpakbuilder.sh
+.gitlab-ci.yml:418:      - flatpak-builder.log
+.gitlab-ci.yml:423:gimp-flatpak:
+.gitlab-ci.yml:424:  extends: .flatpak
+.gitlab-ci.yml:425:  needs: ["deps-flatpak"]
+.gitlab-ci.yml:430:    - sh build/linux/flatpak/2_build-gimp-flatpakbuilder.sh
+.gitlab-ci.yml:433:      - temp*.flatpak
+.gitlab-ci.yml:435:      - gimp-flatpak-builder.log
+.gitlab-ci.yml:820:gtk4-readiness:
+.gitlab-ci.yml:827:    - sh tools/ci/gtk4-readiness.sh
+.gitlab-ci.yml:838:b06-gtk4-listview-gate:
+.gitlab-ci.yml:845:    - sh tools/ci/b06-gtk4-listview-gate.sh
+.gitlab-ci.yml:1002:gtk4-rollout-doc-check:
+.gitlab-ci.yml:1009:    - sh tools/ci/gtk4-rollout-doc-check.sh
+.gitlab-ci.yml:1157:  file: flatpak/flatpak_ci_initiative.yml
+.gitlab-ci.yml:1160:dist-flatpak-weekly:
+.gitlab-ci.yml:1165:    - !reference [.flatpak, rules]
+.gitlab-ci.yml:1166:  needs: ["gimp-flatpak"]
+.gitlab-ci.yml:1169:    - sh build/linux/flatpak/3_dist-gimp-flatpakbuilder.sh
+.gitlab-ci.yml:1171:    expose_as: 'Linux flatpak'
+.gitlab-ci.yml:1173:      - build/linux/flatpak/_Output/
+meson_options.txt:76:       choices: [ 'gtk3', 'gtk4' ],
+meson.build:494:gtk4_minver       = '4.6.0'
+meson.build:495:if gtk_toolkit == 'gtk4'
+meson.build:496:  gtk_dep_name      = 'gtk4'
+meson.build:497:  gtk_minver        = gtk4_minver
+meson.build:501:  gtk_dep_name      = 'gtk+-3.0'
+meson.build:1412:# instance the case of flatpak which mount the host root at /run/host/.
+libgimpwidgets/meson.build:100:  'gimpgtk4-migration-probes.c',
+libgimpwidgets/gimppatheditor.c:131:static void   gimp_path_editor_gtk4_listview_probe (void) G_GNUC_UNUSED;
+libgimpwidgets/gimppatheditor.c:836:gimp_path_editor_gtk4_listview_probe (void)
+tools/performance-log-viewer.py:33:from gi.repository import GLib, GObject, Gio, Gdk, Gtk, Pango
+tools/performance-log-viewer.py:647:class FindSamplesPopover (Gtk.Popover):
+tools/performance-log-viewer.py:649:        Gtk.Popover.__init__ (self, *args, **kwargs)
+tools/performance-log-viewer.py:651:        vbox = Gtk.Box (orientation  = Gtk.Orientation.VERTICAL,
+tools/performance-log-viewer.py:657:        entry = Gtk.Entry (width_chars      = 40,
+tools/performance-log-viewer.py:670:        frame = Gtk.Frame (label       = "Selection",
+tools/performance-log-viewer.py:671:                           shadow_type = Gtk.ShadowType.NONE)
+tools/performance-log-viewer.py:676:        vbox2 = Gtk.Box (orientation  = Gtk.Orientation.VERTICAL,
+tools/performance-log-viewer.py:684:        radio = Gtk.RadioButton.new_with_mnemonic (None, "_Replace")
+tools/performance-log-viewer.py:689:        radio = Gtk.RadioButton.new_with_mnemonic_from_widget (radio, "_Add")
+tools/performance-log-viewer.py:694:        radio = Gtk.RadioButton.new_with_mnemonic_from_widget (radio, "_Subtract")
+tools/performance-log-viewer.py:699:        radio = Gtk.RadioButton.new_with_mnemonic_from_widget (radio, "_Intersect")
+tools/performance-log-viewer.py:704:        button = Gtk.Button.new_with_mnemonic ("_Find")
+tools/performance-log-viewer.py:706:        button.set_halign (Gtk.Align.CENTER)
+tools/performance-log-viewer.py:715:        Gtk.Popover.do_hide (self)
+tools/performance-log-viewer.py:773:class CellRendererColorToggle (Gtk.CellRendererToggle):
+tools/performance-log-viewer.py:807:            style.set_state (Gtk.StateFlags (state & ~Gtk.StateFlags.SELECTED))
+tools/performance-log-viewer.py:808:            Gtk.render_background (style, cr, x, y, size, size)
+tools/performance-log-viewer.py:818:class VariableSet (Gtk.TreeView):
+tools/performance-log-viewer.py:819:    class Store (Gtk.ListStore):
+tools/performance-log-viewer.py:826:            Gtk.ListStore.__init__ (self, str, str, Gdk.RGBA, bool)
+tools/performance-log-viewer.py:835:        Gtk.TreeView.__init__ (self, *args, headers_visible = False, **kwargs)
+tools/performance-log-viewer.py:842:        col = Gtk.TreeViewColumn ()
+tools/performance-log-viewer.py:852:        cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:859:class SampleGraph (Gtk.DrawingArea):
+tools/performance-log-viewer.py:861:        Gtk.DrawingArea.__init__ (self, *args, can_focus = True, **kwargs)
+tools/performance-log-viewer.py:863:        self.style_widget = Gtk.Entry ()
+tools/performance-log-viewer.py:1146:        Gtk.render_background (style, cr, 0, 0, width, height)
+tools/performance-log-viewer.py:1313:class SampleGraphList (Gtk.Box):
+tools/performance-log-viewer.py:1323:        Gtk.Box.__init__ (self,
+tools/performance-log-viewer.py:1325:                          orientation = Gtk.Orientation.VERTICAL,
+tools/performance-log-viewer.py:1330:        self.vset_size_group = Gtk.SizeGroup (
+tools/performance-log-viewer.py:1331:            mode = Gtk.SizeGroupMode.HORIZONTAL
+tools/performance-log-viewer.py:1334:        hbox = Gtk.Box (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:1338:        empty = Gtk.DrawingArea ()
+tools/performance-log-viewer.py:1349:        separator = Gtk.Separator (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:1353:        vbox = Gtk.Box (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:1368:                separator = Gtk.Separator (
+tools/performance-log-viewer.py:1369:                    orientation = Gtk.Orientation.HORIZONTAL
+tools/performance-log-viewer.py:1383:        hbox = Gtk.Box (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:1386:        vbox = Gtk.Box (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:1391:        scroll = Gtk.ScrolledWindow (
+tools/performance-log-viewer.py:1392:            hscrollbar_policy = Gtk.PolicyType.NEVER,
+tools/performance-log-viewer.py:1393:            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC
+tools/performance-log-viewer.py:1402:        buttons = Gtk.ButtonBox (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:1404:        buttons.set_layout (Gtk.ButtonBoxStyle.EXPAND)
+tools/performance-log-viewer.py:1407:        button = Gtk.Button.new_from_icon_name ("list-add-symbolic",
+tools/performance-log-viewer.py:1408:                                                Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:1413:        button = Gtk.Button.new_from_icon_name ("list-remove-symbolic",
+tools/performance-log-viewer.py:1414:                                                Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:1419:        button = Gtk.Button.new_from_icon_name ("go-up-symbolic",
+tools/performance-log-viewer.py:1420:                                                Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:1425:        button = Gtk.Button.new_from_icon_name ("go-down-symbolic",
+tools/performance-log-viewer.py:1426:                                                Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:1488:        grid = Gtk.Grid (column_spacing = 4)
+tools/performance-log-viewer.py:1494:        label = Gtk.Label ()
+tools/performance-log-viewer.py:1501:        label = Gtk.Label ()
+tools/performance-log-viewer.py:1518:            separator = Gtk.Separator (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:1527:                label = Gtk.Label (halign = Gtk.Align.START)
+tools/performance-log-viewer.py:1538:                label = Gtk.Label (label = text, halign = Gtk.Align.END)
+tools/performance-log-viewer.py:1547:            separator = Gtk.Separator (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:1554:                label = Gtk.Label (halign = Gtk.Align.START)
+tools/performance-log-viewer.py:1560:                    label = Gtk.Label (label  = marker.description,
+tools/performance-log-viewer.py:1561:                                       halign = Gtk.Align.END)
+tools/performance-log-viewer.py:1569:class InformationViewer (Gtk.ScrolledWindow):
+tools/performance-log-viewer.py:1570:    class Store (Gtk.ListStore):
+tools/performance-log-viewer.py:1575:            Gtk.ListStore.__init__ (self, str, str)
+tools/performance-log-viewer.py:1578:        Gtk.ScrolledWindow.__init__ (
+tools/performance-log-viewer.py:1581:            hscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1582:            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1586:        vbox = Gtk.Box (orientation  = Gtk.Orientation.VERTICAL,
+tools/performance-log-viewer.py:1607:            vbox2 = Gtk.Box (orientation = Gtk.Orientation.VERTICAL,
+tools/performance-log-viewer.py:1612:            label = Gtk.Label (xalign = 0)
+tools/performance-log-viewer.py:1617:            frame = Gtk.Frame (shadow_type = Gtk.ShadowType.IN)
+tools/performance-log-viewer.py:1622:                scrolled = Gtk.ScrolledWindow (
+tools/performance-log-viewer.py:1623:                    hscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1624:                    vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1630:                text = Gtk.TextView (editable      = False,
+tools/performance-log-viewer.py:1632:                                     wrap_mode     = Gtk.WrapMode.WORD,
+tools/performance-log-viewer.py:1641:                scrolled = Gtk.ScrolledWindow (
+tools/performance-log-viewer.py:1642:                    hscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1643:                    vscrollbar_policy = Gtk.PolicyType.NEVER
+tools/performance-log-viewer.py:1653:                tree = Gtk.TreeView (model = store)
+tools/performance-log-viewer.py:1657:                col = Gtk.TreeViewColumn (title = "Name")
+tools/performance-log-viewer.py:1660:                cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:1664:                col = Gtk.TreeViewColumn (title = "Value")
+tools/performance-log-viewer.py:1668:                cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:1683:class MarkersViewer (Gtk.ScrolledWindow):
+tools/performance-log-viewer.py:1684:    class Store (Gtk.ListStore):
+tools/performance-log-viewer.py:1690:            Gtk.ListStore.__init__ (self, int, GObject.TYPE_INT64, str)
+tools/performance-log-viewer.py:1696:        Gtk.Box.__init__ (self,
+tools/performance-log-viewer.py:1698:                          hscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1699:                          vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1707:        tree = Gtk.TreeView (model = store)
+tools/performance-log-viewer.py:1712:        tree.get_selection ().set_mode (Gtk.SelectionMode.MULTIPLE)
+tools/performance-log-viewer.py:1718:        col = Gtk.TreeViewColumn (title = "#")
+tools/performance-log-viewer.py:1722:        cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:1731:        col = Gtk.TreeViewColumn (title = "Time")
+tools/performance-log-viewer.py:1736:        cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:1740:        col = Gtk.TreeViewColumn (title = "Description")
+tools/performance-log-viewer.py:1745:        cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:1749:        col = Gtk.TreeViewColumn ()
+tools/performance-log-viewer.py:1782:        Gtk.ScrolledWindow.do_map (self)
+tools/performance-log-viewer.py:1805:class VariablesViewer (Gtk.ScrolledWindow):
+tools/performance-log-viewer.py:1806:    class Store (Gtk.ListStore):
+tools/performance-log-viewer.py:1822:            Gtk.ListStore.__init__ (self,
+tools/performance-log-viewer.py:1832:        Gtk.Box.__init__ (self,
+tools/performance-log-viewer.py:1834:                          hscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1835:                          vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:1843:        tree = Gtk.TreeView (model = store)
+tools/performance-log-viewer.py:1851:        col = Gtk.TreeViewColumn (title = "Variable")
+tools/performance-log-viewer.py:1859:        cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:1864:            col = Gtk.TreeViewColumn (title = title)
+tools/performance-log-viewer.py:1869:            cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:1886:        col = Gtk.TreeViewColumn ()
+tools/performance-log-viewer.py:1946:        Gtk.ScrolledWindow.do_map (self)
+tools/performance-log-viewer.py:1954:class BacktraceViewer (Gtk.Box):
+tools/performance-log-viewer.py:1955:    class ThreadStore (Gtk.ListStore):
+tools/performance-log-viewer.py:1962:            Gtk.ListStore.__init__ (self, int, int, str, str)
+tools/performance-log-viewer.py:1964:    class FrameStore (Gtk.ListStore):
+tools/performance-log-viewer.py:1974:            Gtk.ListStore.__init__ (self, int, str, str, str, str, str, str)
+tools/performance-log-viewer.py:1976:    class CellRendererViewSource (Gtk.CellRendererPixbuf):
+tools/performance-log-viewer.py:1981:            Gtk.CellRendererPixbuf.__init__ (
+tools/performance-log-viewer.py:1985:                mode      = Gtk.CellRendererMode.ACTIVATABLE,
+tools/performance-log-viewer.py:2001:        Gtk.Box.__init__ (self,
+tools/performance-log-viewer.py:2003:                          orientation = Gtk.Orientation.HORIZONTAL,
+tools/performance-log-viewer.py:2008:        vbox = Gtk.Box (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:2012:        header = Gtk.HeaderBar (title = "Threads", has_subtitle = False)
+tools/performance-log-viewer.py:2016:        scrolled = Gtk.ScrolledWindow (
+tools/performance-log-viewer.py:2017:            hscrollbar_policy = Gtk.PolicyType.NEVER,
+tools/performance-log-viewer.py:2018:            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC
+tools/performance-log-viewer.py:2025:        store.set_sort_column_id (store.ID, Gtk.SortType.ASCENDING)
+tools/performance-log-viewer.py:2027:        tree = Gtk.TreeView (model = store)
+tools/performance-log-viewer.py:2038:        col = Gtk.TreeViewColumn (title = "ID")
+tools/performance-log-viewer.py:2042:        cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:2046:        col = Gtk.TreeViewColumn (title = "Name")
+tools/performance-log-viewer.py:2050:        cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:2054:        col = Gtk.TreeViewColumn (title = "State")
+tools/performance-log-viewer.py:2058:        cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:2062:        separator = Gtk.Separator (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:2066:        vbox = Gtk.Box (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:2070:        header = Gtk.HeaderBar (title = "Stack", has_subtitle = False)
+tools/performance-log-viewer.py:2074:        scrolled = Gtk.ScrolledWindow (
+tools/performance-log-viewer.py:2075:            hscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:2076:            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC
+tools/performance-log-viewer.py:2084:        tree = Gtk.TreeView (model = store, has_tooltip = True)
+tools/performance-log-viewer.py:2099:        col = Gtk.TreeViewColumn (title = "#")
+tools/performance-log-viewer.py:2103:        cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:2107:        col = Gtk.TreeViewColumn (title = "Address")
+tools/performance-log-viewer.py:2111:        cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:2115:        col = Gtk.TreeViewColumn (title = "Object")
+tools/performance-log-viewer.py:2120:        cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:2124:        col = Gtk.TreeViewColumn (title = "Function")
+tools/performance-log-viewer.py:2128:        cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:2132:        col = Gtk.TreeViewColumn (title = "Offset")
+tools/performance-log-viewer.py:2136:        cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:2140:        col = Gtk.TreeViewColumn (title = "Source")
+tools/performance-log-viewer.py:2145:        cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:2149:        col = Gtk.TreeViewColumn (title = "Line")
+tools/performance-log-viewer.py:2153:        cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:2175:        col = Gtk.TreeViewColumn ()
+tools/performance-log-viewer.py:2227:        Gtk.Box.do_map (self)
+tools/performance-log-viewer.py:2350:class CellRendererPercentage (Gtk.CellRendererText):
+tools/performance-log-viewer.py:2354:        Gtk.CellRendererText.__init__ (self, *args, xalign = 1, **kwargs)
+tools/performance-log-viewer.py:2391:        Gtk.CellRendererText.do_render (self,
+tools/performance-log-viewer.py:2401:            state = Gtk.StateFlags        (state |
+tools/performance-log-viewer.py:2402:                                           Gtk.StateFlags.SELECTED)
+tools/performance-log-viewer.py:2403:            flags = Gtk.CellRendererState (flags |
+tools/performance-log-viewer.py:2404:                                           Gtk.CellRendererState.SELECTED)
+tools/performance-log-viewer.py:2418:            Gtk.render_background (style, cr,
+tools/performance-log-viewer.py:2425:            Gtk.CellRendererText.do_render (self,
+tools/performance-log-viewer.py:2432:class ProfileViewer (Gtk.ScrolledWindow):
+tools/performance-log-viewer.py:2433:    class ThreadFilter (Gtk.TreeView):
+tools/performance-log-viewer.py:2434:        class Store (Gtk.ListStore):
+tools/performance-log-viewer.py:2442:                Gtk.ListStore.__init__ (self,
+tools/performance-log-viewer.py:2470:            Gtk.TreeView.__init__ (self, *args, **kwargs)
+tools/performance-log-viewer.py:2477:            filter = Gtk.TreeModelFilter (child_model = store)
+tools/performance-log-viewer.py:2482:            col = Gtk.TreeViewColumn (title = "ID")
+tools/performance-log-viewer.py:2485:            cell = Gtk.CellRendererText (xalign = 1)
+tools/performance-log-viewer.py:2489:            col = Gtk.TreeViewColumn (title = "Name")
+tools/performance-log-viewer.py:2492:            cell = Gtk.CellRendererText ()
+tools/performance-log-viewer.py:2497:                col = Gtk.TreeViewColumn (title = str (state))
+tools/performance-log-viewer.py:2511:                cell = Gtk.CellRendererToggle ()
+tools/performance-log-viewer.py:2549:            Gtk.TreeView.do_map (self)
+tools/performance-log-viewer.py:2557:    class ThreadPopover (Gtk.Popover):
+tools/performance-log-viewer.py:2559:            Gtk.Popover.__init__ (self, *args, border_width = 4, **kwargs)
+tools/performance-log-viewer.py:2561:            frame = Gtk.Frame (shadow_type = Gtk.ShadowType.IN)
+tools/performance-log-viewer.py:2565:            scrolled = Gtk.ScrolledWindow (
+tools/performance-log-viewer.py:2566:                hscrollbar_policy        = Gtk.PolicyType.NEVER,
+tools/performance-log-viewer.py:2567:                vscrollbar_policy        = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:2579:    class Profile (Gtk.Box):
+tools/performance-log-viewer.py:2586:        class Store (Gtk.ListStore):
+tools/performance-log-viewer.py:2593:                Gtk.ListStore.__init__ (self,
+tools/performance-log-viewer.py:2600:                                   None, (Gtk.Widget,)),
+tools/performance-log-viewer.py:2602:                                   None, (Gtk.Widget,)),
+tools/performance-log-viewer.py:2613:                      sort      = (Store.INCLUSIVE, Gtk.SortType.DESCENDING),
+tools/performance-log-viewer.py:2616:            Gtk.Box.__init__ (self,
+tools/performance-log-viewer.py:2618:                              orientation = Gtk.Orientation.HORIZONTAL,
+tools/performance-log-viewer.py:2628:            vbox = Gtk.Box (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:2632:            header = Gtk.HeaderBar (title = title or "All Functions")
+tools/performance-log-viewer.py:2648:                button = Gtk.MenuButton (popover = popover)
+tools/performance-log-viewer.py:2654:                hbox = Gtk.Box (orientation = Gtk.Orientation.HORIZONTAL,
+tools/performance-log-viewer.py:2659:                label = Gtk.Label (label = "Threads")
+tools/performance-log-viewer.py:2663:                image = Gtk.Image.new_from_icon_name ("pan-down-symbolic",
+tools/performance-log-viewer.py:2664:                                                      Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:2671:                button = Gtk.Button (tooltip_text = "Call-graph direction")
+tools/performance-log-viewer.py:2677:                image = Gtk.Image ()
+tools/performance-log-viewer.py:2682:                button = Gtk.Button.new_from_icon_name (
+tools/performance-log-viewer.py:2684:                    Gtk.IconSize.BUTTON
+tools/performance-log-viewer.py:2694:            scrolled = Gtk.ScrolledWindow (
+tools/performance-log-viewer.py:2695:                hscrollbar_policy = Gtk.PolicyType.NEVER,
+tools/performance-log-viewer.py:2696:                vscrollbar_policy = Gtk.PolicyType.AUTOMATIC
+tools/performance-log-viewer.py:2705:            tree = Gtk.TreeView (model = store)
+tools/performance-log-viewer.py:2717:            col = Gtk.TreeViewColumn (title = "Function")
+tools/performance-log-viewer.py:2722:            cell = Gtk.CellRendererText (ellipsize = Pango.EllipsizeMode.END)
+tools/performance-log-viewer.py:2727:            col = Gtk.TreeViewColumn (title = "Self")
+tools/performance-log-viewer.py:2736:            col = Gtk.TreeViewColumn (title = "All")
+tools/performance-log-viewer.py:2845:                                                         Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:2872:            box = Gtk.Box (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:2877:            separator = Gtk.Separator (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:3049:    class SourceProfile (Gtk.Box):
+tools/performance-log-viewer.py:3050:        class Store (Gtk.ListStore):
+tools/performance-log-viewer.py:3058:                Gtk.ListStore.__init__ (self, int, bool, float, float, str)
+tools/performance-log-viewer.py:3062:                                   None, (Gtk.Widget,)),
+tools/performance-log-viewer.py:3064:                                   None, (Gtk.Widget,)),
+tools/performance-log-viewer.py:3075:            Gtk.Box.__init__ (self,
+tools/performance-log-viewer.py:3077:                              orientation = Gtk.Orientation.VERTICAL,
+tools/performance-log-viewer.py:3083:            header = Gtk.HeaderBar (title    = file.get_basename (),
+tools/performance-log-viewer.py:3089:            box = Gtk.Box (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:3095:            button = Gtk.Button.new_from_icon_name ("go-up-symbolic",
+tools/performance-log-viewer.py:3096:                                                    Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:3103:            button = Gtk.Button.new_from_icon_name ("go-down-symbolic",
+tools/performance-log-viewer.py:3104:                                                    Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:3111:            button = Gtk.Button.new_from_icon_name ("edit-select-symbolic",
+tools/performance-log-viewer.py:3112:                                                    Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:3119:            button = Gtk.Button.new_from_icon_name ("text-x-generic-symbolic",
+tools/performance-log-viewer.py:3120:                                                    Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:3127:            scrolled = Gtk.ScrolledWindow (
+tools/performance-log-viewer.py:3128:                hscrollbar_policy = Gtk.PolicyType.NEVER,
+tools/performance-log-viewer.py:3129:                vscrollbar_policy = Gtk.PolicyType.AUTOMATIC
+tools/performance-log-viewer.py:3137:            tree = Gtk.TreeView (model = store)
+tools/performance-log-viewer.py:3148:            col = Gtk.TreeViewColumn (title = "Self")
+tools/performance-log-viewer.py:3158:            col = Gtk.TreeViewColumn (title = "All")
+tools/performance-log-viewer.py:3168:            col = Gtk.TreeViewColumn ()
+tools/performance-log-viewer.py:3171:            cell = Gtk.CellRendererText (xalign = 1,
+tools/performance-log-viewer.py:3179:            cell = Gtk.CellRendererText (family = "Monospace",
+tools/performance-log-viewer.py:3365:        Gtk.ScrolledWindow.__init__ (
+tools/performance-log-viewer.py:3368:            hscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+tools/performance-log-viewer.py:3369:            vscrollbar_policy = Gtk.PolicyType.NEVER,
+tools/performance-log-viewer.py:3424:        Gtk.ScrolledWindow.do_map (self)
+tools/performance-log-viewer.py:3479:class LogViewer (Gtk.Window):
+tools/performance-log-viewer.py:3481:        Gtk.Window.__init__ (
+tools/performance-log-viewer.py:3486:            window_position = Gtk.WindowPosition.CENTER,
+tools/performance-log-viewer.py:3489:        header = Gtk.HeaderBar (
+tools/performance-log-viewer.py:3497:        box = Gtk.Box (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:3503:        button = Gtk.Button.new_from_icon_name ("go-previous-symbolic",
+tools/performance-log-viewer.py:3504:                                                Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:3514:        button = Gtk.Button.new_from_icon_name ("go-next-symbolic",
+tools/performance-log-viewer.py:3515:                                                Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:3525:        button = Gtk.MenuButton ()
+tools/performance-log-viewer.py:3530:        image = Gtk.Image.new_from_icon_name ("edit-find-symbolic",
+tools/performance-log-viewer.py:3531:                                              Gtk.IconSize.BUTTON)
+tools/performance-log-viewer.py:3546:        button = Gtk.Button.new_from_icon_name (
+tools/performance-log-viewer.py:3548:            Gtk.IconSize.BUTTON
+tools/performance-log-viewer.py:3556:        button = Gtk.Button.new_from_icon_name (
+tools/performance-log-viewer.py:3558:            Gtk.IconSize.BUTTON
+tools/performance-log-viewer.py:3567:        paned = Gtk.Paned (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:3578:        hbox = Gtk.Box (orientation = Gtk.Orientation.HORIZONTAL)
+tools/performance-log-viewer.py:3582:        sidebar = Gtk.StackSidebar ()
+tools/performance-log-viewer.py:3586:        stack = Gtk.Stack (transition_type = Gtk.StackTransitionType.CROSSFADE)
+tools/performance-log-viewer.py:3606:        box = Gtk.Box (orientation = Gtk.Orientation.VERTICAL)
+tools/performance-log-viewer.py:3652:Gtk.Settings.get_default ().set_property ("gtk-application-prefer-dark-theme",
+tools/performance-log-viewer.py:3658:window.connect ("destroy", Gtk.main_quit)
+tools/performance-log-viewer.py:3662:Gtk.main ()
+libgimpwidgets/gimpgtk4-migration-probes.c:14:static void gimp_gtk4_migration_probes (void) G_GNUC_UNUSED;
+libgimpwidgets/gimpgtk4-migration-probes.c:17:gimp_gtk4_migration_probes (void)
+libgimpwidgets/gimpcairo-utils.c:208: * @widget: (nullable): [class@Gtk.Widget] to draw the focus indicator on.
+tools/gimptool.c:424:  return pkg_config ("--cflags gimp-" GIMP_PKGCONFIG_VERSION " gtk+-3.0");
+tools/gimptool.c:469:  return pkg_config ("--libs gimp-" GIMP_PKGCONFIG_VERSION " gtk+-3.0");
+libgimpwidgets/gimppickbutton-xdg.c:96:       * Cf. https://github.com/flatpak/xdg-desktop-portal/blob/master/data/org.freedesktop.portal.Request.xml

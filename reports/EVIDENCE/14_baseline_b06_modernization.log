@@ -1,0 +1,28 @@
+# CMD: sh tools/ci/b06-path-editor-modernization.sh
+# DATE: 2026-02-15T17:45:23-03:00
+B06 path editor modernization checklist
+
+PASS  Uses GtkListBox widget
+PASS  Selection handled by GtkListBox
+PASS  Supports explicit unselect flow
+PASS  Uses compat box-pack wrapper
+PASS  Uses compat container-add wrapper
+PASS  No GtkTreeView type in pilot file
+PASS  No gtk_tree_view_ API in pilot file
+PASS  No GtkTreeSelection type in pilot file
+PASS  No gtk_tree_selection_ API in pilot file
+PASS  No direct gtk_box_pack_start API in pilot file
+PASS  No direct gtk_container_add API in pilot file
+PASS  Has roundtrip test
+PASS  Has reorder test
+PASS  Has add/delete test
+PASS  Has writable toggle test
+PASS  Meson builds test-path-editor
+PASS  Meson registers path-editor test
+PASS  Meson builds gimpwidgets-compat source
+
+PASS: B06 pilot modernization check passed.
+TIME_ELAPSED=0.04
+MAX_RSS_KB=4160
+CPU_PCT=100%
+EXIT_CODE=0

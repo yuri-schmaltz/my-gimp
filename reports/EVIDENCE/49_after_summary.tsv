@@ -1,0 +1,6 @@
+name|exit|elapsed_s|max_rss_kb|cpu
+40_after_build_libgimpwidgets|0|0.78|91200|221%
+41_after_gtk4_readiness|0|0.18|6400|630%
+42_after_gtk4_complete|1|0.35|6720|635%
+43_after_e2e_core|0|0.03|4160|96%
+44_after_ui_visual_smoke|0|3.06|57208|110%

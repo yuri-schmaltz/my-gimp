@@ -1,0 +1,90 @@
+diff --git a/libgimpwidgets/gimphintbox.c b/libgimpwidgets/gimphintbox.c
+index b1a46903ad..89ad09cca8 100644
+--- a/libgimpwidgets/gimphintbox.c
++++ b/libgimpwidgets/gimphintbox.c
+@@ -27,6 +27,7 @@
+ #include "libgimpbase/gimpbase.h"
+ 
+ #include "gimpwidgets.h"
++#include "gimpwidgets-compat.h"
+ 
+ 
+ /**
+@@ -124,7 +125,7 @@ gimp_hint_box_constructed (GObject *object)
+ 
+   if (image)
+     {
+-      gtk_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 0);
++      gimp_widgets_compat_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 0);
+       gtk_widget_set_visible (image, TRUE);
+     }
+ 
+@@ -139,7 +140,7 @@ gimp_hint_box_constructed (GObject *object)
+   gimp_label_set_attributes (GTK_LABEL (label),
+                              PANGO_ATTR_STYLE, PANGO_STYLE_ITALIC,
+                              -1);
+-  gtk_box_pack_start (GTK_BOX (box), label, FALSE, FALSE, 0);
++  gimp_widgets_compat_box_pack_start (GTK_BOX (box), label, FALSE, FALSE, 0);
+   gtk_widget_set_visible (label, TRUE);
+ }
+ 
+diff --git a/libgimpwidgets/gimpintradioframe.c b/libgimpwidgets/gimpintradioframe.c
+index d44f3ba3bf..f3b25cfac7 100644
+--- a/libgimpwidgets/gimpintradioframe.c
++++ b/libgimpwidgets/gimpintradioframe.c
+@@ -31,6 +31,7 @@
+ 
+ #include "gimpintradioframe.h"
+ #include "gimpintstore.h"
++#include "gimpwidgets-compat.h"
+ 
+ 
+ /**
+@@ -145,7 +146,7 @@ static void
+ gimp_int_radio_frame_init (GimpIntRadioFrame *radio_frame)
+ {
+   radio_frame->box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+-  gtk_container_add (GTK_CONTAINER (radio_frame), radio_frame->box);
++  gimp_widgets_compat_container_add (GTK_WIDGET (radio_frame), radio_frame->box);
+   gtk_widget_show (GTK_WIDGET (radio_frame->box));
+ }
+ 
+@@ -674,7 +675,7 @@ gimp_int_radio_frame_fill (GimpIntRadioFrame *frame)
+                               -1);
+ 
+           button = gtk_radio_button_new_with_mnemonic (group, label);
+-          gtk_box_pack_start (GTK_BOX (frame->box), button, FALSE, FALSE, 0);
++          gimp_widgets_compat_box_pack_start (GTK_BOX (frame->box), button, FALSE, FALSE, 0);
+           gtk_widget_show (button);
+ 
+           g_free (label);
+diff --git a/libgimpwidgets/gimpmemsizeentry.c b/libgimpwidgets/gimpmemsizeentry.c
+index d86360ef3a..9753e75fed 100644
+--- a/libgimpwidgets/gimpmemsizeentry.c
++++ b/libgimpwidgets/gimpmemsizeentry.c
+@@ -28,6 +28,7 @@
+ 
+ #include "gimpmemsizeentry.h"
+ #include "gimpwidgets.h"
++#include "gimpwidgets-compat.h"
+ 
+ #include "libgimp/libgimp-intl.h"
+ 
+@@ -232,7 +233,7 @@ gimp_memsize_entry_new (guint64  value,
+ #undef CAST
+ 
+   gtk_entry_set_width_chars (GTK_ENTRY (entry->spinbutton), 7);
+-  gtk_box_pack_start (GTK_BOX (entry), entry->spinbutton, FALSE, FALSE, 0);
++  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->spinbutton, FALSE, FALSE, 0);
+   gtk_widget_show (entry->spinbutton);
+ 
+   g_signal_connect (entry->adjustment, "value-changed",
+@@ -250,7 +251,7 @@ gimp_memsize_entry_new (guint64  value,
+                     G_CALLBACK (gimp_memsize_entry_unit_callback),
+                     entry);
+ 
+-  gtk_box_pack_start (GTK_BOX (entry), entry->menu, FALSE, FALSE, 0);
++  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->menu, FALSE, FALSE, 0);
+   gtk_widget_show (entry->menu);
+ 
+   return GTK_WIDGET (entry);

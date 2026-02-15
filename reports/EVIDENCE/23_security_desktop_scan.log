@@ -1,0 +1,423 @@
+# potential secret patterns
+libgimpwidgets/gimpeevl.c:513:        *consumed_token = eva->current_token;
+libgimpwidgets/gimpeevl.c:529:  eva->start_of_current_token = s;
+plug-ins/ifs-compose/ifs-compose-storage.c:98:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:102:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:103:  if (token == G_TOKEN_FLOAT)
+plug-ins/ifs-compose/ifs-compose-storage.c:105:  else if (token == G_TOKEN_INT)
+plug-ins/ifs-compose/ifs-compose-storage.c:110:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:114:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:115:  if (token == G_TOKEN_FLOAT)
+plug-ins/ifs-compose/ifs-compose-storage.c:117:  else if (token == G_TOKEN_INT)
+plug-ins/ifs-compose/ifs-compose-storage.c:122:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:126:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:127:  if (token == G_TOKEN_FLOAT)
+plug-ins/ifs-compose/ifs-compose-storage.c:129:  else if (token == G_TOKEN_INT)
+plug-ins/ifs-compose/ifs-compose-storage.c:134:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:152:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:154:  if (token == '-')
+plug-ins/ifs-compose/ifs-compose-storage.c:157:      token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:160:  if (token == G_TOKEN_FLOAT)
+plug-ins/ifs-compose/ifs-compose-storage.c:165:  else if (token == G_TOKEN_INT)
+plug-ins/ifs-compose/ifs-compose-storage.c:181:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:185:  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:191:	  expected_token = parse_genuine_float (scanner, &result->x);
+plug-ins/ifs-compose/ifs-compose-storage.c:197:	  expected_token = parse_genuine_float (scanner, &result->y);
+plug-ins/ifs-compose/ifs-compose-storage.c:203:	  expected_token = parse_genuine_float (scanner, &result->theta);
+plug-ins/ifs-compose/ifs-compose-storage.c:209:	  expected_token = parse_genuine_float (scanner, &result->scale);
+plug-ins/ifs-compose/ifs-compose-storage.c:215:	  expected_token = parse_genuine_float (scanner, &result->asym);
+plug-ins/ifs-compose/ifs-compose-storage.c:221:	  expected_token = parse_genuine_float (scanner, &result->shear);
+plug-ins/ifs-compose/ifs-compose-storage.c:227:	  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:235:	  token = ifsvals_parse_color (scanner, result->red_color);
+plug-ins/ifs-compose/ifs-compose-storage.c:241:	  token = ifsvals_parse_color (scanner, result->green_color);
+plug-ins/ifs-compose/ifs-compose-storage.c:247:	  token = ifsvals_parse_color (scanner, result->blue_color);
+plug-ins/ifs-compose/ifs-compose-storage.c:253:	  token = ifsvals_parse_color (scanner, result->black_color);
+plug-ins/ifs-compose/ifs-compose-storage.c:259:	  token = ifsvals_parse_color (scanner, result->target_color);
+plug-ins/ifs-compose/ifs-compose-storage.c:265:	  expected_token = parse_genuine_float (scanner, &result->hue_scale);
+plug-ins/ifs-compose/ifs-compose-storage.c:271:	  expected_token = parse_genuine_float (scanner, &result->value_scale);
+plug-ins/ifs-compose/ifs-compose-storage.c:277:	  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:285:	  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:286:	  if (token == G_TOKEN_FLOAT)
+plug-ins/ifs-compose/ifs-compose-storage.c:288:          else if (token == G_TOKEN_INT)
+plug-ins/ifs-compose/ifs-compose-storage.c:299:      token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:337:  expected_token = G_TOKEN_NONE;
+plug-ins/ifs-compose/ifs-compose-storage.c:338:  while (expected_token == G_TOKEN_NONE)
+plug-ins/ifs-compose/ifs-compose-storage.c:340:      token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:348:	  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:349:	  if (token == G_TOKEN_INT)
+plug-ins/ifs-compose/ifs-compose-storage.c:352:	    expected_token = G_TOKEN_INT;
+plug-ins/ifs-compose/ifs-compose-storage.c:356:	  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:357:	  if (token == G_TOKEN_INT)
+plug-ins/ifs-compose/ifs-compose-storage.c:360:	    expected_token = G_TOKEN_INT;
+plug-ins/ifs-compose/ifs-compose-storage.c:364:	  token = g_scanner_get_next_token (scanner);
+plug-ins/ifs-compose/ifs-compose-storage.c:365:	  if (token == G_TOKEN_INT)
+plug-ins/ifs-compose/ifs-compose-storage.c:368:	    expected_token = G_TOKEN_INT;
+plug-ins/ifs-compose/ifs-compose-storage.c:372:	  expected_token = parse_genuine_float (scanner, &new_vals.radius);
+plug-ins/ifs-compose/ifs-compose-storage.c:376:	  expected_token = parse_genuine_float (scanner, &new_vals.aspect_ratio);
+plug-ins/ifs-compose/ifs-compose-storage.c:380:	  expected_token = parse_genuine_float (scanner, &new_vals.center_x);
+plug-ins/ifs-compose/ifs-compose-storage.c:384:	  expected_token = parse_genuine_float (scanner, &new_vals.center_y);
+plug-ins/ifs-compose/ifs-compose-storage.c:389:	  expected_token = ifsvals_parse_element (scanner, &el->v);
+plug-ins/ifs-compose/ifs-compose-storage.c:391:	  if (expected_token == G_TOKEN_NONE)
+plug-ins/ifs-compose/ifs-compose-storage.c:402:	  expected_token = G_TOKEN_SYMBOL;
+plug-ins/ifs-compose/ifs-compose-storage.c:447:  scanner->config->symbol_2_token = TRUE;
+libgimpwidgets/gimpcolorprofilestore.c:727:  token = G_TOKEN_LEFT_PAREN;
+libgimpwidgets/gimpcolorprofilestore.c:731:      token = g_scanner_get_next_token (scanner);
+libgimpwidgets/gimpcolorprofilestore.c:736:          token = G_TOKEN_SYMBOL;
+libgimpwidgets/gimpcolorprofilestore.c:740:          token = gimp_color_profile_store_load_profile (store, scanner, i++);
+libgimpwidgets/gimpcolorprofilestore.c:744:          token = G_TOKEN_LEFT_PAREN;
+app/dialogs/action-search-dialog.c:225:          for (key_token = key_tokens[0], label_tokens = search_tokens[i];
+app/dialogs/action-search-dialog.c:227:               key_token = g_utf8_find_next_char (key_token, NULL), label_tokens++)
+plug-ins/imagemap/imap_cern_parse.c:1267:  yytoken = 0;
+plug-ins/imagemap/imap_cern_parse.c:1390:      yychar = yytoken = YYEOF;
+plug-ins/imagemap/imap_cern_parse.c:1395:      yytoken = YYTRANSLATE (yychar);
+plug-ins/imagemap/imap_cern_parse.c:1611:  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
+plug-ins/imagemap/imap_cern_parse.c:1770:      yytoken = YYTRANSLATE (yychar);
+plug-ins/imagemap/imap_ncsa_parse.c:1265:  yytoken = 0;
+plug-ins/imagemap/imap_ncsa_parse.c:1388:      yychar = yytoken = YYEOF;
+plug-ins/imagemap/imap_ncsa_parse.c:1393:      yytoken = YYTRANSLATE (yychar);
+plug-ins/imagemap/imap_ncsa_parse.c:1619:  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
+plug-ins/imagemap/imap_ncsa_parse.c:1778:      yytoken = YYTRANSLATE (yychar);
+app/propgui/gimppropgui-eval.c:986:  token = *expr;
+app/propgui/gimppropgui-eval.c:988:  if (*token == '\0')
+app/propgui/gimppropgui-eval.c:1036:  return token && (g_ascii_isalpha (*token) || *token == '_');
+plug-ins/imagemap/imap_main.c:943:   next_token = description;
+plug-ins/flame/libifs.c:962:      itoken = i;
+plug-ins/imagemap/imap_csim_parse.c:1369:  yytoken = 0;
+plug-ins/imagemap/imap_csim_parse.c:1492:      yychar = yytoken = YYEOF;
+plug-ins/imagemap/imap_csim_parse.c:1497:      yytoken = YYTRANSLATE (yychar);
+plug-ins/imagemap/imap_csim_parse.c:1904:  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
+plug-ins/imagemap/imap_csim_parse.c:2063:      yytoken = YYTRANSLATE (yychar);
+app/config/gimprc-unknown.c:86:      token = (GimpConfigToken *) list->data;
+app/config/gimprc-unknown.c:114:  token = g_slice_new (GimpConfigToken);
+app/config/gimprc-unknown.c:159:      GimpConfigToken *token = list->data;
+app/config/gimprc-unknown.c:193:      GimpConfigToken *token = list->data;
+app/config/gimprc-unknown.c:206:      GimpConfigToken *token = list->data;
+app/config/gimprc-deserialize.c:84:  token = G_TOKEN_LEFT_PAREN;
+app/config/gimprc-deserialize.c:90:      if (G_UNLIKELY (next != token && ! (token == G_TOKEN_SYMBOL &&
+app/config/gimprc-deserialize.c:96:      token = g_scanner_get_next_token (scanner);
+app/config/gimprc-deserialize.c:101:          token = G_TOKEN_SYMBOL;
+app/config/gimprc-deserialize.c:105:          token = gimp_rc_deserialize_unknown (config, scanner);
+app/config/gimprc-deserialize.c:109:          token = gimp_config_deserialize_property (config,
+app/config/gimprc-deserialize.c:114:          token = G_TOKEN_LEFT_PAREN;
+app/config/gimprc-deserialize.c:126:  if (token == G_TOKEN_NONE)
+app/config/gimprc-deserialize.c:133:  if (token == G_TOKEN_STRING && next == G_TOKEN_IDENTIFIER)
+plug-ins/imagemap/imap_preferences.c:79:   char *token = strtok(NULL, " )");
+plug-ins/imagemap/imap_preferences.c:90:   char *token = strtok(NULL, " )");
+plug-ins/imagemap/imap_preferences.c:97:   char *token = strtok(NULL, " )");
+plug-ins/imagemap/imap_preferences.c:124:   token = strtok(line, " ");
+app/pdb/gimprc-cmds.c:62:  token = g_value_get_string (gimp_value_array_index (args, 0));
+app/pdb/gimprc-cmds.c:99:  token = g_value_get_string (gimp_value_array_index (args, 0));
+app/tools/gimp-tools.c:464:  token = G_TOKEN_LEFT_PAREN;
+app/tools/gimp-tools.c:470:      token = g_scanner_get_next_token (scanner);
+app/tools/gimp-tools.c:475:          token = G_TOKEN_SYMBOL;
+app/tools/gimp-tools.c:482:              token = G_TOKEN_INT;
+app/tools/gimp-tools.c:484:                token = G_TOKEN_RIGHT_PAREN;
+app/tools/gimp-tools.c:490:          token = G_TOKEN_LEFT_PAREN;
+app/text/gimpfont.c:370:      token = g_scanner_get_next_token (scanner);
+app/text/gimpfont.c:380:          if (token == G_TOKEN_IDENTIFIER)
+app/text/gimpfont.c:385:          while ((token = g_scanner_get_next_token (scanner)) != G_TOKEN_EOF)
+app/text/gimpfont.c:387:              if (token == G_TOKEN_RIGHT_PAREN)
+app/plug-in/plug-in-rc.c:187:  token = G_TOKEN_LEFT_PAREN;
+app/plug-in/plug-in-rc.c:193:      token = g_scanner_get_next_token (scanner);
+app/plug-in/plug-in-rc.c:198:          token = G_TOKEN_SYMBOL;
+app/plug-in/plug-in-rc.c:205:              token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:207:                token = G_TOKEN_RIGHT_PAREN;
+app/plug-in/plug-in-rc.c:211:              token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:213:                token = G_TOKEN_RIGHT_PAREN;
+app/plug-in/plug-in-rc.c:218:              token = plug_in_def_deserialize (gimp, scanner, &plug_in_defs);
+app/plug-in/plug-in-rc.c:227:          token = G_TOKEN_LEFT_PAREN;
+app/plug-in/plug-in-rc.c:316:  token = G_TOKEN_LEFT_PAREN;
+app/plug-in/plug-in-rc.c:320:      token = g_scanner_get_next_token (scanner);
+app/plug-in/plug-in-rc.c:325:          token = G_TOKEN_SYMBOL;
+app/plug-in/plug-in-rc.c:332:              token = plug_in_procedure_deserialize (scanner, gimp,
+app/plug-in/plug-in-rc.c:336:              if (token == G_TOKEN_LEFT_PAREN)
+app/plug-in/plug-in-rc.c:344:              token = plug_in_help_def_deserialize (scanner, plug_in_def);
+app/plug-in/plug-in-rc.c:348:              token = plug_in_has_init_deserialize (scanner, plug_in_def);
+app/plug-in/plug-in-rc.c:357:          token = G_TOKEN_LEFT_PAREN;
+app/plug-in/plug-in-rc.c:365:  if (token == G_TOKEN_LEFT_PAREN)
+app/plug-in/plug-in-rc.c:367:      token = G_TOKEN_RIGHT_PAREN;
+app/plug-in/plug-in-rc.c:445:      token = plug_in_menu_path_deserialize (scanner, *proc);
+app/plug-in/plug-in-rc.c:450:  token = plug_in_icon_deserialize (scanner, *proc);
+app/plug-in/plug-in-rc.c:454:  token = plug_in_file_or_batch_proc_deserialize (scanner, *proc);
+app/plug-in/plug-in-rc.c:476:      token = plug_in_proc_arg_deserialize (scanner, gimp, procedure, FALSE);
+app/plug-in/plug-in-rc.c:483:      token = plug_in_proc_arg_deserialize (scanner, gimp, procedure, TRUE);
+app/plug-in/plug-in-rc.c:648:          token = g_scanner_get_next_token (scanner);
+app/plug-in/plug-in-rc.c:785:      token = G_TOKEN_LEFT_PAREN;
+app/plug-in/plug-in-rc.c:792:      token = G_TOKEN_SYMBOL;
+app/plug-in/plug-in-rc.c:798:      token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:809:      token = G_TOKEN_STRING;
+app/plug-in/plug-in-rc.c:826:          token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:839:          token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:848:          token = G_TOKEN_STRING;
+app/plug-in/plug-in-rc.c:862:              token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:878:                  token = G_TOKEN_STRING;
+app/plug-in/plug-in-rc.c:883:                  token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:889:                  token = G_TOKEN_STRING;
+app/plug-in/plug-in-rc.c:907:          token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:920:          token = G_TOKEN_FLOAT;
+app/plug-in/plug-in-rc.c:929:          token = G_TOKEN_STRING;
+app/plug-in/plug-in-rc.c:946:              token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:954:                  token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:969:              token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:976:              token = G_TOKEN_STRING;
+app/plug-in/plug-in-rc.c:1005:          token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:1014:          token = G_TOKEN_STRING;
+app/plug-in/plug-in-rc.c:1030:          token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:1041:          token = G_TOKEN_INT;
+app/plug-in/plug-in-rc.c:1047:          token = G_TOKEN_STRING;
+app/plug-in/plug-in-rc.c:1055:      token = G_TOKEN_RIGHT_PAREN;
+app/plug-in/plug-in-rc.c:1059:  token = G_TOKEN_LEFT_PAREN;
+plug-ins/python/gradients-save-as-css.py:51:            token = "\n    " + token
+app/plug-in/gimppluginprocedure.c:1124:      next_token = extensions;
+app/menus/shortcuts-rc.c:83:  token = G_TOKEN_LEFT_PAREN;
+app/menus/shortcuts-rc.c:86:         (token == G_TOKEN_SYMBOL &&
+app/menus/shortcuts-rc.c:89:      token = g_scanner_get_next_token (scanner);
+app/menus/shortcuts-rc.c:94:          token = G_TOKEN_SYMBOL;
+app/menus/shortcuts-rc.c:101:              token = G_TOKEN_INT;
+app/menus/shortcuts-rc.c:103:                token = G_TOKEN_RIGHT_PAREN;
+app/menus/shortcuts-rc.c:108:              token = shortcuts_action_deserialize (scanner, application);
+app/menus/shortcuts-rc.c:118:          while ((token = g_scanner_get_next_token (scanner)) != G_TOKEN_EOF)
+app/menus/shortcuts-rc.c:120:              if (token == G_TOKEN_RIGHT_PAREN)
+app/menus/shortcuts-rc.c:123:          token = G_TOKEN_LEFT_PAREN;
+app/menus/shortcuts-rc.c:127:          token = G_TOKEN_LEFT_PAREN;
+app/gui/session.c:117:  token = G_TOKEN_LEFT_PAREN;
+app/gui/session.c:121:      token = g_scanner_get_next_token (scanner);
+app/gui/session.c:126:          token = G_TOKEN_SYMBOL;
+app/gui/session.c:138:              token = G_TOKEN_STRING;
+app/gui/session.c:222:                  token = G_TOKEN_LEFT_PAREN;
+app/gui/session.c:230:              token = G_TOKEN_IDENTIFIER;
+app/gui/session.c:243:              token = G_TOKEN_IDENTIFIER;
+app/gui/session.c:256:            token = G_TOKEN_IDENTIFIER;
+app/gui/session.c:269:              token = G_TOKEN_INT;
+app/gui/session.c:282:              token = G_TOKEN_INT;
+app/gui/session.c:291:          token = G_TOKEN_RIGHT_PAREN;
+app/gui/session.c:295:          token = G_TOKEN_LEFT_PAREN;
+app/core/gimppadactions.c:191:  token = G_TOKEN_LEFT_PAREN;
+app/core/gimppadactions.c:200:      token = g_scanner_get_next_token (scanner);
+app/core/gimppadactions.c:205:          token = G_TOKEN_SYMBOL;
+app/core/gimppadactions.c:226:          token = G_TOKEN_RIGHT_PAREN;
+app/core/gimppadactions.c:230:          token = G_TOKEN_LEFT_PAREN;
+app/core/gimpextensionmanager.c:266:  token = G_TOKEN_LEFT_PAREN;
+app/core/gimpextensionmanager.c:270:      token = g_scanner_get_next_token (scanner);
+
+# network/listen indicators
+.gitlab-ci.yml:85:  # Default Docker image (keep variables: DEB_VERSION: consistent with devel-docs/os-support.txt)
+.gitlab-ci.yml:94:    # Enable colorful output when supported (e.g. ninja, cppcheck)
+.gitlab-ci.yml:132:    - export GIMP_PREFIX="${CI_PROJECT_DIR}/_install-${RUNNER}"
+.gitlab-ci.yml:138:- gcc -print-multi-os-directory 2>/dev/null | grep -q ./ && export LIB_DIR=$(gcc -print-multi-os-directory | sed 's/\.\.\///g') || export LIB_DIR="lib"
+.gitlab-ci.yml:139:- gcc -print-multiarch 2>/dev/null | grep -q . && export LIB_SUBDIR=$(echo $(gcc -print-multiarch)'/') || export LIB_SUBDIR=
+.gitlab-ci.yml:141:- export PKG_CONFIG_PATH="${GIMP_PREFIX}/${LIB_DIR}/${LIB_SUBDIR}pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+.gitlab-ci.yml:142:- export XDG_DATA_DIRS="${GIMP_PREFIX}/share:/usr/share${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+.gitlab-ci.yml:144:- export PATH="${GIMP_PREFIX}/bin:$PATH"
+.gitlab-ci.yml:145:- export LD_LIBRARY_PATH="${GIMP_PREFIX}/${LIB_DIR}/${LIB_SUBDIR}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+.gitlab-ci.yml:146:- export GI_TYPELIB_PATH="${GIMP_PREFIX}/${LIB_DIR}/${LIB_SUBDIR}girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
+.gitlab-ci.yml:156:    - export BUILDAH_FORMAT=docker
+.gitlab-ci.yml:157:    - export STORAGE_DRIVER=vfs
+.gitlab-ci.yml:316:    reports:
+.gitlab-ci.yml:406:    - export GIMP_PREFIX="${CI_PROJECT_DIR}/_install"
+.gitlab-ci.yml:464:    - export BUILDAH_FORMAT=docker
+.gitlab-ci.yml:465:    - export STORAGE_DRIVER=vfs
+.gitlab-ci.yml:569:    - if ("$VARIANT" -eq '-msvc') { $VSINSTALLDIR = $(vswhere -products * -latest -property installationPath); Import-Module "$VSINSTALLDIR\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"; Enter-VsDevShell -VsInstallPath "$VSINSTALLDIR" -SkipAutomaticLocation -DevCmdArguments "-arch=$(((Get-WmiObject Win32_ComputerSystem).SystemType).Split('-')[0].Trim().ToLower())" }
+.gitlab-ci.yml:570:  #30min is enough only on msys2 or if no vcpkg port was updated/rebuilt, we need more time in case of port bumps
+.gitlab-ci.yml:658:        OPT_PREFIX: /opt/macports
+.gitlab-ci.yml:662:        OPT_PREFIX: /opt/macports
+.gitlab-ci.yml:673:    - export GIMP_PREFIX="$PWD/_install-$(uname -m)"
+.gitlab-ci.yml:674:    - export PATH="$OPT_PREFIX/bin:$PATH"
+.gitlab-ci.yml:680:- export PKG_CONFIG_PATH="${GIMP_PREFIX}/lib/pkgconfig:${OPT_PREFIX}/lib/pkgconfig:${OPT_PREFIX}/opt/libarchive/lib/pkgconfig"
+.gitlab-ci.yml:681:- export XDG_DATA_DIRS="${GIMP_PREFIX}/share:${OPT_PREFIX}/share"
+.gitlab-ci.yml:683:- export PATH="${GIMP_PREFIX}/bin:${OPT_PREFIX}/bin:$PATH"
+.gitlab-ci.yml:684:- export GI_TYPELIB_PATH="${GIMP_PREFIX}/lib/girepository-1.0:${OPT_PREFIX}/lib/girepository-1.0"
+.gitlab-ci.yml:694:        - macports-cached
+.gitlab-ci.yml:698:    - zsh build/macos/1_build-deps-macports.sh --part1
+.gitlab-ci.yml:701:      - macports
+.gitlab-ci.yml:711:    - zsh build/macos/1_build-deps-macports.sh --part2
+.gitlab-ci.yml:714:      - macports
+.gitlab-ci.yml:727:        - macports-cached
+.gitlab-ci.yml:731:    - zsh build/macos/1_build-deps-macports.sh
+.gitlab-ci.yml:734:      - macports
+.gitlab-ci.yml:749:    - zsh build/macos/2_build-gimp-macports.sh
+.gitlab-ci.yml:778:    GIMP_TESTS_LOG_FILE: "$CI_PROJECT_DIR/_log/import-tests.log"
+.gitlab-ci.yml:785:    - export PYTHONPATH="${PLUG_IN_DIR}test-file-plug-ins"
+.gitlab-ci.yml:786:    - export GIMP_TESTS_CONFIG_FILE="${PLUG_IN_DIR}test-file-plug-ins/tests/batch-config.ini"
+.gitlab-ci.yml:791:    - cat ${PLUG_IN_DIR}test-file-plug-ins/batch-import-tests.py | gimp-console-${APP_VER} -idf --batch-interpreter python-fu-eval -b - --quit
+.gitlab-ci.yml:793:        printf "There are file import regressions. Check the log at ${GIMP_TESTS_LOG_FILE}!\n";
+.gitlab-ci.yml:796:    # FIXME No export testing for now until it's more developed. A limited test
+.gitlab-ci.yml:797:    #       can be done from the plug-in for bmp export.
+.gitlab-ci.yml:801:    reports:
+.gitlab-ci.yml:802:      junit: "_log/import-tests.xml"
+.gitlab-ci.yml:929:      - _log/ui-visual/report/
+.gitlab-ci.yml:988:    ICC_REPORT_DIR: "_log/color-icc/report"
+.gitlab-ci.yml:1052:    - mkdir report
+.gitlab-ci.yml:1053:    - cppcheck-htmlreport --source-dir=. --title=gimp --file=cppcheck.xml --report-dir=report
+.gitlab-ci.yml:1056:      - report/
+.gitlab-ci.yml:1097:    - export GIMP_PREFIX=$(echo $PWD/_install*)
+tools/mnemonic-clashes:15:from sys import argv
+tools/mnemonic-clashes:16:from itertools import chain
+tools/mnemonic-clashes:17:from glob import glob
+tools/mnemonic-clashes:18:from xml.etree.ElementTree import ElementTree
+tools/meson-mkenums.py:2:import sys
+tools/meson-mkenums.py:3:import os
+tools/meson-mkenums.py:4:import subprocess
+tools/meson-mkenums.py:5:import filecmp
+tools/meson-mkenums.py:6:import shutil
+tools/meson-mkenums.py:7:from datetime import datetime
+tools/performance-log-viewer.py:24:import builtins, sys, os, math, statistics, bisect, functools, enum, re, \
+tools/performance-log-viewer.py:27:from collections import namedtuple
+tools/performance-log-viewer.py:28:from xml.etree   import ElementTree
+tools/performance-log-viewer.py:30:import gi
+tools/performance-log-viewer.py:33:from gi.repository import GLib, GObject, Gio, Gdk, Gtk, Pango
+tools/gimptool.c:534:       * TODO We may want to further support compilation with a source file
+tools/performance-log-close-tags.py:24:from xml.etree import ElementTree
+tools/performance-log-close-tags.py:25:import sys
+tools/meson_install_win_debug.py:2:import os
+tools/meson_install_win_debug.py:3:import shutil
+tools/meson_install_win_debug.py:4:import re
+tools/meson_install_win_debug.py:5:import sys
+tools/meson_install_win_debug.py:6:import json
+tools/meson_install_subdir.py:3:import sys, os
+tools/meson_install_subdir.py:4:from pathlib import Path
+tools/meson_install_subdir.py:5:import argparse
+tools/meson_install_subdir.py:7:import json
+tools/meson_install_subdir.py:9:import shutil
+tools/performance-log-expand.py:24:from xml.etree import ElementTree
+tools/performance-log-expand.py:25:import sys
+tools/check-gimp-data.py:2:import os
+tools/check-gimp-data.py:3:import subprocess
+tools/check-gimp-data.py:4:from pathlib import Path
+plug-ins/file-psd/psd-load.h:29:                         PSDSupport   *unsupported_features,
+plug-ins/file-psd/psd-load.h:38:                         PSDSupport   *unsupported_features,
+plug-ins/file-psd/psd-load.h:42:                         PSDSupport   *unsupported_features);
+plug-ins/gfig/notes.txt:6:Most importantly: this version of Gfig has been massively revised.  It
+tools/performance-log-resolve.py:24:from xml.etree import ElementTree
+tools/performance-log-resolve.py:25:import sys
+tools/release-stats.sh:255:echo "* $closed_issues reports were closed as FIXED."
+tools/release-stats.sh:265:# I think this is not very portable, and may be a bash-specific syntax
+tools/release-stats.sh:325:echo "* Our UX tracker had $ux_closed_issues reports closed as FIXED."
+tools/release-stats.sh:355:echo "Let's not forget to thank all the people who help us triaging in Gitlab, report"
+plug-ins/file-psd/psd-util.c:813:          g_message ("Unsupported blend mode: %s. Mode reverts to normal",
+plug-ins/file-psd/psd-util.c:857:        g_message ("Unsupported blend color space: %s. "
+plug-ins/file-psd/psd-util.c:867:        g_message ("Unsupported composite color space: %s. "
+plug-ins/file-psd/psd-util.c:878:        g_message ("Unsupported composite mode: %s. "
+plug-ins/file-psd/psd-util.c:901:    g_message ("Unsupported blend mode: %s. Mode reverts to normal",
+plug-ins/file-psd/psd-util.c:944:        g_message ("Unsupported Photoshop layer color tag: %i. GIMP layer color tag set to none.",
+plug-ins/file-psd/psd-util.c:989:        g_message ("Photoshop doesn't support GIMP layer color tag: %i. Photoshop layer color tag set to none.",
+tools/gimppath2svg.py:3:import sys,re
+app/tests/test-xcf.c:345:             FALSE /*export_backward*/,
+app/tests/test-xcf.c:346:             FALSE /*export_forward*/,
+plug-ins/file-psd/TODO.txt:3:Photoshop 2.0 and lower files are not supported due to lack of
+plug-ins/file-psd/TODO.txt:23:add layer support for:
+tools/defcheck.py:32:import sys, subprocess
+tools/defcheck.py:34:from os import path
+tools/defcheck.py:110:         print("  but are not exported by the library.")
+tools/cp-plug-in-subfolder.py:12:import os
+tools/cp-plug-in-subfolder.py:13:import shutil
+tools/cp-plug-in-subfolder.py:14:import stat
+tools/cp-plug-in-subfolder.py:15:import sys
+libgimp/gimpfileprocedure.c:30: * File procedures implement file support. They cannot be created directly.
+libgimp/gimpfileprocedure.c:31: * Instead, you will create an instance of one of the subclasses (such as export
+libgimp/gimpfileprocedure.c:120: * %GimpExportProcedureDialog title looking like "Export Image as %s".
+libgimp/gimpfileprocedure.c:277: * Some [class@Gimp.LoadProcedure] or [class@Gimp.ExportProcedure] may
+libgimp/gimpfileprocedure.c:279: * supporting container formats which will call another procedure for
+libgimp/gimpfileprocedure.c:286: * even on less common combinations. For instance, I could export an
+tools/performance-log-progressive-coalesce.py:25:from xml.etree import ElementTree
+tools/performance-log-progressive-coalesce.py:26:import sys
+tools/lib_bundle.py:22:import argparse
+tools/lib_bundle.py:23:import os
+tools/lib_bundle.py:24:import subprocess
+tools/lib_bundle.py:25:import re
+tools/lib_bundle.py:26:import shutil
+tools/lib_bundle.py:27:import sys
+tools/lib_bundle.py:28:import struct
+tools/lib_bundle.py:235:  supported_minos = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
+tools/lib_bundle.py:236:  if not supported_minos:
+tools/lib_bundle.py:243:  if tuple(map(int, bin_minos.split('.'))) > tuple(map(int, supported_minos.split('.'))):
+tools/lib_bundle.py:244:    sys.stderr.write(f"\033[31m(ERROR)\033[0m: {binary} requires macOS {bin_minos}, which is higher than macOS {supported_minos} which GIMP was built against.\n")
+libgimp/gimpprocedureconfig.h:59:                                                              GimpImage            *exported_image,
+plug-ins/file-psd/psd-load.c:158:static void             initialize_unsupported     (PSDSupport     *supported_features);
+plug-ins/file-psd/psd-load.c:166:            PSDSupport   *unsupported_features,
+plug-ins/file-psd/psd-load.c:179:  initialize_unsupported (unsupported_features);
+plug-ins/file-psd/psd-load.c:180:  img_a.unsupported_features = unsupported_features;
+plug-ins/file-psd/psd-load.c:333:                     PSDSupport   *unsupported_features,
+plug-ins/file-psd/psd-load.c:367:  initialize_unsupported (unsupported_features);
+plug-ins/file-psd/psd-load.c:368:  img_a.unsupported_features = unsupported_features;
+plug-ins/file-psd/psd-load.c:550:                  _("Unsupported file format version: %d"), img_a->version);
+plug-ins/file-psd/psd-load.c:564:                  _("Unsupported or invalid image height: %d"),
+plug-ins/file-psd/psd-load.c:572:                  _("Unsupported or invalid image width: %d"),
+plug-ins/file-psd/psd-load.c:581:                   _("Unsupported or invalid image size: %dx%d"),
+plug-ins/file-psd/psd-load.c:596:                   _("Unsupported color mode: %s"),
+plug-ins/file-psd/psd-load.c:606:                       _("Unsupported color mode: %s"),
+plug-ins/file-psd/psd-load.c:612:  /* Warning for unsupported bit depth */
+plug-ins/file-psd/psd-load.c:633:                    _("Unsupported bit depth: %d"), img_a->bps);
+plug-ins/file-psd/psd-load.c:964:                              _("Unsupported or invalid layer height: %d"),
+plug-ins/file-psd/psd-load.c:973:                              _("Unsupported or invalid layer width: %d"),
+plug-ins/file-psd/psd-load.c:983:                              _("Unsupported or invalid layer size: %dx%d"),
+plug-ins/file-psd/psd-load.c:1008:                           _("Unsupported or invalid mask info size."));
+plug-ins/file-psd/psd-load.c:1010:              g_debug ("Unsupported or invalid mask info size: %" G_GSIZE_FORMAT, block_len);
+plug-ins/file-psd/psd-load.c:1191:                                   _("Unsupported or invalid layer mask height: %d"),
+plug-ins/file-psd/psd-load.c:1200:                                   _("Unsupported or invalid layer mask width: %d"),
+plug-ins/file-psd/psd-load.c:1210:                                   _("Unsupported or invalid layer mask size: %dx%d"),
+plug-ins/file-psd/psd-load.c:1231:                            " (not imported)", block_len);
+plug-ins/file-psd/psd-load.c:1294:              lyr_a[lidx]->unsupported_features = img_a->unsupported_features;
+plug-ins/file-psd/psd-load.c:1635:        /* Precision not supported */
+plug-ins/file-psd/psd-load.c:1904:      lyr_a[lidx]->unsupported_features = img_a->unsupported_features;
+plug-ins/file-psd/psd-load.c:2245:                                 _("Unsupported compression mode: %d"), comp_mode);
+plug-ins/file-psd/psd-load.c:2530:               * invisible. since we only support raster layers atm, we can
+plug-ins/file-psd/psd-load.c:2833:                                                "Outer Glow (imported)",
+plug-ins/file-psd/psd-load.c:2863:                                     _("imported"));
+plug-ins/file-psd/psd-load.c:3134:                        _("Unsupported compression mode: %d"), comp_mode);
+plug-ins/file-psd/psd-load.c:3519:                   _("Unsupported or invalid channel size"));
+plug-ins/file-psd/psd-load.c:3927:initialize_unsupported (PSDSupport *unsupported_features)
+plug-ins/file-psd/psd-load.c:3929:  unsupported_features->show_gui         = FALSE;
+plug-ins/file-psd/psd-load.c:3930:  unsupported_features->duotone_mode     = FALSE;
+plug-ins/file-psd/psd-load.c:3932:  unsupported_features->adjustment_layer = FALSE;
+plug-ins/file-psd/psd-load.c:3933:  unsupported_features->fill_layer       = FALSE;
+plug-ins/file-psd/psd-load.c:3934:  unsupported_features->text_layer       = FALSE;
+plug-ins/file-psd/psd-load.c:3935:  unsupported_features->linked_layer     = FALSE;
+plug-ins/file-psd/psd-load.c:3936:  unsupported_features->vector_mask      = FALSE;
+plug-ins/file-psd/psd-load.c:3937:  unsupported_features->smart_object     = FALSE;
+plug-ins/file-psd/psd-load.c:3938:  unsupported_features->stroke           = FALSE;
+plug-ins/file-psd/psd-load.c:3939:  unsupported_features->layer_effect     = FALSE;
+plug-ins/file-psd/psd-load.c:3940:  unsupported_features->layer_comp       = FALSE;
+plug-ins/file-psd/psd-load.c:3941:  unsupported_features->psd_metadata     = FALSE;
+plug-ins/file-psd/psd-load.c:3946:             PSDSupport  *unsupported_features)
+plug-ins/file-psd/psd-load.c:3953:                            "import-psd",
+plug-ins/file-psd/psd-load.c:3966:  /* Duotone import notification */
+plug-ins/file-psd/psd-load.c:3967:  if (unsupported_features->duotone_mode)
+plug-ins/file-psd/psd-load.c:3971:      label_text = g_strdup_printf ("<b>%s</b>\n%s", _("Duotone Import"),
+plug-ins/file-psd/psd-load.c:3972:                                    _("Image will be imported as Grayscale.\n"
+plug-ins/file-psd/psd-load.c:3974:                                      "and can be reapplied on export."));
+plug-ins/file-psd/psd-load.c:3988:  if (unsupported_features->show_gui)
+plug-ins/file-psd/psd-load.c:3996:                                              "that\nare not yet fully supported "
+plug-ins/file-psd/psd-load.c:4015:      if (unsupported_features->adjustment_layer)
+plug-ins/file-psd/psd-load.c:4018:                                 "supported and will show up as empty layers.");
+plug-ins/file-psd/psd-load.c:4019:      if (unsupported_features->psd_metadata)
+plug-ins/file-psd/psd-load.c:4022:                                 "supported and will show up as empty layers.");
+plug-ins/file-psd/psd-load.c:4023:      if (unsupported_features->fill_layer)
+plug-ins/file-psd/psd-load.c:4026:                                 "supported and will be converted "
+plug-ins/file-psd/psd-load.c:4028:      if (unsupported_features->text_layer)
+plug-ins/file-psd/psd-load.c:4031:                                 "supported and will be converted "
+plug-ins/file-psd/psd-load.c:4033:      if (unsupported_features->linked_layer)
+plug-ins/file-psd/psd-load.c:4036:                                 "supported and will show up as empty layers.");
+plug-ins/file-psd/psd-load.c:4037:      if (unsupported_features->vector_mask)
+plug-ins/file-psd/psd-load.c:4040:                                 "supported and will be converted "
+plug-ins/file-psd/psd-load.c:4042:      if (unsupported_features->stroke)
+plug-ins/file-psd/psd-load.c:4045:                                 "supported and will show up as empty layers.");
+plug-ins/file-psd/psd-load.c:4046:      if (unsupported_features->layer_effect)
+plug-ins/file-psd/psd-load.c:4049:                                 "supported and will show up as empty layers.");
+plug-ins/file-psd/psd-load.c:4050:      if (unsupported_features->smart_object)
+plug-ins/file-psd/psd-load.c:4053:                                 "supported and will show up as empty layers.");
+plug-ins/file-psd/psd-load.c:4054:      if (unsupported_features->layer_comp)
+plug-ins/file-psd/psd-load.c:4058:                                 "supported and will show up as empty layers.");
+libgimpwidgets/gimpicons.h:101:#define GIMP_ICON_ASPECT_PORTRAIT           "gimp-portrait"
+tools/ci/gtk4-functional-regression-suite.sh:100:run_step_shc "color-icc-diff-strict" "ICC_MANIFEST=_log/color-icc-smoke/corpus.txt ICC_EXPECTED_DIR=_log/color-icc-smoke/expected ICC_ACTUAL_DIR=_log/color-icc-smoke/actual ICC_REPORT_DIR=_log/color-icc/report ICC_REQUIRE_ACTUAL=1 sh tools/ci/color-icc-diff.sh"
+libgimp/gimpdrawable_pdb.c:826: * (for export) with the specified drawable.
+libgimp/gimpdrawable_pdb.c:1038: * TRUE, then portions of the drawable which are offset out of bounds
+tools/compute-svg-viewbox.c:25:  RsvgRectangle  viewport = { 0.0, 0.0, 16.0, 16.0 };
+tools/compute-svg-viewbox.c:70:  rsvg_handle_get_geometry_for_layer (handle, id, &viewport, &out_ink_rect, &out_logical_rect, NULL);
+tools/performance-log-coalesce.py:25:from xml.etree import ElementTree
+tools/performance-log-coalesce.py:26:import sys
+tools/ci/b06-path-editor-modernization.sh:59:check_present "$file" "gtk_list_box_unselect_all" "Supports explicit unselect flow"
+tools/ci/b06-path-editor-junit.sh:39:  echo "FAIL: required B06 testcases missing from JUnit report."
+tools/ci/color-icc-diff-smoke.sh:8:report_dir="$work_root/report"
+tools/ci/color-icc-diff-smoke.sh:17:mkdir -p "$expected_dir" "$actual_dir" "$report_dir"
+tools/ci/color-icc-diff-smoke.sh:39:ICC_REPORT_DIR="$report_dir" \

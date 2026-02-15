@@ -1,0 +1,39 @@
+# submodules and git
+[submodule "_deps/babl"]
+	path = _deps/babl
+	url = https://gitlab.gnome.org/GNOME/babl.git
+[submodule "_deps/exiv2"]
+	path = _deps/exiv2
+	url = https://github.com/Exiv2/exiv2.git
+[submodule "_deps/gegl"]
+	path = _deps/gegl
+	url = https://gitlab.gnome.org/GNOME/gegl.git
+[submodule "_deps/gexiv2"]
+	path = _deps/gexiv2
+	url = https://gitlab.gnome.org/GNOME/gexiv2.git
+	ignore = untracked
+[submodule "_deps/json-c"]
+	path = _deps/json-c
+	url = https://github.com/json-c/json-c.git
+[submodule "_deps/libmypaint"]
+	path = _deps/libmypaint
+	url = https://github.com/mypaint/libmypaint.git
+	ignore = untracked
+[submodule "_deps/mypaint-brushes"]
+	path = _deps/mypaint-brushes
+	url = https://github.com/mypaint/mypaint-brushes.git
+	ignore = untracked
+[submodule "gimp-data"]
+	path = gimp-data
+	url = https://gitlab.gnome.org/GNOME/gimp-data.git
+	branch = main
+	shallow = true
+
+-70e9eb96473b9c7fd6ebf2b9a48dd83180dd1820 _deps/babl
+-04207b9c39bf7b3b1a7144f7ed4e4f16b4f29ef6 _deps/exiv2
+-900112fdf8a59cd71a60a1c794d9c015b43bdc6e _deps/gegl
+-3d03a4ae6bcd90b9b0cb6e41e81979d3a94cec67 _deps/gexiv2
+-8c01a7c32f254f18157c4b1f8a590eb195697aca _deps/json-c
+-2768251dacce3939136c839aeca413f4aa4241d0 _deps/libmypaint
+-08da4a48a4b63f2e0f3303942d7c21da8479ea9f _deps/mypaint-brushes
+ f95307f007abe76f84b5e073adec3e6680ab389b gimp-data (GIMP_3_0_0_RC3-59-gf95307f)

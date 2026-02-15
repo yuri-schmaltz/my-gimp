@@ -1,0 +1,43 @@
+# test and ci scripts
+total 92
+drwxrwxr-x 3 yurix yurix 4096 Feb 14 01:38 .
+drwxrwxr-x 3 yurix yurix 4096 Feb 13 11:11 ..
+-rwxrwxr-x 1 yurix yurix 3411 Feb 14 01:07 b04-file-dialog-backend-check.sh
+-rwxrwxr-x 1 yurix yurix 3433 Feb 14 01:08 b05-clipboard-compat-check.sh
+-rwxrwxr-x 1 yurix yurix 1397 Feb 14 01:33 b06-gtk4-listview-gate.sh
+-rwxrwxr-x 1 yurix yurix 1604 Feb 14 00:11 b06-path-editor-junit.sh
+-rwxrwxr-x 1 yurix yurix 3069 Feb 14 00:34 b06-path-editor-modernization.sh
+-rwxrwxr-x 1 yurix yurix 1641 Feb 13 10:06 color-icc-checklist.sh
+-rwxrwxr-x 1 yurix yurix 1284 Feb 14 01:12 color-icc-diff-smoke.sh
+-rwxrwxr-x 1 yurix yurix 4156 Feb 14 00:51 color-icc-diff.sh
+-rwxrwxr-x 1 yurix yurix 2161 Feb 13 10:01 e2e-core-checklist.sh
+drwxrwxr-x 3 yurix yurix 4096 Feb 14 00:51 fixtures
+-rwxrwxr-x 1 yurix yurix 4166 Feb 14 01:52 gtk4-complete-migration-check.sh
+-rwxrwxr-x 1 yurix yurix 3658 Feb 14 01:55 gtk4-functional-regression-suite.sh
+-rwxrwxr-x 1 yurix yurix 1613 Feb 13 09:50 gtk4-readiness.sh
+-rwxrwxr-x 1 yurix yurix 1383 Feb 13 10:07 gtk4-rollout-doc-check.sh
+-rwxrwxr-x 1 yurix yurix 2165 Feb 14 01:12 tablet-matrix-check.sh
+-rwxrwxr-x 1 yurix yurix 3019 Feb 14 01:14 ui-test-metrics.sh
+-rwxrwxr-x 1 yurix yurix 1960 Feb 13 10:06 ui-visual-baseline-check.sh
+-rwxrwxr-x 1 yurix yurix 1145 Feb 14 01:13 ui-visual-diff-smoke.sh
+-rwxrwxr-x 1 yurix yurix 3285 Feb 14 00:51 ui-visual-diff.sh
+tools/ci/b06-gtk4-listview-gate.sh
+tools/ci/gtk4-readiness.sh
+tools/ci/b06-path-editor-junit.sh
+tools/ci/ui-visual-baseline-check.sh
+tools/ci/b05-clipboard-compat-check.sh
+tools/ci/gtk4-rollout-doc-check.sh
+tools/ci/e2e-core-checklist.sh
+tools/ci/tablet-matrix-check.sh
+tools/ci/ui-visual-diff.sh
+tools/ci/ui-test-metrics.sh
+tools/ci/gtk4-functional-regression-suite.sh
+tools/ci/color-icc-checklist.sh
+tools/ci/b06-path-editor-modernization.sh
+tools/ci/color-icc-diff-smoke.sh
+tools/ci/b04-file-dialog-backend-check.sh
+tools/ci/color-icc-diff.sh
+tools/ci/ui-visual-diff-smoke.sh
+tools/ci/gtk4-complete-migration-check.sh
+tools/ci/fixtures/color-icc/README.md
+tools/ci/fixtures/color-icc/corpus.txt

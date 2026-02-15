@@ -1,0 +1,20 @@
+# key source lines
+.gitlab-ci.yml:820:gtk4-readiness:
+.gitlab-ci.yml:838:b06-gtk4-listview-gate:
+.gitlab-ci.yml:1002:gtk4-rollout-doc-check:
+meson_options.txt:75:option('gtk-toolkit', type: 'combo', value: 'gtk3',
+meson.build:492:gtk_toolkit       = get_option('gtk-toolkit')
+meson.build:494:gtk4_minver       = '4.6.0'
+meson.build:496:  gtk_dep_name      = 'gtk4'
+meson.build:497:  gtk_minver        = gtk4_minver
+meson.build:498:  gtk3              = dependency(gtk_dep_name,       version: '>='+gtk_minver)
+meson.build:501:  gtk_dep_name      = 'gtk+-3.0'
+meson.build:503:  gtk3              = dependency(gtk_dep_name,       version: '>='+gtk_minver)
+meson.build:2168:    gtk_dep_name,
+
+libgimpwidgets/gimpmemsizeentry.c:236:  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->spinbutton, FALSE, FALSE, 0);
+libgimpwidgets/gimpmemsizeentry.c:254:  gimp_widgets_compat_box_pack_start (GTK_BOX (entry), entry->menu, FALSE, FALSE, 0);
+libgimpwidgets/gimphintbox.c:128:      gimp_widgets_compat_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 0);
+libgimpwidgets/gimphintbox.c:143:  gimp_widgets_compat_box_pack_start (GTK_BOX (box), label, FALSE, FALSE, 0);
+libgimpwidgets/gimpintradioframe.c:149:  gimp_widgets_compat_container_add (GTK_WIDGET (radio_frame), radio_frame->box);
+libgimpwidgets/gimpintradioframe.c:678:          gimp_widgets_compat_box_pack_start (GTK_BOX (frame->box), button, FALSE, FALSE, 0);

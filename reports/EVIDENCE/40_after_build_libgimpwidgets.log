@@ -1,0 +1,11 @@
+# CMD: ninja -C _build-local libgimpwidgets/libgimpwidgets-3.0.so.0.200.0 -j4
+# DATE: 2026-02-15T17:46:28-03:00
+ninja: Entering directory `_build-local'
+[1/4] Compiling C object libgimpwidgets/libgimpwidgets-3.0.so.0.200.0.p/gimpmemsizeentry.c.o
+[2/4] Compiling C object libgimpwidgets/libgimpwidgets-3.0.so.0.200.0.p/gimphintbox.c.o
+[3/4] Compiling C object libgimpwidgets/libgimpwidgets-3.0.so.0.200.0.p/gimpintradioframe.c.o
+[4/4] Linking target libgimpwidgets/libgimpwidgets-3.0.so.0.200.0
+TIME_ELAPSED=0.78
+MAX_RSS_KB=91200
+CPU_PCT=221%
+EXIT_CODE=0

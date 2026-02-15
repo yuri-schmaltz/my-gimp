@@ -1,0 +1,12 @@
+# CMD: sh tools/ci/b06-gtk4-listview-gate.sh
+# DATE: 2026-02-15T17:45:23-03:00
+B06 GTK4 listview gate
+
+PASS  GtkListView usage present in path editor
+PASS  GtkColumnView usage present in path editor
+
+PASS: B06 GTK4 listview gate passed.
+TIME_ELAPSED=0.01
+MAX_RSS_KB=5440
+CPU_PCT=133%
+EXIT_CODE=0
