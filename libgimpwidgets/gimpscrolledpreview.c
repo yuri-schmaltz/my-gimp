@@ -30,6 +30,7 @@
 #include "gimpicons.h"
 #include "gimppreviewarea.h"
 #include "gimpscrolledpreview.h"
+#include "gimpwidgets-compat.h"
 
 #include "libgimp/libgimp-intl.h"
 
@@ -217,7 +218,7 @@ gimp_scrolled_preview_init (GimpScrolledPreview *preview)
 
   image = gtk_image_new_from_icon_name (GIMP_ICON_DIALOG_NAVIGATION,
                                         GTK_ICON_SIZE_MENU);
-  gtk_container_add (GTK_CONTAINER (priv->nav_icon), image);
+  gimp_widgets_compat_container_add (priv->nav_icon, image);
   gtk_widget_show (image);
 
   g_signal_connect (priv->nav_icon, "button-press-event",
@@ -568,12 +569,12 @@ gimp_scrolled_preview_nav_button_press (GtkWidget           *widget,
 
       outer = gtk_frame_new (NULL);
       gtk_frame_set_shadow_type (GTK_FRAME (outer), GTK_SHADOW_OUT);
-      gtk_container_add (GTK_CONTAINER (priv->nav_popup), outer);
+      gimp_widgets_compat_container_add (priv->nav_popup, outer);
       gtk_widget_show (outer);
 
       inner = gtk_frame_new (NULL);
       gtk_frame_set_shadow_type (GTK_FRAME (inner), GTK_SHADOW_IN);
-      gtk_container_add (GTK_CONTAINER (outer), inner);
+      gimp_widgets_compat_container_add (outer, inner);
       gtk_widget_show (inner);
 
       g_object_get (gimp_preview_get_area (gimp_preview),
@@ -589,7 +590,7 @@ gimp_scrolled_preview_nav_button_press (GtkWidget           *widget,
                            "check-custom-color2", check_custom_color2,
                            NULL);
 
-      gtk_container_add (GTK_CONTAINER (inner), area);
+      gimp_widgets_compat_container_add (inner, area);
 
       g_signal_connect (area, "event",
                         G_CALLBACK (gimp_scrolled_preview_nav_popup_event),

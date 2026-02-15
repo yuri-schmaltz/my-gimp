@@ -29,6 +29,7 @@
 #include "gimpwidgetstypes.h"
 
 #include "gimpfilechooser.h"
+#include "gimpwidgets-compat.h"
 
 #include "libgimp/libgimp-intl.h"
 
@@ -206,7 +207,7 @@ gimp_file_chooser_constructed (GObject *object)
   GimpFileChooser *chooser = GIMP_FILE_CHOOSER (object);
 
   chooser->label_widget = gtk_label_new (NULL);
-  gtk_box_pack_start (GTK_BOX (chooser), chooser->label_widget, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (chooser), chooser->label_widget, FALSE, FALSE, 0);
   if (chooser->label)
     gtk_label_set_text_with_mnemonic (GTK_LABEL (chooser->label_widget), chooser->label);
   gtk_label_set_xalign (GTK_LABEL (chooser->label_widget), 0.0);
@@ -392,7 +393,7 @@ gimp_file_chooser_set_action (GimpFileChooser       *chooser,
     case GIMP_FILE_CHOOSER_ACTION_OPEN:
     case GIMP_FILE_CHOOSER_ACTION_SELECT_FOLDER:
       chooser->button = gtk_file_chooser_button_new (chooser->title, (GtkFileChooserAction) action);
-      gtk_box_pack_start (GTK_BOX (chooser), chooser->button, FALSE, FALSE, 0);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (chooser), chooser->button, FALSE, FALSE, 0);
       g_signal_connect (chooser->button, "selection-changed",
                         G_CALLBACK (gimp_file_chooser_button_selection_changed),
                         chooser);
@@ -403,7 +404,7 @@ gimp_file_chooser_set_action (GimpFileChooser       *chooser,
     case GIMP_FILE_CHOOSER_ACTION_SAVE:
     case GIMP_FILE_CHOOSER_ACTION_CREATE_FOLDER:
       chooser->entry = gtk_entry_new ();
-      gtk_box_pack_start (GTK_BOX (chooser), chooser->entry, TRUE, TRUE, 0);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (chooser), chooser->entry, TRUE, TRUE, 0);
       if (chooser->file)
         {
           uri_path = g_file_get_path (chooser->file);
@@ -420,7 +421,7 @@ gimp_file_chooser_set_action (GimpFileChooser       *chooser,
       gtk_widget_set_visible (chooser->entry, TRUE);
 
       chooser->button = gtk_button_new_from_icon_name (GIMP_ICON_FILE_MANAGER, GTK_ICON_SIZE_SMALL_TOOLBAR);
-      gtk_box_pack_start (GTK_BOX (chooser), chooser->button, FALSE, FALSE, 0);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (chooser), chooser->button, FALSE, FALSE, 0);
       gtk_widget_set_visible (chooser->button, TRUE);
       g_signal_connect (chooser->button, "clicked",
                         G_CALLBACK (gimp_file_chooser_button_clicked),
