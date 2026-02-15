@@ -29,6 +29,7 @@
 #include "libgimpbase/gimpbase.h"
 
 #include "gimpwidgets.h"
+#include "gimpwidgets-compat.h"
 
 #include "libgimp/libgimp-intl.h"
 
@@ -123,7 +124,7 @@ gimp_int_radio_group_new (gboolean         in_frame,
         button = gtk_radio_button_new (group);
 
       group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (button));
-      gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+      gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
 
       if (item_data)
         {
@@ -154,7 +155,7 @@ gimp_int_radio_group_new (gboolean         in_frame,
       GtkWidget *frame;
 
       frame = gimp_frame_new (frame_title);
-      gtk_container_add (GTK_CONTAINER (frame), vbox);
+      gimp_widgets_compat_container_add (frame, vbox);
       gtk_widget_show (vbox);
 
       return frame;
@@ -249,7 +250,7 @@ gimp_random_seed_new (guint    *seed,
   adj = gtk_adjustment_new (*seed, 0, (guint32) -1, 1, 10, 0);
   spinbutton = gimp_spin_button_new (adj, 1.0, 0);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (spinbutton), TRUE);
-  gtk_box_pack_start (GTK_BOX (hbox), spinbutton, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), spinbutton, FALSE, FALSE, 0);
   gtk_widget_show (spinbutton);
 
   g_signal_connect (adj, "value-changed",
@@ -266,7 +267,7 @@ gimp_random_seed_new (guint    *seed,
                 "margin-start", 2,
                 "margin-end",   2,
                 NULL);
-  gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 0);
   gtk_widget_show (button);
 
   /* Send spinbutton as data so that we can change the value in
@@ -283,7 +284,7 @@ gimp_random_seed_new (guint    *seed,
 
   toggle = gtk_check_button_new_with_mnemonic (_("_Randomize"));
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (toggle), *random_seed);
-  gtk_box_pack_start (GTK_BOX (hbox), toggle, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (hbox), toggle, FALSE, FALSE, 0);
   gtk_widget_show (toggle);
 
   g_signal_connect (toggle, "toggled",

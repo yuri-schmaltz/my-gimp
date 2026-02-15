@@ -34,6 +34,7 @@
 #include "gimpcolornotebook.h"
 #include "gimpcolorscales.h"
 #include "gimphelpui.h"
+#include "gimpwidgets-compat.h"
 
 #include "libgimp/libgimp-intl.h"
 
@@ -150,7 +151,7 @@ gimp_color_notebook_init (GimpColorNotebook *notebook)
 
   notebook->notebook = gtk_notebook_new ();
   gtk_notebook_popup_enable (GTK_NOTEBOOK (notebook->notebook));
-  gtk_box_pack_start (GTK_BOX (notebook), notebook->notebook, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (notebook), notebook->notebook, TRUE, TRUE, 0);
   gtk_widget_show (notebook->notebook);
 
   g_signal_connect (notebook->notebook, "switch-page",
@@ -440,11 +441,11 @@ gimp_color_notebook_add_page (GimpColorNotebook *notebook,
 
   image = gtk_image_new_from_icon_name (selector_class->icon_name,
                                         GTK_ICON_SIZE_MENU);
-  gtk_box_pack_start (GTK_BOX (menu_widget), image, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (menu_widget), image, FALSE, FALSE, 0);
   gtk_widget_show (image);
 
   label = gtk_label_new (gettext (selector_class->name));
-  gtk_box_pack_start (GTK_BOX (menu_widget), label, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (menu_widget), label, FALSE, FALSE, 0);
   gtk_widget_show (label);
 
   image = gtk_image_new_from_icon_name (selector_class->icon_name,
