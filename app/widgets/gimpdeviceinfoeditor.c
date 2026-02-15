@@ -28,6 +28,7 @@
 #endif
 
 #include "libgimpbase/gimpbase.h"
+#include "libgimpwidgets/gimpwidgets-compat.h"
 #include "libgimpwidgets/gimpwidgets.h"
 
 #include "widgets-types.h"
@@ -308,10 +309,10 @@ gimp_device_info_editor_constructed (GObject *object)
       gtk_container_add (GTK_CONTAINER (frame), frame2);
       gtk_widget_show (frame2);
 
-      view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (private->axis_store));
+      view = gimp_widgets_compat_tree_view_new_with_model (GTK_TREE_MODEL (private->axis_store));
       g_object_unref (private->axis_store);
 
-      gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), FALSE);
+      gimp_widgets_compat_tree_view_set_headers_visible (view, FALSE);
 
       gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view),
                                                    -1, NULL,
@@ -349,8 +350,8 @@ gimp_device_info_editor_constructed (GObject *object)
       gtk_container_add (GTK_CONTAINER (frame2), view);
       gtk_widget_show (view);
 
-      sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (view));
-      gtk_tree_selection_set_mode (sel, GTK_SELECTION_BROWSE);
+      sel = gimp_widgets_compat_tree_view_get_selection (view);
+      gimp_widgets_compat_tree_selection_set_mode (sel, GTK_SELECTION_BROWSE);
     }
   else
     {
@@ -532,7 +533,7 @@ gimp_device_info_editor_constructed (GObject *object)
                         editor);
 
       if (has_axes)
-        gtk_tree_selection_select_iter (sel, &axis_iter);
+        gimp_widgets_compat_tree_selection_select_iter (sel, &axis_iter);
     }
 
   if (gimp_device_info_get_source (private->info) == GDK_SOURCE_TABLET_PAD)
@@ -577,8 +578,8 @@ gimp_device_info_editor_constructed (GObject *object)
 
       column = gtk_tree_view_column_new ();
       gtk_tree_view_column_set_title (column, _("Action"));
-      gtk_tree_view_append_column (GTK_TREE_VIEW (private->pad_action_view),
-                                   column);
+      gimp_widgets_compat_tree_view_append_column (private->pad_action_view,
+                                                   column);
 
       cell = gtk_cell_renderer_pixbuf_new ();
       gtk_tree_view_column_pack_start (column, cell, FALSE);
@@ -611,7 +612,7 @@ gimp_device_info_editor_constructed (GObject *object)
                                GTK_TREE_MODEL (private->pad_store));
 
       private->pad_sel =
-        gtk_tree_view_get_selection (GTK_TREE_VIEW (private->pad_action_view));
+        gimp_widgets_compat_tree_view_get_selection (private->pad_action_view);
 
       g_signal_connect (private->pad_sel, "changed",
                         G_CALLBACK (gimp_device_info_editor_sel_changed),
@@ -827,7 +828,7 @@ gimp_device_info_editor_axis_selected (GtkTreeSelection     *selection,
 
   private = GIMP_DEVICE_INFO_EDITOR_GET_PRIVATE (editor);
 
-  if (gtk_tree_selection_get_selected (selection, NULL, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (selection, NULL, &iter))
     {
       gint axis_index;
 
@@ -947,7 +948,7 @@ gimp_device_info_editor_sel_changed (GtkTreeSelection     *sel,
 
   private = GIMP_DEVICE_INFO_EDITOR_GET_PRIVATE (editor);
 
-  if (gtk_tree_selection_get_selected (sel, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (sel, &model, &iter))
     {
       GimpPadActionType  type;
       guint              number;
@@ -1052,7 +1053,7 @@ gimp_device_info_editor_pad_row_ensure (GimpDeviceInfoEditor *editor,
 
   view = GTK_TREE_VIEW (private->pad_action_view);
   path = gtk_tree_model_get_path (tree_model, &iter);
-  gtk_tree_view_scroll_to_cell (view, path, NULL, FALSE, 0.0, 0.0);
+  gimp_widgets_compat_tree_view_scroll_to_cell (GTK_WIDGET (view), path, NULL, FALSE, 0.0, 0.0);
   gtk_tree_view_set_cursor (view, path, NULL, FALSE);
   gtk_tree_path_free (path);
 
@@ -1123,7 +1124,7 @@ gimp_device_info_editor_edit_clicked (GtkWidget            *button,
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (private->pad_grab_button),
                                 FALSE);
 
-  if (gtk_tree_selection_get_selected (private->pad_sel, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (private->pad_sel, &model, &iter))
     {
       GimpContext       *user_context;
       GimpPadActionType  type;
@@ -1191,7 +1192,7 @@ gimp_device_info_editor_edit_clicked (GtkWidget            *button,
 
       g_set_weak_pointer
         (&private->pad_edit_sel,
-         gtk_tree_view_get_selection (GTK_TREE_VIEW (GIMP_ACTION_EDITOR (view)->view)));
+         gimp_widgets_compat_tree_view_get_selection (GIMP_ACTION_EDITOR (view)->view));
 
       gtk_widget_set_sensitive (GTK_WIDGET (editor), FALSE);
       gtk_widget_show (private->pad_edit_dialog);
@@ -1212,7 +1213,7 @@ gimp_device_info_editor_delete_clicked (GtkWidget            *button,
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (private->pad_grab_button),
                                 FALSE);
 
-  if (gtk_tree_selection_get_selected (private->pad_sel, &model, &iter))
+  if (gimp_widgets_compat_tree_selection_get_selected (private->pad_sel, &model, &iter))
     {
       GimpPadActionType type;
       guint             number;
@@ -1267,13 +1268,13 @@ gimp_device_info_editor_edit_response (GtkWidget            *dialog,
       gchar        *icon_name   = NULL;
       gchar        *action_name = NULL;
 
-      if (gtk_tree_selection_get_selected (private->pad_edit_sel, &model, &iter))
+      if (gimp_widgets_compat_tree_selection_get_selected (private->pad_edit_sel, &model, &iter))
         gtk_tree_model_get (model, &iter,
                             GIMP_ACTION_VIEW_COLUMN_ICON_NAME, &icon_name,
                             GIMP_ACTION_VIEW_COLUMN_NAME,      &action_name,
                             -1);
 
-      if (gtk_tree_selection_get_selected (private->pad_sel, &model, &iter))
+      if (gimp_widgets_compat_tree_selection_get_selected (private->pad_sel, &model, &iter))
         {
           if (action_name)
             {
