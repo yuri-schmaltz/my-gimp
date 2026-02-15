@@ -2,11 +2,44 @@
 
 set -eu
 
-junit_file="$(find . -type f -path './_build-*/meson-logs/testlog.junit.xml' | head -1 || true)"
+find_junit_file() {
+  find . -type f -path './_build-*/meson-logs/testlog.junit.xml' | head -1 || true
+}
+
+find_meson_build_dir() {
+  for dir in _build*; do
+    [ -d "$dir" ] || continue
+    if meson introspect --tests "$dir" >/dev/null 2>&1; then
+      echo "$dir"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+junit_file="$(find_junit_file)"
+
+if [ -z "$junit_file" ] && [ "${UI_METRICS_AUTO_GENERATE:-0}" = "1" ]; then
+  build_dir="$(find_meson_build_dir || true)"
+
+  if [ -n "$build_dir" ]; then
+    echo "No testlog.junit.xml found; attempting to generate via meson test in $build_dir."
+    if meson test -C "$build_dir" --print-errorlogs --no-rebuild >/dev/null 2>&1; then
+      :
+    else
+      echo "WARN: meson test failed while attempting to generate JUnit."
+    fi
+  else
+    echo "WARN: no valid Meson build dir found for JUnit generation."
+  fi
+
+  junit_file="$(find_junit_file)"
+fi
 
 if [ -z "$junit_file" ]; then
-  if [ -n "${CI:-}" ]; then
-    echo "FAIL: testlog.junit.xml not found in CI artifacts."
+  if [ -n "${CI:-}" ] || [ "${UI_METRICS_REQUIRED:-0}" = "1" ]; then
+    echo "FAIL: testlog.junit.xml not found and metrics are required."
     exit 1
   fi
 

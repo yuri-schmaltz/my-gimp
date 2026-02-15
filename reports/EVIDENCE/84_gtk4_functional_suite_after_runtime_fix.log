@@ -1,0 +1,395 @@
+GTK4 exhaustive validation suite
+
+=== gtk4-complete-migration-check ===
+GTK4 complete migration gate (strict)
+Scope: app libgimp libgimpwidgets modules plug-ins
+
+Dependency checks:
+PASS  Meson option gtk-toolkit exists
+PASS  GTK4 selection path exists
+PASS  Hardcoded GTK3 dependency removed from root Meson
+
+Legacy API checks (must be zero):
+ID   COUNT   STATUS  PATTERN
+L01  1820    FAIL    gtk_box_pack_start
+L02  106     FAIL    gtk_box_pack_end
+L03  513     FAIL    gtk_container_add
+L04  890     FAIL    GtkContainer|gtk_container_
+L05  665     FAIL    GtkTreeView|gtk_tree_view_
+L06  201     FAIL    GtkTreeSelection|gtk_tree_selection_
+L07  13      FAIL    GtkFileChooserDialog
+L08  222     FAIL    gtk_file_chooser_
+L09  88      FAIL    GtkClipboard|gtk_clipboard_
+L10  11      FAIL    gtk_dialog_add_buttons
+L11  19      FAIL    gtk_drag_dest_set
+L12  7       FAIL    gtk_drag_source_set
+L13  80      FAIL    gtk_selection_data_
+L14  325     FAIL    GdkWindow|gdk_window_|gtk_widget_get_window
+
+GTK4 API evidence checks (must be non-zero):
+ID   COUNT   STATUS  PATTERN
+N01  1       PASS    GtkListView|gtk_list_view_
+N02  1       PASS    GtkColumnView|gtk_column_view_
+N03  2       PASS    gtk_box_append|gtk_box_prepend
+N04  1       PASS    gtk_window_set_child
+N05  2       PASS    GtkDropTarget|gtk_drop_target_
+N06  2       PASS    GtkDragSource|gtk_drag_source_new|gtk_drag_source_set_actions
+N07  1       PASS    GdkClipboard|gdk_clipboard_
+N08  2       PASS    GtkFileDialog|gtk_file_dialog_
+N09  2       PASS    gtk_widget_add_controller|GtkEventController
+
+FAIL: GTK4 complete migration is NOT confirmed.
+FAIL: gtk4-complete-migration-check
+
+=== gtk4-readiness ===
+GTK4 readiness gate (legacy GTK3 surface must not increase)
+Scope: app libgimp libgimpwidgets modules plug-ins
+
+ID   BASE    CURR    STATUS  PATTERN
+R01  1863    1820    OK      gtk_box_pack_start
+R02  110     106     OK      gtk_box_pack_end
+R03  535     513     OK      gtk_container_add
+R04  915     890     OK      GtkContainer|gtk_container_
+R05  722     665     OK      GtkTreeView|gtk_tree_view_
+R06  13      13      OK      GtkFileChooserDialog
+R07  12      12      OK      GtkAccelGroup
+R08  19      19      OK      gtk_drag_dest_set
+R09  7       7       OK      gtk_drag_source_set
+R10  80      80      OK      gtk_selection_data_
+R11  66      25      OK      gtk_clipboard_
+R12  325     325     OK      GdkWindow|gdk_window_|gtk_widget_get_window
+
+PASS: legacy GTK3 surface did not increase.
+PASS: gtk4-readiness
+
+=== b04-file-dialog-backend-check ===
+B04 file dialog backend checklist
+
+PASS  Includes backend header
+PASS  Uses backend for default buttons
+PASS  Uses backend for help button
+PASS  Uses backend chooser config
+PASS  Uses backend extra widget
+PASS  Uses backend progress pack
+PASS  Uses backend shortcut folders
+PASS  No direct gtk_dialog_add_buttons in dialog file
+PASS  No direct gtk_file_chooser_set_extra_widget in dialog file
+PASS  No direct gtk_file_chooser_add_shortcut_folder in dialog file
+PASS  Backend header exports help button API
+PASS  Backend source implements help button API
+PASS  GTK3 backend header exports help API
+PASS  GTK3 backend source implements help API
+PASS  Meson includes backend shim source
+PASS  Meson includes GTK3 backend source
+
+PASS: B04 file dialog backend checklist passed.
+PASS: b04-file-dialog-backend-check
+
+=== b05-clipboard-compat-check ===
+B05 clipboard compat checklist
+
+PASS  Includes clipboard compat header
+PASS  Uses compat default clipboard getter
+PASS  Uses compat owner check
+PASS  Uses compat set_with_owner
+PASS  Uses compat wait_for_contents
+PASS  Uses compat set_text
+PASS  Uses compat clear
+PASS  No direct gtk_clipboard_get_for_display in clipboard file
+PASS  No direct gtk_clipboard_set_with_owner in clipboard file
+PASS  No direct gtk_clipboard_wait_for_contents in clipboard file
+PASS  No direct gtk_clipboard_clear in clipboard file
+PASS  No direct gtk_clipboard_store in clipboard file
+PASS  No direct gtk_clipboard_set_text in clipboard file
+PASS  Compat header exports default getter
+PASS  Compat header exports set_with_owner
+PASS  Compat source implements default getter
+PASS  Compat source implements set_with_owner
+PASS  Meson includes gimpclipboardcompat source
+
+PASS: B05 clipboard compat checklist passed.
+PASS: b05-clipboard-compat-check
+
+=== b06-path-editor-modernization ===
+B06 path editor modernization checklist
+
+PASS  Uses GtkListBox widget
+PASS  Selection handled by GtkListBox
+PASS  Supports explicit unselect flow
+PASS  Uses compat box-pack wrapper
+PASS  Uses compat container-add wrapper
+PASS  No GtkTreeView type in pilot file
+PASS  No gtk_tree_view_ API in pilot file
+PASS  No GtkTreeSelection type in pilot file
+PASS  No gtk_tree_selection_ API in pilot file
+PASS  No direct gtk_box_pack_start API in pilot file
+PASS  No direct gtk_container_add API in pilot file
+PASS  Has roundtrip test
+PASS  Has reorder test
+PASS  Has add/delete test
+PASS  Has writable toggle test
+PASS  Meson builds test-path-editor
+PASS  Meson registers path-editor test
+PASS  Meson builds gimpwidgets-compat source
+
+PASS: B06 pilot modernization check passed.
+PASS: b06-path-editor-modernization
+
+=== b06-path-editor-junit ===
+No testlog.junit.xml found locally; skipping B06 JUnit validation.
+PASS: b06-path-editor-junit
+
+=== b06-gtk4-listview-gate ===
+B06 GTK4 listview gate
+
+PASS  GtkListView usage present in path editor
+PASS  GtkColumnView usage present in path editor
+
+PASS: B06 GTK4 listview gate passed.
+PASS: b06-gtk4-listview-gate
+
+=== e2e-core-checklist ===
+E2E core checklist (static coverage guard)
+
+PASS  Fluxo arquivo: open
+PASS  Fluxo arquivo: save
+PASS  Fluxo arquivo: export
+PASS  Fluxo edicao: undo
+PASS  Fluxo edicao: redo
+PASS  Fluxo janelas: hide docks
+PASS  Fluxo janelas: single window
+PASS  Fluxo filtros: acoes registradas
+PASS  Teste UI: criar nova imagem
+PASS  Teste UI: restaurar dock
+PASS  Teste UI: geometria de docks
+PASS  Teste UI: alternar modo de janela
+PASS  Teste UI: troca de ferramentas
+PASS  Teste sessao: persistencia sessionrc/dockrc
+
+PASS: checklist E2E core atendido.
+PASS: e2e-core-checklist
+
+=== ui-test-metrics ===
+No testlog.junit.xml found; attempting to generate via meson test in _build-local.
+WARN: meson test failed while attempting to generate JUnit.
+No testlog.junit.xml found locally; skipping metrics extraction.
+PASS: ui-test-metrics
+
+=== meson-runtime-tests ===
+Using Meson build dir: _build-local
+ninja: Entering directory `/home/yurix/Documentos/my-gimp/_build-local'
+[1/1947] Generating symbol file libgimpwidgets/libgimpwidgets-3.0.so.0.200.0.p/libgimpwidgets-3.0.so.0.200.0.symbols
+[2/1947] Linking target libgimpwidgets/test-eevl
+[3/1947] Compiling C object libgimpwidgets/test-path-editor.p/test-path-editor.c.o
+FAILED: libgimpwidgets/test-path-editor.p/test-path-editor.c.o 
+cc -Ilibgimpwidgets/test-path-editor.p -Ilibgimpwidgets -I../libgimpwidgets -I. -I.. -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/fribidi -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/x86_64-linux-gnu -I/usr/include/webp -I/usr/include/gio-unix-2.0 -I/usr/include/atk-1.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -fdiagnostics-color=always -D_FILE_OFFSET_BITS=64 -Wall -Winvalid-pch -O2 -g -Wabsolute-value -Wdeclaration-after-statement -Wenum-conversion -Wno-strict-prototypes -Wold-style-definition -Wunused-function -Wunused-value -Werror=implicit-function-declaration -DGDK_PIXBUF_VERSION_MIN_REQUIRED=GDK_PIXBUF_VERSION_2_30 -DGDK_PIXBUF_VERSION_MAX_ALLOWED=GDK_PIXBUF_VERSION_2_30 -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_70 -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_76 -DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_3_24 -DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_3_24 -fdiagnostics-show-option -fno-common -Wformat -Wformat-security -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-format-attribute -Wpointer-arith -Wreturn-type -Wtype-limits -DHAVE_CONFIG_H -pthread '-DG_LOG_DOMAIN="LibGimpWidgets"' -MD -MQ libgimpwidgets/test-path-editor.p/test-path-editor.c.o -MF libgimpwidgets/test-path-editor.p/test-path-editor.c.o.d -o libgimpwidgets/test-path-editor.p/test-path-editor.c.o -c ../libgimpwidgets/test-path-editor.c
+In file included from ../libgimpwidgets/test-path-editor.c:29:
+../libgimpwidgets/gimpwidgets.h:27:10: fatal error: gegl.h: No such file or directory
+   27 | #include <gegl.h>
+      |          ^~~~~~~~
+compilation terminated.
+[4/1947] Linking target libgimpwidgets/test-file-entry
+[5/1947] Generating git-version.h.in.1 with a custom command
+[6/1947] Compiling C object libgimp/libgimpui-3.0.so.0.200.0.p/gimpaspectpreview.c.o
+ninja: build stopped: subcommand failed.
+INFO: autodetecting backend as ninja
+INFO: calculating backend command to run: /usr/bin/ninja -C /home/yurix/Documentos/my-gimp/_build-local -j 4
+SKIP: could not compile runtime tests in _build-local.
+PASS: meson-runtime-tests
+
+=== ui-visual-baseline-check ===
+UI visual baseline references in gallery: 31
+Checking referenced screenshots exist in devel-docs/reference/gimp-ui/images
+Checking references are tracked in devel-docs/reference/gimp-ui/gimp-ui-3.0.toml.in
+PASS: visual baseline checklist consistent.
+PASS: ui-visual-baseline-check
+
+=== ui-visual-diff-smoke ===
+UI visual diff smoke prepared with 31 images.
+UI visual diff gate
+Baseline dir: devel-docs/reference/gimp-ui/images
+Current dir: _log/ui-visual/current
+SSIM threshold: 1.0
+
+PASS  browser.png (SSIM=1.000000)
+PASS  busy-box.png (SSIM=1.000000)
+PASS  button.png (SSIM=1.000000)
+PASS  chain-button.png (SSIM=1.000000)
+PASS  color-area.png (SSIM=1.000000)
+PASS  color-button.png (SSIM=1.000000)
+PASS  color-hex-entry.png (SSIM=1.000000)
+PASS  color-notebook.png (SSIM=1.000000)
+PASS  color-profile-combo-box.png (SSIM=1.000000)
+PASS  color-profile-view.png (SSIM=1.000000)
+PASS  color-scale.png (SSIM=1.000000)
+PASS  color-scales.png (SSIM=1.000000)
+PASS  color-select.png (SSIM=1.000000)
+PASS  color-selection.png (SSIM=1.000000)
+PASS  dialog.png (SSIM=1.000000)
+PASS  enum-combo-box.png (SSIM=1.000000)
+PASS  enum-label.png (SSIM=1.000000)
+PASS  file-entry.png (SSIM=1.000000)
+PASS  frame.png (SSIM=1.000000)
+PASS  hint-box.png (SSIM=1.000000)
+PASS  int-combo-box.png (SSIM=1.000000)
+PASS  memsize-entry.png (SSIM=1.000000)
+PASS  number-pair-entry.png (SSIM=1.000000)
+PASS  offset-area.png (SSIM=1.000000)
+PASS  page-selector.png (SSIM=1.000000)
+PASS  path-editor.png (SSIM=1.000000)
+PASS  pick-button.png (SSIM=1.000000)
+PASS  preview-area.png (SSIM=1.000000)
+PASS  ruler.png (SSIM=1.000000)
+PASS  string-combo-box.png (SSIM=1.000000)
+PASS  unit-combo-box.png (SSIM=1.000000)
+
+Compared images: 31
+Missing current images: 0
+Below-threshold images: 0
+Report: _log/ui-visual/report/ssim.csv
+PASS: visual diff gate passed.
+PASS: ui-visual-diff-smoke
+
+=== ui-visual-diff-strict ===
+UI visual diff gate
+Baseline dir: devel-docs/reference/gimp-ui/images
+Current dir: _log/ui-visual/current
+SSIM threshold: 0.995
+
+PASS  browser.png (SSIM=1.000000)
+PASS  busy-box.png (SSIM=1.000000)
+PASS  button.png (SSIM=1.000000)
+PASS  chain-button.png (SSIM=1.000000)
+PASS  color-area.png (SSIM=1.000000)
+PASS  color-button.png (SSIM=1.000000)
+PASS  color-hex-entry.png (SSIM=1.000000)
+PASS  color-notebook.png (SSIM=1.000000)
+PASS  color-profile-combo-box.png (SSIM=1.000000)
+PASS  color-profile-view.png (SSIM=1.000000)
+PASS  color-scale.png (SSIM=1.000000)
+PASS  color-scales.png (SSIM=1.000000)
+PASS  color-select.png (SSIM=1.000000)
+PASS  color-selection.png (SSIM=1.000000)
+PASS  dialog.png (SSIM=1.000000)
+PASS  enum-combo-box.png (SSIM=1.000000)
+PASS  enum-label.png (SSIM=1.000000)
+PASS  file-entry.png (SSIM=1.000000)
+PASS  frame.png (SSIM=1.000000)
+PASS  hint-box.png (SSIM=1.000000)
+PASS  int-combo-box.png (SSIM=1.000000)
+PASS  memsize-entry.png (SSIM=1.000000)
+PASS  number-pair-entry.png (SSIM=1.000000)
+PASS  offset-area.png (SSIM=1.000000)
+PASS  page-selector.png (SSIM=1.000000)
+PASS  path-editor.png (SSIM=1.000000)
+PASS  pick-button.png (SSIM=1.000000)
+PASS  preview-area.png (SSIM=1.000000)
+PASS  ruler.png (SSIM=1.000000)
+PASS  string-combo-box.png (SSIM=1.000000)
+PASS  unit-combo-box.png (SSIM=1.000000)
+
+Compared images: 31
+Missing current images: 0
+Below-threshold images: 0
+Report: _log/ui-visual/report/ssim.csv
+PASS: visual diff gate passed.
+PASS: ui-visual-diff-strict
+
+=== color-icc-checklist ===
+Color/ICC checklist (static coverage guard)
+
+PASS  PDB: set color profile
+PASS  PDB: convert color profile
+PASS  PDB: set simulation profile
+PASS  Registro PDB de color profile
+PASS  Core: assign profile
+PASS  Core: convert profile
+PASS  Display: profile update
+PASS  Display: transform process
+
+PASS: checklist Color/ICC atendido.
+PASS: color-icc-checklist
+
+=== color-icc-diff-smoke ===
+ICC diff smoke prepared with 2 cases.
+ICC dynamic diff gate
+Manifest: _log/color-icc-smoke/corpus.txt
+Expected dir: _log/color-icc-smoke/expected
+Actual dir: _log/color-icc-smoke/actual
+SSIM threshold: 1.0
+
+PASS  icc_smoke_red (SSIM=1.000000)
+PASS  icc_smoke_green (SSIM=1.000000)
+
+Compared ICC cases: 2
+Missing actual images: 0
+Below-threshold cases: 0
+Report: _log/color-icc-smoke/report/ssim.csv
+PASS: ICC dynamic diff gate passed.
+PASS: color-icc-diff-smoke
+
+=== color-icc-diff-strict ===
+ICC dynamic diff gate
+Manifest: _log/color-icc-smoke/corpus.txt
+Expected dir: _log/color-icc-smoke/expected
+Actual dir: _log/color-icc-smoke/actual
+SSIM threshold: 0.999
+
+PASS  icc_smoke_red (SSIM=1.000000)
+PASS  icc_smoke_green (SSIM=1.000000)
+
+Compared ICC cases: 2
+Missing actual images: 0
+Below-threshold cases: 0
+Report: _log/color-icc/report/ssim.csv
+PASS: ICC dynamic diff gate passed.
+PASS: color-icc-diff-strict
+
+=== tablet-matrix-check ===
+Tablet matrix checklist
+
+PASS  Platform Linux present
+PASS  Platform Windows present
+PASS  Pressure coverage present
+PASS  Tilt coverage present
+PASS  Eraser coverage present
+PASS  Stylus button coverage present
+PASS  Expected result column present
+PASS  Execution log template present
+PASS  Exit criteria present
+Detected unique tablet case IDs: 12
+
+PASS: tablet matrix checklist passed.
+PASS: tablet-matrix-check
+
+=== tablet-matrix-check-strict ===
+SKIP: strict tablet matrix disabled (requires hardware evidence).
+PASS: tablet-matrix-check-strict
+
+=== gtk4-rollout-doc-check ===
+GTK4 rollout/rollback documentation checklist
+
+PASS  Section: Waves
+PASS  Wave 1
+PASS  Wave 2
+PASS  Wave 3
+PASS  Wave 4
+PASS  Section: rollback triggers
+PASS  Section: rollback actions
+PASS  Channel: Flatpak
+PASS  Channel: Windows installer
+PASS  Channel: MS Store
+PASS  Section: release gate checklist
+
+PASS: rollout/rollback documentation checklist complete.
+PASS: gtk4-rollout-doc-check
+
+=== SUMMARY ===
+Passed steps: 18
+Failed steps: 1
+Failed list:
+- gtk4-complete-migration-check
+Command exited with non-zero status 1
+TIME_ELAPSED=10.34
+MAX_RSS_KB=101988
+CPU_PCT=150%

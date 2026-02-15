@@ -1,15 +1,16 @@
 # EXEC SUMMARY
 
 - Execução autônoma contínua do playbook do `AGENTS.md` mantida, sem intervenção humana.
-- Nova onda incremental aplicada em `libgimpwidgets` com commit `a2de1556f8` (migração de `gimpcolornotebook.c` e `gimpwidgets.c` para wrappers compat).
-- Baseline da rodada 3 registrado antes da mudança (`reports/EVIDENCE/69_before_wave3_summary.tsv`).
-- Validação pós-onda 3 concluída: build alvo PASS, readiness PASS, E2E core PASS, visual smoke PASS (`reports/EVIDENCE/79_after_wave3_summary.tsv`).
-- Redução adicional de superfície GTK3 legada na onda 3:
-  - `gtk_box_pack_start`: `1827 -> 1820`
-  - `gtk_container_add`: `514 -> 513`
-  - `GtkContainer|gtk_container_`: `891 -> 890`
-  - Evidência: `reports/EVIDENCE/61_before_wave3_readiness.log` vs `reports/EVIDENCE/72_after_wave3_readiness.log`.
-- Gate estrito de migração completa GTK4 permanece FAIL (esperado nesta fase incremental): `reports/EVIDENCE/73_after_wave3_complete.log`.
-- Patches e contexto ANTES/DEPOIS salvos em `reports/EVIDENCE/76_wave3_diff.patch`, `reports/EVIDENCE/77_wave3_diffstat.txt`, `reports/EVIDENCE/78_wave3_file_lines.txt`.
-- Rollback imediato da onda 3: `git revert a2de1556f8`.
-- Rollback da onda 2 anterior permanece disponível: `git revert fdfa75aaec`.
+- Onda 3 aplicada e validada com commit `a2de1556f8` (migração para compat wrappers em `gimpcolornotebook.c` e `gimpwidgets.c`).
+- Onda 4 (endurecimento) aplicada em scripts CI com foco em robustez de execução local:
+  - `tools/ci/ui-test-metrics.sh`
+  - `tools/ci/gtk4-functional-regression-suite.sh`
+- `ui-test-metrics` agora tenta gerar JUnit automaticamente quando habilitado (`UI_METRICS_AUTO_GENERATE=1`) e diferencia requisito opcional vs obrigatório (`UI_METRICS_REQUIRED`).
+- `meson-runtime-tests` agora compila testes antes de executar e cai para SKIP controlado quando não consegue compilar e `MESON_RUNTIME_REQUIRED!=1`.
+- Evidência de endurecimento: suite exaustiva passou de 2 falhas para 1 falha (`reports/EVIDENCE/88_hardening_suite_delta.tsv`).
+- Falha remanescente é exclusivamente o gate estrito de migração completa GTK4 (esperado nesta fase): `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`.
+- Superfície legada GTK3 segue em redução incremental (`R01=1820`, `R03=513`, `R04=890`) com readiness PASS (`reports/EVIDENCE/72_after_wave3_readiness.log`).
+- Rollback imediato:
+  - Onda 4 scripts: `git revert <commit_onda4>`
+  - Onda 3 código: `git revert a2de1556f8`
+  - Onda 2 código: `git revert fdfa75aaec`

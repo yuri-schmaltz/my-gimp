@@ -1,0 +1,3 @@
+No testlog.junit.xml found; attempting to generate via meson test in _build-local.
+WARN: meson test failed while attempting to generate JUnit.
+No testlog.junit.xml found locally; skipping metrics extraction.

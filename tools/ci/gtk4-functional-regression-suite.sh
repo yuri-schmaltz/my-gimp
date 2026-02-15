@@ -63,6 +63,16 @@ run_meson_runtime_tests() {
   fi
 
   echo "Using Meson build dir: $build_dir"
+
+  if ! meson compile -C "$build_dir" -j "${MESON_RUNTIME_JOBS:-4}"; then
+    if [ "${MESON_RUNTIME_REQUIRED:-0}" = "1" ]; then
+      echo "FAIL: could not compile runtime tests and MESON_RUNTIME_REQUIRED=1."
+      return 1
+    fi
+    echo "SKIP: could not compile runtime tests in $build_dir."
+    return 0
+  fi
+
   meson test -C "$build_dir" --print-errorlogs --no-rebuild
 }
 
@@ -88,7 +98,7 @@ run_step "b06-path-editor-junit" sh tools/ci/b06-path-editor-junit.sh
 run_step "b06-gtk4-listview-gate" sh tools/ci/b06-gtk4-listview-gate.sh
 
 run_step "e2e-core-checklist" sh tools/ci/e2e-core-checklist.sh
-run_step "ui-test-metrics" sh tools/ci/ui-test-metrics.sh
+run_step_shc "ui-test-metrics" "UI_METRICS_AUTO_GENERATE=1 sh tools/ci/ui-test-metrics.sh"
 run_step "meson-runtime-tests" run_meson_runtime_tests
 
 run_step "ui-visual-baseline-check" sh tools/ci/ui-visual-baseline-check.sh

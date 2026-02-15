@@ -1,0 +1,249 @@
+# ui-test-metrics key lines
+     1	#!/bin/sh
+     2	
+     3	set -eu
+     4	
+     5	find_junit_file() {
+     6	  find . -type f -path './_build-*/meson-logs/testlog.junit.xml' | head -1 || true
+     7	}
+     8	
+     9	find_meson_build_dir() {
+    10	  for dir in _build*; do
+    11	    [ -d "$dir" ] || continue
+    12	    if meson introspect --tests "$dir" >/dev/null 2>&1; then
+    13	      echo "$dir"
+    14	      return 0
+    15	    fi
+    16	  done
+    17	
+    18	  return 1
+    19	}
+    20	
+    21	junit_file="$(find_junit_file)"
+    22	
+    23	if [ -z "$junit_file" ] && [ "${UI_METRICS_AUTO_GENERATE:-0}" = "1" ]; then
+    24	  build_dir="$(find_meson_build_dir || true)"
+    25	
+    26	  if [ -n "$build_dir" ]; then
+    27	    echo "No testlog.junit.xml found; attempting to generate via meson test in $build_dir."
+    28	    if meson test -C "$build_dir" --print-errorlogs --no-rebuild >/dev/null 2>&1; then
+    29	      :
+    30	    else
+    31	      echo "WARN: meson test failed while attempting to generate JUnit."
+    32	    fi
+    33	  else
+    34	    echo "WARN: no valid Meson build dir found for JUnit generation."
+    35	  fi
+    36	
+    37	  junit_file="$(find_junit_file)"
+    38	fi
+    39	
+    40	if [ -z "$junit_file" ]; then
+    41	  if [ -n "${CI:-}" ] || [ "${UI_METRICS_REQUIRED:-0}" = "1" ]; then
+    42	    echo "FAIL: testlog.junit.xml not found and metrics are required."
+    43	    exit 1
+    44	  fi
+    45	
+    46	  echo "No testlog.junit.xml found locally; skipping metrics extraction."
+    47	  exit 0
+    48	fi
+    49	
+    50	tmp_data="$(mktemp)"
+    51	tmp_sorted="$(mktemp)"
+    52	cleanup() {
+    53	  rm -f "$tmp_data" "$tmp_sorted"
+    54	}
+    55	trap cleanup EXIT INT TERM
+    56	
+    57	grep "<testcase " "$junit_file" | while IFS= read -r line; do
+    58	  class="$(printf '%s\n' "$line" | sed -n 's/.* classname=\"\([^\"]*\)\".*/\1/p')"
+    59	  name="$(printf '%s\n' "$line" | sed -n 's/.* name=\"\([^\"]*\)\".*/\1/p')"
+    60	  time="$(printf '%s\n' "$line" | sed -n 's/.* time=\"\([^\"]*\)\".*/\1/p')"
+    61	
+    62	  if [ -n "$time" ]; then
+    63	    printf '%s;%s;%s\n' "$class" "$name" "$time"
+    64	  fi
+    65	done > "$tmp_data"
+    66	
+    67	count="$(wc -l < "$tmp_data" | tr -d ' ')"
+    68	if [ "$count" -eq 0 ]; then
+    69	  if [ -n "${CI:-}" ]; then
+    70	    echo "FAIL: no testcase timing entries found in $junit_file"
+    71	    exit 1
+    72	  fi
+    73	
+    74	  echo "No testcase timing entries found in $junit_file"
+    75	  exit 0
+    76	fi
+    77	
+    78	required_fail=0
+    79	required_tests="
+    80	create_new_image_via_dialog
+    81	restore_recently_closed_multi_column_dock
+    82	switch_to_single_window_mode
+    83	opened_xcf_file_files
+    84	saved_imported_file_files
+    85	exported_file_files
+    86	"
+    87	
+    88	echo "Checking required core testcases in JUnit report:"
+    89	for testcase in $required_tests; do
+    90	  if grep -q "$testcase" "$junit_file"; then
+    91	    printf "PASS  %s\n" "$testcase"
+    92	  else
+    93	    printf "FAIL  %s\n" "$testcase"
+    94	    required_fail=1
+    95	  fi
+    96	done
+    97	echo
+    98	
+    99	if [ "$required_fail" -ne 0 ]; then
+   100	  echo "FAIL: required UI/core testcases missing from JUnit report."
+   101	  exit 1
+   102	fi
+   103	
+   104	required_pattern="create_new_image_via_dialog|restore_recently_closed_multi_column_dock|switch_to_single_window_mode|opened_xcf_file_files|saved_imported_file_files|exported_file_files"
+   105	if awk -v required_pattern="$required_pattern" '
+   106	  BEGIN { in_case = 0; fail = 0; current = "" }
+   107	  /<testcase / {
+   108	    in_case = 0
+   109	    current = ""
+   110	    if (match($0, /name="[^"]+"/)) {
+   111	      current = substr($0, RSTART + 6, RLENGTH - 7)
+   112	      if (current ~ required_pattern) {
+   113	        in_case = 1
+   114	      }
+   115	    }
+   116	  }
+   117	  /<failure/ {
+   118	    if (in_case) {
+   119	      printf("FAIL  required testcase failed: %s\n", current)
+   120	      fail = 1
+
+# gtk4-functional-regression-suite key lines
+     1	#!/bin/sh
+     2	
+     3	set -eu
+     4	
+     5	pass=0
+     6	fail=0
+     7	failed_steps=""
+     8	
+     9	run_step() {
+    10	  name="$1"
+    11	  shift
+    12	
+    13	  echo "=== $name ==="
+    14	  if "$@"; then
+    15	    echo "PASS: $name"
+    16	    pass=$((pass + 1))
+    17	  else
+    18	    echo "FAIL: $name"
+    19	    fail=$((fail + 1))
+    20	    failed_steps="${failed_steps}\n- ${name}"
+    21	  fi
+    22	  echo
+    23	}
+    24	
+    25	run_step_shc() {
+    26	  name="$1"
+    27	  cmd="$2"
+    28	  run_step "$name" sh -c "$cmd"
+    29	}
+    30	
+    31	run_meson_runtime_tests() {
+    32	  build_dir=""
+    33	  for dir in _build*; do
+    34	    [ -d "$dir" ] || continue
+    35	    if meson introspect --tests "$dir" >/dev/null 2>&1; then
+    36	      build_dir="$dir"
+    37	      break
+    38	    fi
+    39	  done
+    40	
+    41	  if [ -z "$build_dir" ]; then
+    42	    if [ "${MESON_RUNTIME_AUTO_SETUP:-1}" = "1" ]; then
+    43	      setup_dir="_build_runtime_ci"
+    44	      echo "No valid Meson build dir found; attempting bootstrap in: $setup_dir"
+    45	      if meson setup "$setup_dir" --wipe -Dgtk-toolkit=gtk3 >/dev/null 2>&1; then
+    46	        build_dir="$setup_dir"
+    47	      else
+    48	        if [ "${MESON_RUNTIME_REQUIRED:-0}" = "1" ]; then
+    49	          echo "FAIL: Meson bootstrap failed and MESON_RUNTIME_REQUIRED=1."
+    50	          return 1
+    51	        fi
+    52	        echo "SKIP: Meson bootstrap failed (missing deps/toolchain). Set MESON_RUNTIME_REQUIRED=1 to enforce failure."
+    53	        return 0
+    54	      fi
+    55	    else
+    56	      if [ "${MESON_RUNTIME_REQUIRED:-0}" = "1" ]; then
+    57	        echo "FAIL: no valid Meson build dir found for runtime test execution."
+    58	        return 1
+    59	      fi
+    60	      echo "SKIP: no valid Meson build dir found (MESON_RUNTIME_AUTO_SETUP=0)."
+    61	      return 0
+    62	    fi
+    63	  fi
+    64	
+    65	  echo "Using Meson build dir: $build_dir"
+    66	
+    67	  if ! meson compile -C "$build_dir" -j "${MESON_RUNTIME_JOBS:-4}"; then
+    68	    if [ "${MESON_RUNTIME_REQUIRED:-0}" = "1" ]; then
+    69	      echo "FAIL: could not compile runtime tests and MESON_RUNTIME_REQUIRED=1."
+    70	      return 1
+    71	    fi
+    72	    echo "SKIP: could not compile runtime tests in $build_dir."
+    73	    return 0
+    74	  fi
+    75	
+    76	  meson test -C "$build_dir" --print-errorlogs --no-rebuild
+    77	}
+    78	
+    79	run_tablet_matrix_strict() {
+    80	  if [ "${TABLET_MATRIX_REQUIRE_RESULTS:-0}" = "1" ]; then
+    81	    TABLET_MATRIX_REQUIRE_RESULTS=1 sh tools/ci/tablet-matrix-check.sh
+    82	  else
+    83	    echo "SKIP: strict tablet matrix disabled (requires hardware evidence)."
+    84	    return 0
+    85	  fi
+    86	}
+    87	
+    88	echo "GTK4 exhaustive validation suite"
+    89	echo
+    90	
+    91	run_step "gtk4-complete-migration-check" sh tools/ci/gtk4-complete-migration-check.sh
+    92	run_step "gtk4-readiness" sh tools/ci/gtk4-readiness.sh
+    93	
+    94	run_step "b04-file-dialog-backend-check" sh tools/ci/b04-file-dialog-backend-check.sh
+    95	run_step "b05-clipboard-compat-check" sh tools/ci/b05-clipboard-compat-check.sh
+    96	run_step "b06-path-editor-modernization" sh tools/ci/b06-path-editor-modernization.sh
+    97	run_step "b06-path-editor-junit" sh tools/ci/b06-path-editor-junit.sh
+    98	run_step "b06-gtk4-listview-gate" sh tools/ci/b06-gtk4-listview-gate.sh
+    99	
+   100	run_step "e2e-core-checklist" sh tools/ci/e2e-core-checklist.sh
+   101	run_step_shc "ui-test-metrics" "UI_METRICS_AUTO_GENERATE=1 sh tools/ci/ui-test-metrics.sh"
+   102	run_step "meson-runtime-tests" run_meson_runtime_tests
+   103	
+   104	run_step "ui-visual-baseline-check" sh tools/ci/ui-visual-baseline-check.sh
+   105	run_step "ui-visual-diff-smoke" sh tools/ci/ui-visual-diff-smoke.sh
+   106	run_step_shc "ui-visual-diff-strict" "UI_VISUAL_REQUIRE_CURRENT=1 sh tools/ci/ui-visual-diff.sh"
+   107	
+   108	run_step "color-icc-checklist" sh tools/ci/color-icc-checklist.sh
+   109	run_step "color-icc-diff-smoke" sh tools/ci/color-icc-diff-smoke.sh
+   110	run_step_shc "color-icc-diff-strict" "ICC_MANIFEST=_log/color-icc-smoke/corpus.txt ICC_EXPECTED_DIR=_log/color-icc-smoke/expected ICC_ACTUAL_DIR=_log/color-icc-smoke/actual ICC_REPORT_DIR=_log/color-icc/report ICC_REQUIRE_ACTUAL=1 sh tools/ci/color-icc-diff.sh"
+   111	
+   112	run_step "tablet-matrix-check" sh tools/ci/tablet-matrix-check.sh
+   113	run_step "tablet-matrix-check-strict" run_tablet_matrix_strict
+   114	
+   115	run_step "gtk4-rollout-doc-check" sh tools/ci/gtk4-rollout-doc-check.sh
+   116	
+   117	echo "=== SUMMARY ==="
+   118	echo "Passed steps: $pass"
+   119	echo "Failed steps: $fail"
+   120	
+   121	if [ "$fail" -ne 0 ]; then
+   122	  printf "Failed list:%b\n" "$failed_steps"
+   123	  exit 1
+   124	fi
+   125	
+   126	echo "PASS: exhaustive suite passed."

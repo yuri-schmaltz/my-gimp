@@ -1,0 +1,3 @@
+ tools/ci/gtk4-functional-regression-suite.sh | 12 ++++++++-
+ tools/ci/ui-test-metrics.sh                  | 39 +++++++++++++++++++++++++---
+ 2 files changed, 47 insertions(+), 4 deletions(-)

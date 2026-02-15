@@ -8,54 +8,48 @@ Score = (Impacto × Probabilidade) ÷ Esforço
 |---|---|---|---:|---:|---:|---|---|---:|
 | B001 | GTK4 migração completa | Alta | 10 | 10 | 7 | Médio | Alta | 14.29 |
 | B002 | Migração TreeView/Selection | Alta | 8 | 9 | 5 | Médio | Alta | 14.40 |
-| B003 | Observabilidade de testes | Média | 6 | 8 | 2 | Baixo | Média | 24.00 |
+| B003 | Observabilidade de testes | Média | 6 | 7 | 2 | Baixo | Média | 21.00 |
 | B004 | Segurança/segredos | Média | 7 | 4 | 3 | Baixo | Média | 9.33 |
 | B005 | Desktop tablet real | Média | 6 | 6 | 6 | Médio | Média | 6.00 |
+| B006 | Toolchain local para runtime tests | Média | 7 | 8 | 3 | Baixo | Alta | 18.67 |
 
 ## Achados detalhados
 
 ### B001 — Migração GTK4 completa ainda não confirmada
-- Categoria: Migração GTK4.
-- Evidência:
-  - `sh tools/ci/gtk4-complete-migration-check.sh` => FAIL (`reports/EVIDENCE/73_after_wave3_complete.log`).
-  - Contagens legadas atuais relevantes: `L01=1820`, `L03=513`, `L04=890`, `L05=665`.
-- Impacto: bloqueia fechamento formal da migração completa para GTK4.
-- Causa provável: superfície legada histórica ainda ampla em widgets/core.
-- Recomendação: manter ondas incrementais por arquivo, começando por baixa cardinalidade remanescente (`gimpenumwidgets.c`, `gimppropwidgets.c`, `gimpcolorscales.c`).
-- Validação atual: FAIL.
-- Risco + mitigação: risco de regressão de UI; mitigar com build alvo + `gtk4-readiness` + `e2e-core-checklist` + `ui-visual-diff-smoke` por onda.
+- Evidência: `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log` (`gtk4-complete-migration-check` FAIL).
+- Contagens legadas atuais relevantes: `L01=1820`, `L03=513`, `L04=890`, `L05=665`.
+- Impacto: bloqueia fechamento formal da migração completa GTK4.
+- Recomendação: continuar ondas incrementais por arquivo com foco em APIs de maior volume.
+- Validação: FAIL.
 - Rollback: `git revert <commit_da_onda>`.
 
-### B002 — Superfície legada GtkTreeView/selection ainda grande
-- Categoria: UI/arquitetura de widgets.
-- Evidência: `L05=665` e `L06=201` em `reports/EVIDENCE/73_after_wave3_complete.log`.
-- Impacto: porta para GTK4 exige transformação estrutural além de wrappers simples.
-- Causa provável: dependência histórica de `GtkTreeView`/`GtkTreeSelection`.
-- Recomendação: roadmap por domínio (listas simples -> `GtkListView`; estruturas tabulares -> `GtkColumnView`).
-- Validação atual: FAIL (gate completo).
-- Risco + mitigação: regressão funcional de seleção/edição; mitigar com testes específicos por widget.
-- Rollback: revert por commit de onda.
+### B002 — Superfície legada GtkTreeView/selection ainda alta
+- Evidência: `L05=665`, `L06=201` em `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`.
+- Impacto: requer transformação estrutural além de wrappers simples.
+- Recomendação: plano por domínio para `GtkListView`/`GtkColumnView`.
+- Validação: FAIL (gate completo).
 
-### B003 — Métricas de teste incompletas por ausência de JUnit local
-- Categoria: Observabilidade/QA.
-- Evidência: `reports/EVIDENCE/17_baseline_ui_metrics.log` (sem `testlog.junit.xml`).
-- Impacto: reduz visibilidade de tendência de testes.
-- Recomendação: inserir geração local de JUnit antes de `ui-test-metrics.sh`.
-- Validação atual: PASS técnico do script, cobertura de métrica parcial.
-- Rollback: remoção do ajuste de pipeline local.
+### B003 — JUnit local ainda não disponível por padrão
+- Evidência: `reports/EVIDENCE/82_ui_metrics_autogen_after_hardening.log`.
+- Situação atual: script melhorado tenta gerar JUnit automaticamente, mas pode cair em SKIP local.
+- Impacto: métricas quantitativas podem continuar ausentes em ambiente incompleto.
+- Recomendação: provisionar ambiente de teste completo e/ou definir `UI_METRICS_REQUIRED=1` em pipelines dedicados.
+- Validação: PASS técnico do script, cobertura parcial.
 
 ### B004 — Verificação de segredos com falso-positivo alto
-- Categoria: Segurança.
-- Evidência: scan regex com alto ruído em `reports/EVIDENCE/23_security_desktop_scan.log`.
-- Impacto: precisão baixa para achar segredo real.
+- Evidência: `reports/EVIDENCE/23_security_desktop_scan.log`.
+- Impacto: baixa precisão para detectar segredo real.
 - Recomendação: scanner dedicado com baseline/allowlist.
-- Validação atual: NÃO VERIFICADO para exposição real de segredo.
-- Rollback: desativar scanner adicional se necessário.
+- Validação: NÃO VERIFICADO para exposição real.
 
-### B005 — Matriz tablet validada apenas por checklist
-- Categoria: Desktop/entrada de dispositivo.
+### B005 — Matriz tablet validada por checklist, não hardware real
 - Evidência: `reports/EVIDENCE/20_baseline_tablet_matrix.log`.
-- Impacto: cobertura parcial de comportamento real de hardware.
-- Recomendação: job opcional com evidência de execução em hardware.
-- Validação atual: PASS de checklist, runtime real NÃO VERIFICADO.
-- Rollback: desativar job opcional de hardware.
+- Impacto: cobertura parcial de comportamento real.
+- Recomendação: job opcional com evidência real de hardware.
+- Validação: PASS checklist; runtime real NÃO VERIFICADO.
+
+### B006 — Runtime tests dependem de toolchain/deps locais completos
+- Evidência: `fatal error: gegl.h: No such file or directory` durante compilação de testes em `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`.
+- Impacto: execução runtime local pode virar SKIP e reduzir profundidade de validação.
+- Recomendação: padronizar ambiente local/CI com dependências necessárias para compilar todos os testes.
+- Validação: mitigado por fallback SKIP controlado; pendência de ambiente.

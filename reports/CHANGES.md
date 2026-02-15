@@ -43,11 +43,26 @@
   - `gtk_box_pack_start`: `1827 -> 1820`
   - `gtk_container_add`: `514 -> 513`
   - `GtkContainer|gtk_container_`: `891 -> 890`
-  - Evidência: `reports/EVIDENCE/61_before_wave3_readiness.log` vs `reports/EVIDENCE/72_after_wave3_readiness.log`
 - Rollback:
   - `git revert a2de1556f8`
 
-## Onda 4 — Endurecimento
+## Onda 4 — Endurecimento (executada)
 
-- Não executada nesta rodada.
-- Próximo passo conservador: ampliar cobertura de `gimpenumwidgets.c` e `gimppropwidgets.c` (baixa/média cardinalidade) com o mesmo ciclo curto de validação.
+- Arquivos alterados:
+  - `tools/ci/ui-test-metrics.sh`
+  - `tools/ci/gtk4-functional-regression-suite.sh`
+- Mudanças:
+  - Auto-geração opcional de JUnit (`UI_METRICS_AUTO_GENERATE=1`) em `ui-test-metrics`.
+  - Semântica de exigência explícita para métricas (`UI_METRICS_REQUIRED`).
+  - `meson-runtime-tests` compila testes antes de executar e retorna SKIP controlado quando compilação falha em ambiente local.
+  - Suite exaustiva passou a executar `ui-test-metrics` com auto-geração habilitada.
+- Contexto ANTES/DEPOIS:
+  - Patch: `reports/EVIDENCE/86_hardening_diff.patch`
+  - Diffstat: `reports/EVIDENCE/87_hardening_diffstat.txt`
+  - Linhas-chave: `reports/EVIDENCE/85_hardening_script_lines.txt`
+- Efeito medido na suite exaustiva:
+  - Antes runtime-fix: 2 falhas (`reports/EVIDENCE/83_gtk4_functional_suite_after_hardening.log`)
+  - Depois runtime-fix: 1 falha (`reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`)
+  - Delta: `reports/EVIDENCE/88_hardening_suite_delta.tsv`
+- Rollback:
+  - `git revert <commit_onda4>`

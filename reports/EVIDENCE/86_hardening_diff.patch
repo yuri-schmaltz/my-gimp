@@ -1,0 +1,82 @@
+diff --git a/tools/ci/gtk4-functional-regression-suite.sh b/tools/ci/gtk4-functional-regression-suite.sh
+index f70c4522f2..26d988ff61 100755
+--- a/tools/ci/gtk4-functional-regression-suite.sh
++++ b/tools/ci/gtk4-functional-regression-suite.sh
+@@ -63,6 +63,16 @@ run_meson_runtime_tests() {
+   fi
+ 
+   echo "Using Meson build dir: $build_dir"
++
++  if ! meson compile -C "$build_dir" -j "${MESON_RUNTIME_JOBS:-4}"; then
++    if [ "${MESON_RUNTIME_REQUIRED:-0}" = "1" ]; then
++      echo "FAIL: could not compile runtime tests and MESON_RUNTIME_REQUIRED=1."
++      return 1
++    fi
++    echo "SKIP: could not compile runtime tests in $build_dir."
++    return 0
++  fi
++
+   meson test -C "$build_dir" --print-errorlogs --no-rebuild
+ }
+ 
+@@ -88,7 +98,7 @@ run_step "b06-path-editor-junit" sh tools/ci/b06-path-editor-junit.sh
+ run_step "b06-gtk4-listview-gate" sh tools/ci/b06-gtk4-listview-gate.sh
+ 
+ run_step "e2e-core-checklist" sh tools/ci/e2e-core-checklist.sh
+-run_step "ui-test-metrics" sh tools/ci/ui-test-metrics.sh
++run_step_shc "ui-test-metrics" "UI_METRICS_AUTO_GENERATE=1 sh tools/ci/ui-test-metrics.sh"
+ run_step "meson-runtime-tests" run_meson_runtime_tests
+ 
+ run_step "ui-visual-baseline-check" sh tools/ci/ui-visual-baseline-check.sh
+diff --git a/tools/ci/ui-test-metrics.sh b/tools/ci/ui-test-metrics.sh
+index 2923222f15..446858f825 100755
+--- a/tools/ci/ui-test-metrics.sh
++++ b/tools/ci/ui-test-metrics.sh
+@@ -2,11 +2,44 @@
+ 
+ set -eu
+ 
+-junit_file="$(find . -type f -path './_build-*/meson-logs/testlog.junit.xml' | head -1 || true)"
++find_junit_file() {
++  find . -type f -path './_build-*/meson-logs/testlog.junit.xml' | head -1 || true
++}
++
++find_meson_build_dir() {
++  for dir in _build*; do
++    [ -d "$dir" ] || continue
++    if meson introspect --tests "$dir" >/dev/null 2>&1; then
++      echo "$dir"
++      return 0
++    fi
++  done
++
++  return 1
++}
++
++junit_file="$(find_junit_file)"
++
++if [ -z "$junit_file" ] && [ "${UI_METRICS_AUTO_GENERATE:-0}" = "1" ]; then
++  build_dir="$(find_meson_build_dir || true)"
++
++  if [ -n "$build_dir" ]; then
++    echo "No testlog.junit.xml found; attempting to generate via meson test in $build_dir."
++    if meson test -C "$build_dir" --print-errorlogs --no-rebuild >/dev/null 2>&1; then
++      :
++    else
++      echo "WARN: meson test failed while attempting to generate JUnit."
++    fi
++  else
++    echo "WARN: no valid Meson build dir found for JUnit generation."
++  fi
++
++  junit_file="$(find_junit_file)"
++fi
+ 
+ if [ -z "$junit_file" ]; then
+-  if [ -n "${CI:-}" ]; then
+-    echo "FAIL: testlog.junit.xml not found in CI artifacts."
++  if [ -n "${CI:-}" ] || [ "${UI_METRICS_REQUIRED:-0}" = "1" ]; then
++    echo "FAIL: testlog.junit.xml not found and metrics are required."
+     exit 1
+   fi
+ 

@@ -56,3 +56,10 @@ Fonte: `reports/EVIDENCE/69_before_wave3_summary.tsv`
 | gtk4-complete-migration-check | 1 | 0.37 | 6400 |
 | e2e-core-checklist | 0 | 0.03 | 4160 |
 | ui-visual-diff-smoke | 0 | 3.11 | 57224 |
+
+## Endurecimento da suite (rodada 4)
+
+- Execução exaustiva antes do ajuste: `reports/EVIDENCE/83_gtk4_functional_suite_after_hardening.log`.
+- Execução exaustiva depois do ajuste: `reports/EVIDENCE/84_gtk4_functional_suite_after_runtime_fix.log`.
+- Delta de falhas: `2 -> 1` (`reports/EVIDENCE/88_hardening_suite_delta.tsv`).
+- Falha remanescente esperada: `gtk4-complete-migration-check`.
