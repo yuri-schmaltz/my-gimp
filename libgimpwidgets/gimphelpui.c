@@ -26,6 +26,7 @@
 #include <gdk/gdkkeysyms.h>
 
 #include "gimpwidgets.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgets-private.h"
 
 #include "libgimp/libgimp-intl.h"
@@ -379,7 +380,7 @@ gimp_help_menu_item_query_tooltip (GtkWidget  *widget,
   gtk_label_set_use_markup (GTK_LABEL (label), use_markup);
   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
   gtk_label_set_xalign (GTK_LABEL (label), 0.0);
-  gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
   gtk_widget_show (label);
 
   g_free (text);
@@ -390,7 +391,7 @@ gimp_help_menu_item_query_tooltip (GtkWidget  *widget,
                              PANGO_ATTR_SCALE, PANGO_SCALE_SMALL,
                              -1);
   gtk_label_set_xalign (GTK_LABEL (label), 1.0);
-  gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
+  gimp_widgets_compat_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
   gtk_widget_show (label);
 
   gtk_tooltip_set_custom (tooltip, vbox);

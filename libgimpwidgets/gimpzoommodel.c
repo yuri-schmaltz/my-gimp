@@ -29,6 +29,7 @@
 #include "libgimpmath/gimpmath.h"
 
 #include "gimphelpui.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgetsmarshal.h"
 #include "gimpzoommodel.h"
 
@@ -494,7 +495,7 @@ zoom_button_new (const gchar *icon_name,
                                         icon_size : GTK_ICON_SIZE_BUTTON);
 
   button = gtk_button_new ();
-  gtk_container_add (GTK_CONTAINER (button), image);
+  gimp_widgets_compat_container_add (button, image);
   gtk_widget_show (image);
 
   return button;

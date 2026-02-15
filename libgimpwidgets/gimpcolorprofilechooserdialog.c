@@ -37,6 +37,7 @@
 #include "gimpcolorprofilechooserdialog.h"
 #include "gimpcolorprofileview.h"
 #include "gimpdialog.h"
+#include "gimpwidgets-compat.h"
 
 #include "libgimp/libgimp-intl.h"
 
@@ -127,7 +128,7 @@ gimp_color_profile_chooser_dialog_constructed (GObject *object)
                                   GTK_POLICY_AUTOMATIC);
 
   profile_view = gimp_color_profile_view_new ();
-  gtk_container_add (GTK_CONTAINER (scrolled_window), profile_view);
+  gimp_widgets_compat_container_add (scrolled_window, profile_view);
   gtk_widget_show (profile_view);
 
   dialog->profile_view = GIMP_COLOR_PROFILE_VIEW (profile_view);

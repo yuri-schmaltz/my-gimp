@@ -39,6 +39,7 @@
 #include "gimpicons.h"
 #include "gimppickbutton.h"
 #include "gimppickbutton-private.h"
+#include "gimpwidgets-compat.h"
 #include "gimpwidgetsutils.h"
 
 #include "libgimp/libgimp-intl.h"
@@ -136,7 +137,7 @@ gimp_pick_button_init (GimpPickButton *button)
 
   image = gtk_image_new_from_icon_name (GIMP_ICON_COLOR_PICK_FROM_SCREEN,
                                         GTK_ICON_SIZE_BUTTON);
-  gtk_container_add (GTK_CONTAINER (button), image);
+  gimp_widgets_compat_container_add (GTK_WIDGET (button), image);
   gtk_widget_show (image);
 
   gimp_help_set_help_data (GTK_WIDGET (button),
